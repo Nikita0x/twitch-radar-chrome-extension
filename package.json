@@ -1,0 +1,15 @@
+{
+  "name": "twitch-notifier-something",
+  "version": "1.0.0",
+  "description": "none",
+  "license": "ISC",
+  "author": "Nikita0x",
+  "type": "commonjs",
+  "main": "popup.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "chrome-types": "^0.1.434"
+  }
+}
