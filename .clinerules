@@ -1,0 +1,41 @@
+# Project Rules
+
+## Code Style & Conventions
+1. Всегда используй Vue3 + Composition API (`<script setup lang="ts">`)
+2. Вместо `.then()` всегда пиши `async/await`
+3. **Никакого `any`**. Используй `unknown` с проверками, либо создавай интерфейсы/типы
+4. Порядок тегов в SFC: `<template>` → `<script>` → `<style>`
+5. Не аннотируй return type у функций — TypeScript выводит сам
+
+## Project Context
+- **Type:** Chrome Extension (Manifest V3)
+- **Framework:** Vue 3 + TypeScript + Pinia
+- **Build:** Vite + vue-tsc
+- **Entry:** `src/main.ts` → `src/App.vue`
+
+## Commands
+- `npm run dev` — сборка в watch-режиме (для разработки)
+- `npm run check` — проверка типов TypeScript по всему проекту (vue-tsc)
+- `npm run build` — полная сборка: сначала проверка типов, потом билд
+
+## Twitch API
+- **Client ID:** `cvem7bputjzs04pdh02g96bqb4wrj9`
+- **Auth flow:** `chrome.identity.launchWebAuthFlow()` (redirect URI — chromiumapp.org)
+- **OAuth scopes:** `user:read:email`, `user:read:follows`
+- **Token storage:** `chrome.storage.local`
+- **API base:** `https://api.twitch.tv/helix`
+
+## Components
+| Component | Purpose |
+|-----------|---------|
+| `TwitchLogin.vue` | OAuth авторизация, хранение токена, профиль |
+| `TwitchApiButtons.vue` | API запросы (following list, top streams) |
+| `NotificationButton.vue` | Тестовые уведомления |
+| `VueButton.vue` | Тестовый компонент |
+
+## Architecture Notes
+- Нет Vue Router — это extension, один экран
+- Стили только `scoped`, без внешних UI библиотек
+- Pinia store используется (пример: `src/stores/counter.ts`)
+- Все компоненты в `src/components/`
+- Chrome API типы из пакета `chrome-types`

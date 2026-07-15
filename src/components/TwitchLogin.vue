@@ -1,133 +1,237 @@
 <template>
-    <div class="twitch-auth">
-        <div v-if="twitchUser">
-            <img :src="twitchUser.profile_image_url" class="avatar" />
-            <p>Привет, {{ twitchUser.display_name }}!</p>
-            <button @click="logout" class="logout-btn">Выйти</button>
-        </div>
-        <button v-else @click="loginWithTwitch" class="login-btn">
-            Войти через Twitch
-        </button>
-    </div>
+	<div class="twitch-auth">
+		<div class="state-shell">
+			<div v-if="loading" class="loading" aria-live="polite">
+				<div class="spinner"></div>
+				<span>Загрузка...</span>
+			</div>
+			<div v-else-if="error" class="error">
+				<p>{{ error }}</p>
+				<button @click="clearError" class="retry-btn">Попробовать снова</button>
+			</div>
+			<div v-else-if="twitchUser" class="user-card fade-in">
+				<img :src="twitchUser.profile_image_url" class="avatar" />
+				<div class="user-info">
+					<p class="user-name">{{ twitchUser.display_name }}</p>
+					<p class="user-id">ID: {{ twitchUser.id }}</p>
+					<p v-if="twitchUser.email" class="user-email">Email: {{ twitchUser.email }}</p>
+					<p v-if="twitchUser.description" class="user-desc">{{ twitchUser.description }}</p>
+					<p
+						v-if="twitchUser.broadcaster_type && twitchUser.broadcaster_type !== ''"
+						class="user-type"
+					>
+						Тип: {{ twitchUser.broadcaster_type }}
+					</p>
+					<p v-if="twitchUser.created_at" class="user-created">
+						На Twitch с: {{ new Date(twitchUser.created_at).toLocaleDateString() }}
+					</p>
+					<p v-if="twitchUser.view_count !== undefined" class="user-views">
+						Просмотров: {{ twitchUser.view_count.toLocaleString() }}
+					</p>
+				</div>
+				<button @click="logout" class="logout-btn">Выйти</button>
+			</div>
+			<button v-else @click="loginWithTwitch" class="login-btn" :disabled="loading">
+				Войти через Twitch
+			</button>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useTwitchStore } from '@/stores/twitch'
 
-const CLIENT_ID = 'cvem7bputjzs04pdh02g96bqb4wrj9'
-const REDIRECT_URI = `https://${chrome.runtime.id}.chromiumapp.org/`
+const twitchStore = useTwitchStore()
+const { twitchUser, loading, error, isAuthenticated } = storeToRefs(twitchStore)
 
-interface TwitchUser {
-    display_name: string
-    profile_image_url: string
+const emit = defineEmits<{
+	(e: 'token-changed'): void
+}>()
+
+const hasAuth = computed(() => isAuthenticated.value)
+
+async function loginWithTwitch() {
+	await twitchStore.loginWithTwitch()
+	if (twitchStore.isAuthenticated) {
+		emit('token-changed')
+	}
 }
 
-const twitchUser = ref<TwitchUser | null>(null)
-const accessToken = ref<string | null>(null)
-
-// 1. Функция запуска авторизации
-function loginWithTwitch() {
-    const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-        REDIRECT_URI
-    )}&response_type=token&scope=user:read:email`
-
-    chrome.identity.launchWebAuthFlow(
-        {
-            url: authUrl,
-            interactive: true
-        },
-        (redirectUrl) => {
-            if (chrome.runtime.lastError || !redirectUrl) {
-                console.error('Ошибка авторизации:', chrome.runtime.lastError)
-                return
-            }
-
-            // Извлекаем access_token из URL редиректа
-            const urlParams = new URLSearchParams(new URL(redirectUrl).hash.substring(1))
-            const token = urlParams.get('access_token')
-
-            if (token) {
-                accessToken.value = token
-                // Сохраняем токен локально
-                chrome.storage.local.set({ twitch_token: token }, () => {
-                    fetchTwitchUserData(token)
-                })
-            }
-        }
-    )
+function clearError() {
+	twitchStore.clearError()
 }
 
-// 2. Получение данных пользователя с Twitch API
-async function fetchTwitchUserData(token: string) {
-    try {
-        const response = await fetch('https://api.twitch.tv/helix/users', {
-            headers: {
-                'Client-ID': CLIENT_ID,
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        const data = await response.json()
-        if (data.data && data.data[0]) {
-            twitchUser.value = data.data[0]
-        }
-    } catch (err) {
-        console.error('Ошибка при получении данных пользователя:', err)
-    }
-}
-
-// 3. Проверка токена при запуске попапа
-onMounted(() => {
-    chrome.storage.local.get(['twitch_token'], (result) => {
-        if (result.twitch_token) {
-            accessToken.value = result.twitch_token
-            fetchTwitchUserData(result.twitch_token)
-        }
-    })
-})
-
-// 4. Выход из аккаунта
 function logout() {
-    chrome.storage.local.remove(['twitch_token'], () => {
-        twitchUser.value = null
-        accessToken.value = null
-    })
+	twitchStore.logout()
+	emit('token-changed')
 }
+
+onMounted(() => {
+	void twitchStore.init()
+})
 </script>
 
 <style scoped>
 .twitch-auth {
-    margin: 15px 0;
-    text-align: center;
+	margin: 15px 0;
+	text-align: center;
+	font-family: inherit;
+}
+
+.state-shell {
+	min-height: 150px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .login-btn {
-    background-color: #9146ff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+	background-color: #9146ff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-weight: bold;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background-color 0.2s;
 }
 
-.login-btn:hover {
-    background-color: #772ce8;
+.login-btn:hover:not(:disabled) {
+	background-color: #772ce8;
+}
+
+.login-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 .logout-btn {
-    background-color: #ff4757;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
+	background-color: #ff4757;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.logout-btn:hover {
+	background-color: #e0404e;
+}
+
+.user-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 12px;
+	background: #f8f8f8;
+	border-radius: 8px;
+	width: 100%;
+	animation: fadeIn 0.2s ease;
+}
+
+.fade-in {
+	animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.user-info {
+	text-align: left;
+	width: 100%;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.user-name {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0 0 4px 0;
+	text-align: center;
+}
+
+.user-id,
+.user-email,
+.user-desc,
+.user-type,
+.user-created,
+.user-views {
+	margin: 2px 0;
+	color: #555;
+}
+
+.user-desc {
+	font-style: italic;
+	color: #777;
 }
 
 .avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-bottom: 5px;
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+}
+
+.loading {
+	padding: 10px;
+	color: #888;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 120px;
+}
+
+.spinner {
+	width: 24px;
+	height: 24px;
+	border: 3px solid rgba(145, 70, 255, 0.2);
+	border-top-color: #9146ff;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.error {
+	padding: 10px;
+	color: #ff4757;
+	font-size: 14px;
+	background: #fff0f0;
+	border-radius: 6px;
+}
+
+.error p {
+	margin: 0 0 8px 0;
+	word-break: break-word;
+}
+
+.retry-btn {
+	background-color: #9146ff;
+	color: white;
+	border: none;
+	padding: 5px 15px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.retry-btn:hover {
+	background-color: #772ce8;
 }
 </style>
