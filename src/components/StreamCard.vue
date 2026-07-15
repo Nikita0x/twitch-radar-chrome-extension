@@ -1,31 +1,23 @@
 <template>
-	<a :href="stream.stream_url" target="_blank" rel="noopener noreferrer" class="result-item">
-		<img :src="stream.thumbnail_url" class="thumb" />
+	<a :href="props.stream.stream_url" target="_blank" rel="noopener noreferrer" class="result-item">
+		<img :src="props.stream.thumbnail_url" class="thumb" />
 		<div class="item-info">
-			<span class="item-name">{{ stream.display_name }}</span>
-			<span class="item-game">{{ stream.game_name || '—' }}</span>
+			<span class="item-name">{{ props.stream.display_name }}</span>
+			<span class="item-game">{{ props.stream.game_name || '—' }}</span>
 			<div class="meta-row">
 				<span class="status-badge online">🔴 Live</span>
-				<span class="viewer-count">👁 {{ stream.viewer_count.toLocaleString() }}</span>
-				<span class="uptime">⏱ {{ stream.uptime }}</span>
+				<span class="viewer-count">👁 {{ props.stream.viewer_count.toLocaleString() }}</span>
+				<span class="uptime">⏱ {{ props.stream.uptime }}</span>
 			</div>
 		</div>
 	</a>
 </template>
 
 <script setup lang="ts">
-interface StreamItem {
-	id: string
-	display_name: string
-	game_name?: string
-	thumbnail_url: string
-	viewer_count: number
-	uptime: string
-	stream_url: string
-}
+import type { FollowedChannel } from '@/stores/twitch'
 
-defineProps<{
-	stream: StreamItem
+const props = defineProps<{
+	stream: FollowedChannel
 }>()
 </script>
 
@@ -107,6 +99,8 @@ defineProps<{
 
 .viewer-count,
 .uptime {
+	display: flex;
+	align-items: center;
 	white-space: nowrap;
 }
 </style>

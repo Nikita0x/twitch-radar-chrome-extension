@@ -6,7 +6,7 @@
 				<span>Загрузка стримов...</span>
 			</div>
 			<div v-else-if="error" class="api-error">{{ error }}</div>
-			<div v-else-if="!hasToken" class="empty-state auth-prompt">
+			<div v-else-if="!isAuthenticated" class="empty-state auth-prompt">
 				<p>Войдите в Twitch, чтобы увидеть любимых стримеров</p>
 				<button class="login-btn" @click="openTwitchLogin">Войти через Twitch</button>
 			</div>
@@ -29,15 +29,9 @@ import { useTwitchStore } from '@/stores/twitch'
 const twitchStore = useTwitchStore()
 const { loading, error, followedStreams, isAuthenticated } = storeToRefs(twitchStore)
 
-const hasToken = computed(() => isAuthenticated.value)
-
 async function openTwitchLogin() {
 	await twitchStore.loginWithTwitch()
 }
-
-onMounted(() => {
-	void twitchStore.init()
-})
 </script>
 
 <style scoped>

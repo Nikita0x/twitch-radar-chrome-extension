@@ -7,7 +7,7 @@
 			</div>
 			<div v-else-if="error" class="error">
 				<p>{{ error }}</p>
-				<button @click="clearError" class="retry-btn">Попробовать снова</button>
+				<button @click="error = null" class="retry-btn">Попробовать снова</button>
 			</div>
 			<div v-else-if="twitchUser" class="user-card fade-in">
 				<img :src="twitchUser.profile_image_url" class="avatar" />
@@ -29,7 +29,7 @@
 						Просмотров: {{ twitchUser.view_count.toLocaleString() }}
 					</p>
 				</div>
-				<button @click="logout" class="logout-btn">Выйти</button>
+				<button @click="twitchStore.logout" class="logout-btn">Выйти</button>
 			</div>
 			<button v-else @click="loginWithTwitch" class="login-btn" :disabled="loading">
 				Войти через Twitch
@@ -46,31 +46,9 @@ import { useTwitchStore } from '@/stores/twitch'
 const twitchStore = useTwitchStore()
 const { twitchUser, loading, error, isAuthenticated } = storeToRefs(twitchStore)
 
-const emit = defineEmits<{
-	(e: 'token-changed'): void
-}>()
-
-const hasAuth = computed(() => isAuthenticated.value)
-
 async function loginWithTwitch() {
 	await twitchStore.loginWithTwitch()
-	if (twitchStore.isAuthenticated) {
-		emit('token-changed')
-	}
 }
-
-function clearError() {
-	twitchStore.clearError()
-}
-
-function logout() {
-	twitchStore.logout()
-	emit('token-changed')
-}
-
-onMounted(() => {
-	void twitchStore.init()
-})
 </script>
 
 <style scoped>

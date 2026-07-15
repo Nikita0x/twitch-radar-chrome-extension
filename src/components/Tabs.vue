@@ -4,7 +4,6 @@
 			<button
 				v-for="tab in tabs"
 				:key="tab.id"
-				:type="button"
 				:class="['tab-button', { active: activeTab === tab.id }]"
 				@click="selectTab(tab.id)"
 			>
