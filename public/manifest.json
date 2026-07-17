@@ -1,11 +1,19 @@
 {
-	"name": "Twitch Radar",
-	"description": "A fast Twitch stream notifier with desktop notifications.",
-	"version": "1.0",
-	"manifest_version": 3,
-	"action": {
-		"default_popup": "index.html",
-		"default_icon": "icon.png"
-	},
-	"permissions": ["notifications", "identity", "storage"]
+    "name": "Twitch Radar",
+    "description": "A fast Twitch stream notifier with desktop notifications.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "icon.png"
+    },
+    "permissions": [
+        "notifications",
+        "identity",
+        "storage",
+        "alarms"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
 }

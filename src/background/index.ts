@@ -1,18 +1,32 @@
-// TODO:
-// chrome.runtime.onInstalled.addListener(() => {
-// 	chrome.alarms.create('check-streams', {
-// 		periodInMinutes: 2,
-// 	})
-// })
+const ALARM_NAME = 'periodic-notification'
+const NOTIFICATION_TITLE = 'Twitch Radar'
 
-// chrome.alarms.onAlarm.addListener(async () => {
-// 	console.log('Checking Twitch')
+function showNotification() {
+    chrome.notifications.create({
+        type: 'image',
+        iconUrl: chrome.runtime.getURL('icon.png'),
+        imageUrl: "https://static-cdn.jtvnw.net/previews-ttv/live_user_kaicenat-200x100.jpg",
+        title: NOTIFICATION_TITLE,
+        message: `Проверка уведомлений · ${new Date().toLocaleTimeString('ru-RU')}`,
+        priority: 2,
+    })
+}
 
-// 	const streams = await loadFollowedStreams()
+// ← ЭТО СОЗДАЁТ ALARM. Без этого ничего не работает!
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 })
+})
 
-// 	await chrome.storage.local.set({
-// 		streams,
-// 	})
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name !== ALARM_NAME) return;
 
-// 	updateBadge()
-// })
+    const { isAuthenticated, notificationsEnabled } = await chrome.storage.local.get([
+        'isAuthenticated',
+        'notificationsEnabled',
+    ])
+
+    if (!isAuthenticated) return;
+    if (notificationsEnabled === false) return;
+
+    showNotification()
+})

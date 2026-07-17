@@ -15,4 +15,21 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        background: 'src/background/index.ts',
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.name === 'background') {
+            return 'background.js'
+          }
+
+          return 'assets/[name]-[hash].js'
+        },
+      },
+    },
+  },
 })
