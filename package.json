@@ -1,31 +1,33 @@
 {
-    "name": "chrome-extension",
-    "version": "0.0.0",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "dev": "vite build --watch",
-        "check": "vue-tsc --build",
-        "build": "npm run check && vite build"
-    },
-    "dependencies": {
-        "pinia": "^3.0.4",
-        "vue": "^3.5.38"
-    },
-    "devDependencies": {
-        "@tsconfig/node24": "^24.0.4",
-        "@types/node": "^24.13.2",
-        "@vitejs/plugin-vue": "^6.0.7",
-        "@vue/tsconfig": "^0.9.1",
-        "chrome-types": "^0.1.434",
-        "npm-run-all2": "^9.0.2",
-        "prettier": "^3.9.5",
-        "typescript": "~6.0.0",
-        "vite": "^8.0.16",
-        "vite-plugin-vue-devtools": "^8.1.2",
-        "vue-tsc": "^3.3.5"
-    },
-    "engines": {
-        "node": "^22.18.0 || >=24.12.0"
-    }
+	"name": "chrome-extension",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite build --watch --mode development",
+		"prod": "vite build --watch --mode production",
+		"check": "vue-tsc --build",
+		"build-dev": "npm run check && vite build --mode development",
+		"build-prod": "npm run check && vite build --mode production"
+	},
+	"dependencies": {
+		"pinia": "^3.0.4",
+		"vue": "^3.5.38"
+	},
+	"devDependencies": {
+		"@tsconfig/node24": "^24.0.4",
+		"@types/node": "^24.13.2",
+		"@vitejs/plugin-vue": "^6.0.7",
+		"@vue/tsconfig": "^0.9.1",
+		"chrome-types": "^0.1.434",
+		"npm-run-all2": "^9.0.2",
+		"prettier": "^3.9.5",
+		"typescript": "~6.0.0",
+		"vite": "^8.0.16",
+		"vite-plugin-vue-devtools": "^8.1.2",
+		"vue-tsc": "^3.3.5"
+	},
+	"engines": {
+		"node": "^22.18.0 || >=24.12.0"
+	}
 }

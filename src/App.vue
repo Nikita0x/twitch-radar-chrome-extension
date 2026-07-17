@@ -1,26 +1,32 @@
 <template>
 	<div class="extension-shell">
-		<h1 @click="console.log(accessToken)">Log access token.</h1>
-		<h1 @click="console.log(twitchUser)">Log Twitch User.</h1>
-		<h1 @click="console.log(followedStreams)">Log Followed Streams.</h1>
+		<!-- <p>
+			isAuthenticated?:
+			<span :style="isAuthenticated ? 'color: green;' : 'color: red;'">{{ isAuthenticated }}</span>
+		</p> -->
+		<!-- <p @click="console.log(accessToken)">Log access token.</p> -->
+		<!-- <p @click="console.log(twitchUser)">Log Twitch User.</p> -->
+		<p @click="console.log(followedStreams)">Log Followed Streams.</p>
+		<HeaderComponent />
 		<Tabs v-model="activeTab" :tabs="tabs">
 			<template #favorites>
-				<TwitchApiButtons />
+				<FavoritesTab />
 			</template>
 			<template #settings>
-				<TwitchLogin />
+				<SettingsTab />
 			</template>
 		</Tabs>
-		<NotificationButton />
-		<VueButton />
+		<!-- <NotificationButton /> -->
+		<!-- <VueButton /> -->
 	</div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import NotificationButton from './components/NotificationButton.vue'
-import TwitchLogin from './components/TwitchLogin.vue'
-import TwitchApiButtons from './components/TwitchApiButtons.vue'
+import HeaderComponent from './components/HeaderComponent.vue'
+import SettingsTab from './components/SettingsTab.vue'
+import FavoritesTab from './components/FavoritesTab.vue'
 import Tabs from './components/Tabs.vue'
 import { useTwitchStore } from '@/stores/twitch'
 import { storeToRefs } from 'pinia'
@@ -41,9 +47,10 @@ onMounted(async () => {
 
 <style scoped>
 .extension-shell {
+	/* background-color: #0e0e10; */
 	width: 500px;
 	height: 560px;
-	padding: 12px;
+	/* padding: 12px; */
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;

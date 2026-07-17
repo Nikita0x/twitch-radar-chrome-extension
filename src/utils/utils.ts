@@ -6,7 +6,7 @@ export function formatUptime(startedAt: string) {
 	const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
 
 	if (hours > 0) {
-		return `${hours}ч ${minutes}м`
+		return `${hours}h ${minutes}m`
 	}
-	return `${minutes}м`
+	return `${minutes}m`
 }

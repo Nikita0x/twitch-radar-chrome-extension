@@ -16,16 +16,7 @@ interface TwitchUser {
 	view_count: number
 }
 
-export interface FollowedChannel {
-	id: string
-	display_name: string
-	game_name?: string
-	is_live: boolean
-	thumbnail_url: string
-	viewer_count: number
-	uptime: string
-	stream_url: string
-}
+export type FollowData = Pick<FollowResponse, 'data'>['data'][number]
 
 interface FollowResponse {
 	data: {
@@ -79,9 +70,10 @@ export const useTwitchStore = defineStore('twitch', () => {
 	const twitchUser = ref<TwitchUser | null>(null)
 	const loading = ref(false)
 	const error = ref<string | null>(null)
-	const followedStreams = ref<FollowedChannel[]>([])
+	const followedStreams = ref<FollowData[]>([])
 
 	const isAuthenticated = computed(() => !!accessToken.value)
+	const totalLiveStreamers = computed(() => followedStreams.value.length)
 
 	async function getUserProfile(token: string) {
 		loading.value = true
@@ -119,6 +111,16 @@ export const useTwitchStore = defineStore('twitch', () => {
 		}
 	}
 
+	/**
+	 * Loads all followed channels that are currently live.
+	 *
+	 * Uses Twitch Helix `Get Followed Streams` endpoint:
+	 * https://dev.twitch.tv/docs/api/reference#get-followed-streams
+	 *
+	 * @param token OAuth access token.
+	 * @returns A list of followed live streams.
+	 */
+
 	async function loadFollowedStreams(token: string) {
 		loading.value = true
 		error.value = null
@@ -127,7 +129,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 			const currentUser = twitchUser.value ?? (await getUserProfile(token))
 
 			const followResponse = await fetch(
-				`https://api.twitch.tv/helix/streams/followed?user_id=${currentUser.id}&first=50`,
+				`https://api.twitch.tv/helix/streams/followed?user_id=${currentUser.id}`,
 				{
 					headers: {
 						'Client-ID': CLIENT_ID,
@@ -142,19 +144,26 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 			const response: FollowResponse = await followResponse.json()
 
-			followedStreams.value = response.data.map((stream) => ({
-				id: stream.user_id,
-				display_name: stream.user_name,
-				game_name: stream.game_name,
-				is_live: true,
-				thumbnail_url:
-					stream.thumbnail_url.replace('{width}', '80').replace('{height}', '45') ||
-					'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png',
-				viewer_count: stream.viewer_count,
-				uptime: formatUptime(stream.started_at),
-				stream_url: `https://www.twitch.tv/${stream.user_login}`,
-			}))
+			// followedStreams.value = response.data.map((stream) => ({
+			// 	id: stream.user_id,
+			// 	display_name: stream.user_name,
+			// 	game_name: stream.game_name,
+			// 	is_live: true,
+			// 	thumbnail_url:
+			// 		stream.thumbnail_url.replace('{width}', '80').replace('{height}', '45') ||
+			// 		'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png',
+			// 	viewer_count: stream.viewer_count,
+			// 	uptime: formatUptime(stream.started_at),
+			// 	stream_url: `https://www.twitch.tv/${stream.user_login}`,
+			// }))
 
+			// TODO: прорабоать
+
+			await chrome.action.setBadgeText({ text: String(totalLiveStreamers.value) })
+			await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' })
+			await chrome.action.setBadgeTextColor({ color: 'white' })
+
+			followedStreams.value = response.data
 			return followedStreams
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)

@@ -13,8 +13,12 @@
 			<div v-else-if="followedStreams.length === 0" class="empty-state">Нет активных стримов</div>
 
 			<div v-else class="results-section fade-in">
-				<h3>Онлайн стримы ({{ followedStreams.length }})</h3>
-				<StreamCard v-for="channel in followedStreams" :key="channel.id" :stream="channel" />
+				<StreamCard
+					v-for="(channel, index) in followedStreams"
+					:key="channel.id"
+					:stream="channel"
+					:style="{ '--index': index }"
+				/>
 			</div>
 		</div>
 	</div>
@@ -108,12 +112,6 @@ async function openTwitchLogin() {
 	}
 }
 
-.results-section {
-	margin-top: 12px;
-	text-align: left;
-	animation: fadeInUp 0.25s ease both;
-}
-
 @keyframes fadeInUp {
 	from {
 		opacity: 0;
@@ -125,12 +123,27 @@ async function openTwitchLogin() {
 	}
 }
 
-.results-section h3 {
-	margin: 0 0 8px 0;
-	font-size: 14px;
-	color: #333;
-	border-bottom: 1px solid #eee;
-	padding-bottom: 4px;
+.results-section {
+	display: flex;
+	flex-direction: column;
+	/* gap: 6px; */
+}
+
+.results-section :deep(.card) {
+	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	animation-delay: calc(var(--index, 0) * 70ms);
+	will-change: transform, opacity;
+}
+
+@keyframes cardWaveIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
 }
 
 .result-item {
@@ -206,10 +219,5 @@ async function openTwitchLogin() {
 
 .online {
 	color: #e91916;
-}
-
-.viewer-count,
-.uptime {
-	white-space: nowrap;
 }
 </style>
