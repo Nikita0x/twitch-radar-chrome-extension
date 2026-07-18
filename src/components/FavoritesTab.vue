@@ -8,12 +8,12 @@
 			<div v-else-if="error" class="api-error">{{ error }}</div>
 			<div v-else-if="!isAuthenticated" class="empty-state auth-prompt">
 				<!-- <LoginBackground> -->
-				<button class="login-btn" @click="openTwitchLogin">Login via Twitch</button>
+				<button class="login-btn" @click="openTwitchLogin">Login with Twitch</button>
 				<!-- </LoginBackground> -->
 			</div>
 			<div v-else-if="followedStreams.length === 0" class="empty-state">No active streams</div>
 
-			<div v-if="!loading && visibleStreams.length === 0" class="empty-search">
+			<div v-if="isAuthenticated && !loading && visibleStreams.length === 0" class="empty-search">
 				<div class="icon">🔍</div>
 				<h3>No streamer found</h3>
 				<p>Try a different search term</p>
