@@ -7,7 +7,6 @@ interface TwitchUser {
 	id: string
 	created_at: string
 	display_name: string
-	email: string
 	description: string
 	broadcaster_type: string
 	profile_image_url: string
@@ -44,6 +43,19 @@ interface FollowResponse {
 // 	twitch_token: string
 // }
 
+export interface StreamersDetails {
+	broadcaster_type: string
+	created_at: string
+	description: string
+	display_name: string
+	id: string
+	login: string
+	offline_image_url: string
+	profile_image_url: string
+	type: string
+	view_count: number
+}
+
 const CLIENT_ID = 'cvem7bputjzs04pdh02g96bqb4wrj9'
 const REDIRECT_URI = `https://${chrome.runtime.id}.chromiumapp.org/`
 
@@ -71,13 +83,13 @@ export const useTwitchStore = defineStore('twitch', () => {
 	const twitchUser = ref<TwitchUser | null>(null)
 	const loading = ref(false)
 	const error = ref<string | null>(null)
-	const followedStreams = ref<FollowData[]>([])
+	const followedLiveStreams = ref<FollowData[]>([])
+	const followedAllStreams = ref<StreamersDetails[]>([])
 
 	const isAuthenticated = computed(() => !!accessToken.value)
-	const totalLiveStreamers = computed(() => followedStreams.value.length)
+	const totalLiveStreamers = computed(() => followedLiveStreams.value.length)
 
 	async function getUserProfile(token: string) {
-		loading.value = true
 		try {
 			const response = await fetch('https://api.twitch.tv/helix/users', {
 				headers: {
@@ -93,7 +105,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 					storage.auth.isAuthenticated = false
 					await saveStorage(storage)
 					accessToken.value = null
-					followedStreams.value = []
+					followedLiveStreams.value = []
 					twitchUser.value = null
 					throw new Error('Токен доступа истёк, выполните повторную авторизацию')
 				}
@@ -103,15 +115,82 @@ export const useTwitchStore = defineStore('twitch', () => {
 			const data: { data: TwitchUser[] } = await response.json()
 			const user = data.data[0]!
 
-			twitchUser.value = user
 			return user
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
 			error.value = message
 			twitchUser.value = null
 			throw err
-		} finally {
-			loading.value = false
+		}
+	}
+
+	async function getAllFollowedChannelsIds(token: string) {
+		error.value = null
+		try {
+			const currentUser = twitchUser.value ?? (await getUserProfile(token))
+
+			const followResponse = await fetch(
+				`https://api.twitch.tv/helix/channels/followed?user_id=${currentUser.id}&first=100`,
+				{
+					headers: {
+						'Client-ID': CLIENT_ID,
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			)
+
+			if (!followResponse.ok) {
+				throw new Error(`HTTP ${followResponse.status}: ${followResponse.statusText}`)
+			}
+
+			const response: {
+				data: {
+					broadcaster_id: string
+					broadcaster_login: string
+					broadcaster_name: string
+					followed_at: string
+				}[]
+				pagination: {
+					cursor: string
+				}
+				total: number
+			} = await followResponse.json()
+
+			return response.data.map((item) => item.broadcaster_id)
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+
+			error.value = message
+
+			throw err
+		}
+	}
+
+	async function getDetailsAboutStreamers(token: string, ids: string): Promise<StreamersDetails[]> {
+		error.value = null
+		try {
+			const followResponse = await fetch(`https://api.twitch.tv/helix/users?${ids}`, {
+				headers: {
+					'Client-ID': CLIENT_ID,
+					Authorization: `Bearer ${token}`,
+				},
+			})
+
+			if (!followResponse.ok) {
+				throw new Error(`HTTP ${followResponse.status}: ${followResponse.statusText}`)
+			}
+
+			const response: {
+				data: StreamersDetails[]
+			} = await followResponse.json()
+
+			return response.data
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err)
+
+			error.value = message
+
+			throw err
 		}
 	}
 
@@ -128,7 +207,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	async function loadFollowedStreams(token: string) {
 		loading.value = true
 		error.value = null
-		followedStreams.value = []
+
 		try {
 			const currentUser = twitchUser.value ?? (await getUserProfile(token))
 
@@ -148,25 +227,13 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 			const response: FollowResponse = await followResponse.json()
 
-			// followedStreams.value = response.data.map((stream) => ({
-			// 	id: stream.user_id,
-			// 	display_name: stream.user_name,
-			// 	game_name: stream.game_name,
-			// 	is_live: true,
-			// 	thumbnail_url:
-			// 		stream.thumbnail_url.replace('{width}', '80').replace('{height}', '45') ||
-			// 		'https://static.twitchcdn.net/assets/favicon-32-e29e246c157142c94346.png',
-			// 	viewer_count: stream.viewer_count,
-			// 	uptime: formatUptime(stream.started_at),
-			// 	stream_url: `https://www.twitch.tv/${stream.user_login}`,
-			// }))
-
-			followedStreams.value = response.data
-			return followedStreams
+			followedLiveStreams.value = response.data
+			return followedLiveStreams.value
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
 			error.value = message
-			followedStreams.value = []
+			followedLiveStreams.value = []
+			throw err
 		} finally {
 			loading.value = false
 		}
@@ -181,7 +248,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 				`?client_id=${CLIENT_ID}` +
 				`&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
 				`&response_type=token` +
-				`&scope=user:read:email+user:read:follows` //TODO: if we don't need user email, remove it (Twitch says if your app doesnt use some rules, then you must remove them or might get banned)
+				`&scope=user:read:follows` //TODO: if we don't need user email, remove it (Twitch says if your app doesnt use some rules, then you must remove them or might get banned)
 
 			const redirectUrl = await launchAuthFlow(authUrl)
 			const token = extractTokenFromUrl(redirectUrl)
@@ -217,7 +284,8 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 		accessToken.value = null
 		twitchUser.value = null
-		followedStreams.value = []
+		followedLiveStreams.value = []
+		followedAllStreams.value = []
 		error.value = null
 		loading.value = false
 	}
@@ -226,16 +294,21 @@ export const useTwitchStore = defineStore('twitch', () => {
 		loading.value = true
 		try {
 			const storage = await getStorage()
-			const auth = storage.auth
 
-			if (auth?.accessToken) {
-				accessToken.value = auth.accessToken
-				await getUserProfile(auth.accessToken)
-				await loadFollowedStreams(auth.accessToken)
+			if (storage.auth.accessToken) {
+				accessToken.value = storage.auth.accessToken
+				twitchUser.value = await getUserProfile(storage.auth.accessToken)
+				followedLiveStreams.value = await loadFollowedStreams(storage.auth.accessToken)
+				const ids = await getAllFollowedChannelsIds(accessToken.value)
+				const stringifiedIds = ids.map((x) => `id=${x}`).join('&')
+				followedAllStreams.value = await getDetailsAboutStreamers(
+					storage.auth.accessToken,
+					stringifiedIds
+				)
 			} else {
 				accessToken.value = null
 				twitchUser.value = null
-				followedStreams.value = []
+				followedLiveStreams.value = []
 			}
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
@@ -245,10 +318,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 		}
 	}
 
-	// Синхронизация isAuthenticated уже происходит в loginWithTwitch/logout/getUserProfile (401)
-	// через storage.auth.isAuthenticated
-
-	watch(followedStreams, async () => {
+	watch(followedLiveStreams, async () => {
 		if (!isAuthenticated.value) {
 			await chrome.action.setBadgeText({ text: '!' })
 			await chrome.action.setBadgeBackgroundColor({ color: '#808080' })
@@ -264,12 +334,16 @@ export const useTwitchStore = defineStore('twitch', () => {
 		twitchUser,
 		loading,
 		error,
-		followedStreams,
+		followedLiveStreams,
+		followedAllStreams,
 		isAuthenticated,
 		getUserProfile,
 		loadFollowedStreams,
 		loginWithTwitch,
 		logout,
 		init,
+
+		getAllFollowedChannelsIds,
+		getDetailsAboutStreamers,
 	}
 })

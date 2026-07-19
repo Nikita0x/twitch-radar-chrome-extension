@@ -16,7 +16,18 @@
 			<div class="thumb-overlay">
 				<span class="thumb-user">{{ props.stream.user_name }}</span>
 			</div>
+			<button
+				class="thumb-notifications-button"
+				@click.prevent="
+					() => {
+						console.log('click')
+					}
+				"
+			>
+				<img :src="'notifications-on.svg'" />
+			</button>
 		</div>
+
 		<div class="card-info">
 			<div>
 				<p class="card-name">{{ props.stream.title }}</p>
@@ -95,6 +106,14 @@ const props = defineProps<{
 	box-sizing: border-box;
 
 	background-color: black;
+}
+.thumb-notifications-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 20px;
+	width: 20px;
+	background-color: red;
 }
 
 .thumb-user {

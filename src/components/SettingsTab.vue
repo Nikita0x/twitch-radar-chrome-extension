@@ -12,7 +12,7 @@
 			</label>
 		</div>
 
-		<div class="state-shell">
+		<div>
 			<div v-if="loading" class="loading" aria-live="polite">
 				<div class="spinner"></div>
 				<span>Loading...</span>
@@ -21,45 +21,46 @@
 				<p>{{ error }}</p>
 				<button @click="error = null" class="retry-btn">Try again</button>
 			</div>
-			<div v-else-if="twitchUser" class="user-card fade-in">
-				<img :src="twitchUser.profile_image_url" class="avatar" />
-				<div class="user-info">
-					<p class="user-name">{{ twitchUser.display_name }}</p>
-					<p class="user-id">ID: {{ twitchUser.id }}</p>
-					<p v-if="twitchUser.email" class="user-email">Email: {{ twitchUser.email }}</p>
-					<p v-if="twitchUser.description" class="user-desc">{{ twitchUser.description }}</p>
-					<p
-						v-if="twitchUser.broadcaster_type && twitchUser.broadcaster_type !== ''"
-						class="user-type"
-					>
-						Тип: {{ twitchUser.broadcaster_type }}
-					</p>
-					<p v-if="twitchUser.created_at" class="user-created">
-						На Twitch с: {{ new Date(twitchUser.created_at).toLocaleDateString() }}
-					</p>
-					<p v-if="twitchUser.view_count !== undefined" class="user-views">
-						Views: {{ twitchUser.view_count.toLocaleString() }}
-					</p>
-				</div>
-				<button @click="twitchStore.logout" class="logout-btn">Logout</button>
-			</div>
-			<button v-else @click="loginWithTwitch" class="login-btn" :disabled="loading">
+
+			<button
+				v-else-if="!isAuthenticated"
+				@click="loginWithTwitch"
+				class="login-btn"
+				:disabled="loading"
+			>
 				Login with Twitch
 			</button>
+		</div>
+
+		<div v-if="followedAllStreams.length" class="followed-section">
+			<h3 class="section-title">Followed Streamers</h3>
+			<input class="search-input" placeholder="Streamer name..." v-model="search" />
+			<StreamerCard v-for="streamer in filteredStreamers" :key="streamer.id" :streamer="streamer" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTwitchStore } from '@/stores/twitch'
 import { useUserSettings } from '@/stores/user-settings'
+import StreamerCard from './StreamerCard.vue'
 
 const twitchStore = useTwitchStore()
 const userSettingsStore = useUserSettings()
-const { twitchUser, loading, error } = storeToRefs(twitchStore)
+const { twitchUser, loading, error, followedAllStreams, isAuthenticated } = storeToRefs(twitchStore)
 const { userSettingsState } = storeToRefs(userSettingsStore)
+
+const search = ref('')
+
+const filteredStreamers = computed(() => {
+	if (!search.value) return followedAllStreams.value
+	const q = search.value.toLowerCase()
+	return followedAllStreams.value.filter(
+		(s) => s.display_name.toLowerCase().includes(q) || s.login.toLowerCase().includes(q)
+	)
+})
 
 async function toggleAllNotifications() {
 	await userSettingsStore.updateSettings({
@@ -75,14 +76,13 @@ async function loginWithTwitch() {
 <style scoped>
 .twitch-auth {
 	margin: 15px 0;
-	text-align: center;
+
 	font-family: inherit;
 }
 
 .setting-row {
 	padding: 8px 16px;
 	text-align: left;
-	border-bottom: 1px solid #eee;
 }
 
 .toggle-label {
@@ -128,31 +128,6 @@ async function loginWithTwitch() {
 	cursor: not-allowed;
 }
 
-.logout-btn {
-	background-color: #ff4757;
-	color: white;
-	border: none;
-	padding: 5px 10px;
-	border-radius: 4px;
-	cursor: pointer;
-}
-
-.logout-btn:hover {
-	background-color: #e0404e;
-}
-
-.user-card {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	padding: 12px;
-	background: #f8f8f8;
-	border-radius: 8px;
-	width: 100%;
-	animation: fadeIn 0.2s ease;
-}
-
 .fade-in {
 	animation: fadeIn 0.2s ease;
 }
@@ -169,39 +144,30 @@ async function loginWithTwitch() {
 	}
 }
 
-.user-info {
-	text-align: left;
+.user-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 12px;
 	width: 100%;
-	font-size: 13px;
-	line-height: 1.5;
+	animation: fadeIn 0.2s ease;
 }
 
-.user-name {
-	font-size: 16px;
-	font-weight: bold;
-	margin: 0 0 4px 0;
-	text-align: center;
+.user-bar .user-name {
+	font-size: 14px;
+	font-weight: 600;
+	color: #222;
+	margin: 0;
+	flex: 1;
+	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.user-id,
-.user-email,
-.user-desc,
-.user-type,
-.user-created,
-.user-views {
-	margin: 2px 0;
-	color: #555;
-}
-
-.user-desc {
-	font-style: italic;
-	color: #777;
-}
-
-.avatar {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
+.user-bar .logout-btn {
+	margin-left: auto;
+	flex-shrink: 0;
 }
 
 .loading {
@@ -255,5 +221,46 @@ async function loginWithTwitch() {
 
 .retry-btn:hover {
 	background-color: #772ce8;
+}
+
+.followed-section {
+	margin-top: 20px;
+	border-top: 1px solid #eee;
+	padding-top: 12px;
+}
+
+.section-title {
+	margin: 0 0 8px 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: #333;
+	text-align: left;
+	padding: 0 12px;
+}
+
+.search-input {
+	flex: 1;
+	padding: 0 5px;
+	height: 38px;
+	border: 1px solid #3d3d44;
+	border-radius: 8px;
+	font-size: 13px;
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s,
+		background 0.2s;
+	width: 100%;
+	box-sizing: border-box;
+	margin-bottom: 8px;
+}
+
+.search-input::placeholder {
+	color: #9b9b9b;
+}
+
+.search-input:focus {
+	outline: none;
+	border-color: #9146ff;
+	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
 }
 </style>

@@ -38,7 +38,7 @@ import { storeToRefs } from 'pinia'
 
 const twitchStore = useTwitchStore()
 const userSettingsStore = useUserSettings()
-const { followedStreams, isAuthenticated } = storeToRefs(twitchStore)
+const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore)
 const { userSettingsState } = storeToRefs(userSettingsStore)
 
 export type Tabs = 'favorites' | 'settings'

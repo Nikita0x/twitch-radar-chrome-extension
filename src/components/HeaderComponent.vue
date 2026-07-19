@@ -22,12 +22,26 @@
 			>
 				<img src="/cog.svg" width="20" height="20" class="cog-icon" />
 			</button>
+
+			<template v-else-if="isAuthenticated">
+				<img
+					:src="twitchUser?.profile_image_url"
+					style="width: 20px; height: 20px; border-radius: 50%"
+				/>
+				<span class="user-name">{{ twitchUser?.display_name }}</span>
+				<button @click="twitchStore.logout" class="logout-btn">Logout</button>
+			</template>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import type { Tabs } from '@/App.vue'
+import { useTwitchStore } from '@/stores/twitch'
+import { storeToRefs } from 'pinia'
+
+const twitchStore = useTwitchStore()
+const { twitchUser, isAuthenticated } = storeToRefs(twitchStore)
 const props = defineProps()
 const activeTab = defineModel<Tabs>()
 </script>
@@ -95,5 +109,27 @@ const activeTab = defineModel<Tabs>()
 
 .heart-btn:hover .heart-icon {
 	transform: scale(1.1);
+}
+
+.user-avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.logout-btn {
+	background-color: #ff4757;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+
+	transition: 0.3s ease all;
+}
+
+.logout-btn:hover {
+	background-color: #e0404e;
 }
 </style>

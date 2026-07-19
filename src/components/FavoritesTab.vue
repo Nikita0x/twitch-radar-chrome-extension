@@ -11,7 +11,7 @@
 				<button class="login-btn" @click="openTwitchLogin">Login with Twitch</button>
 				<!-- </LoginBackground> -->
 			</div>
-			<div v-else-if="followedStreams.length === 0" class="empty-state">No active streams</div>
+			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
 
 			<div v-if="isAuthenticated && !loading && visibleStreams.length === 0" class="empty-search">
 				<div class="icon">🔍</div>
@@ -46,7 +46,7 @@ const props = defineProps<Props>()
 
 const twitchStore = useTwitchStore()
 const userSettings = useUserSettings()
-const { loading, error, followedStreams, isAuthenticated } = storeToRefs(twitchStore)
+const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore)
 const { userSettingsState } = storeToRefs(userSettings)
 
 async function openTwitchLogin() {
@@ -56,7 +56,12 @@ async function openTwitchLogin() {
 const getTime = (date: string) => new Date(date).getTime()
 
 const visibleStreams = computed(() => {
-	let result = [...followedStreams.value]
+	let result = [...followedLiveStreams.value]
+
+	console.log('result: ', result)
+	console.log('result: ', result)
+	console.log('result: ', result)
+	console.log('result: ', result)
 
 	result = result.filter((stream) =>
 		stream.user_name.toLowerCase().includes(props.search.toLowerCase())
