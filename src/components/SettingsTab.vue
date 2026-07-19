@@ -3,7 +3,11 @@
 		<!-- Notifications toggle -->
 		<div class="setting-row">
 			<label class="toggle-label">
-				<input type="checkbox" v-model="notificationsEnabled" @change="saveNotificationSetting" />
+				<input
+					type="checkbox"
+					:checked="userSettingsState.enableAllNotifications"
+					@change="toggleAllNotifications"
+				/>
 				Enable notifications
 			</label>
 		</div>
@@ -50,19 +54,17 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTwitchStore } from '@/stores/twitch'
+import { useUserSettings } from '@/stores/user-settings'
 
 const twitchStore = useTwitchStore()
+const userSettingsStore = useUserSettings()
 const { twitchUser, loading, error } = storeToRefs(twitchStore)
+const { userSettingsState } = storeToRefs(userSettingsStore)
 
-const notificationsEnabled = ref(true)
-
-onMounted(async () => {
-	const { notificationsEnabled: saved } = await chrome.storage.local.get('notificationsEnabled')
-	notificationsEnabled.value = saved !== false // по умолчанию true если не задано
-})
-
-function saveNotificationSetting() {
-	chrome.storage.local.set({ notificationsEnabled: notificationsEnabled.value })
+async function toggleAllNotifications() {
+	await userSettingsStore.updateSettings({
+		enableAllNotifications: !userSettingsState.value.enableAllNotifications,
+	})
 }
 
 async function loginWithTwitch() {

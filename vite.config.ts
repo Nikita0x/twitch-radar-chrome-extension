@@ -6,30 +6,28 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
-  build: {
-    rollupOptions: {
-      input: {
-        main: 'index.html',
-        background: 'src/background/index.ts',
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === 'background') {
-            return 'background.js'
-          }
+	plugins: [vue(), vueDevTools()],
+	resolve: {
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
+		},
+	},
+	build: {
+		sourcemap: true,
+		rollupOptions: {
+			input: {
+				main: 'index.html',
+				background: 'src/background/index.ts',
+			},
+			output: {
+				entryFileNames: (chunkInfo) => {
+					if (chunkInfo.name === 'background') {
+						return 'background.js'
+					}
 
-          return 'assets/[name]-[hash].js'
-        },
-      },
-    },
-  },
+					return 'assets/[name]-[hash].js'
+				},
+			},
+		},
+	},
 })

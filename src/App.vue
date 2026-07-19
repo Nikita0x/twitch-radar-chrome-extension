@@ -8,7 +8,13 @@
 		>
 			<input class="search-input" placeholder="Streamer name..." v-model="search" />
 			<div>
-				<select class="sort-select" name="sort" id="pet-select" v-model="sort">
+				<select
+					class="sort-select"
+					name="sort"
+					id="pet-select"
+					v-model="userSettingsState.sort"
+					@change="userSettingsStore.updateSettings({ sort: userSettingsState.sort })"
+				>
 					<option value="viewers:highToLow">Viewers: High to Low</option>
 					<option value="viewers:lowToHigh">Viewers: Low to High</option>
 					<option value="duration:longest">Duration: Longest</option>
@@ -16,7 +22,7 @@
 				</select>
 			</div>
 		</div>
-		<FavoritesTab v-if="activeTab === 'favorites'" :sort :search />
+		<FavoritesTab v-if="activeTab === 'favorites'" :sort="userSettingsState.sort" :search />
 		<SettingsTab v-else />
 	</div>
 </template>
@@ -27,22 +33,21 @@ import HeaderComponent from './components/HeaderComponent.vue'
 import SettingsTab from './components/SettingsTab.vue'
 import FavoritesTab from './components/FavoritesTab.vue'
 import { useTwitchStore } from '@/stores/twitch'
+import { useUserSettings } from './stores/user-settings.ts'
 import { storeToRefs } from 'pinia'
 
 const twitchStore = useTwitchStore()
+const userSettingsStore = useUserSettings()
 const { followedStreams, isAuthenticated } = storeToRefs(twitchStore)
-
-export type Sort = Viewers | StreamDuration
-type Viewers = 'viewers:highToLow' | 'viewers:lowToHigh'
-type StreamDuration = 'duration:longest' | 'duration:shortest'
+const { userSettingsState } = storeToRefs(userSettingsStore)
 
 export type Tabs = 'favorites' | 'settings'
 
 const activeTab = ref<Tabs>('favorites')
-const sort = ref<Sort>('viewers:highToLow')
 const search = ref('')
 
 onMounted(async () => {
+	await userSettingsStore.loadSettings()
 	await twitchStore.init()
 })
 </script>

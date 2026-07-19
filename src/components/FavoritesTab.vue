@@ -36,17 +36,18 @@ import { computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import StreamCard from './StreamCard.vue'
 import { useTwitchStore } from '@/stores/twitch'
+import { useUserSettings } from '@/stores/user-settings.ts'
 import LoginBackground from './LoginBackground.vue'
-import type { Sort } from '@/App.vue'
 
 interface Props {
-	sort: Sort
 	search: string
 }
 const props = defineProps<Props>()
 
 const twitchStore = useTwitchStore()
+const userSettings = useUserSettings()
 const { loading, error, followedStreams, isAuthenticated } = storeToRefs(twitchStore)
+const { userSettingsState } = storeToRefs(userSettings)
 
 async function openTwitchLogin() {
 	await twitchStore.loginWithTwitch()
@@ -61,7 +62,7 @@ const visibleStreams = computed(() => {
 		stream.user_name.toLowerCase().includes(props.search.toLowerCase())
 	)
 
-	switch (props.sort) {
+	switch (userSettingsState.value.sort) {
 		case 'viewers:highToLow':
 			result.sort((a, b) => b.viewer_count - a.viewer_count)
 			break
