@@ -262,8 +262,12 @@ export const useTwitchStore = defineStore('twitch', () => {
 			storage.auth.isAuthenticated = true
 			await saveStorage(storage)
 
-			await getUserProfile(token)
+			twitchUser.value = await getUserProfile(token)
 			await loadFollowedStreams(token)
+
+			const ids = await getAllFollowedChannelsIds(token)
+			const stringifiedIds = ids.map((x) => `id=${x}`).join('&')
+			followedAllStreams.value = await getDetailsAboutStreamers(token, stringifiedIds)
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err)
 			if (message.includes('canceled') || message.includes('cancelled')) {

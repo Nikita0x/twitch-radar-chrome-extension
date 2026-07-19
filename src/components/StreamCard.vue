@@ -66,9 +66,7 @@ const props = defineProps<{
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
-	padding-left: 5px;
-	padding-right: 10px;
-	padding-block: 5px;
+	padding: 5px;
 	transition: all 0.2s ease;
 }
 

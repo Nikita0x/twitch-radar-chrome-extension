@@ -23,14 +23,15 @@
 				<img src="/cog.svg" width="20" height="20" class="cog-icon" />
 			</button>
 
-			<template v-else-if="isAuthenticated">
+			<div v-else-if="isAuthenticated" style="display: flex; align-items: center; gap: 10px">
+				<button @click="twitchStore.logout" class="logout-btn">Logout</button>
+
 				<img
 					:src="twitchUser?.profile_image_url"
 					style="width: 20px; height: 20px; border-radius: 50%"
 				/>
 				<span class="user-name">{{ twitchUser?.display_name }}</span>
-				<button @click="twitchStore.logout" class="logout-btn">Logout</button>
-			</template>
+			</div>
 		</div>
 	</div>
 </template>

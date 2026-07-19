@@ -55,7 +55,7 @@ function formatDate(dateStr: string) {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	padding: 12px;
+	padding: 5px;
 	border-bottom: 1px solid #f0f0f0;
 	transition: background 0.2s ease;
 }

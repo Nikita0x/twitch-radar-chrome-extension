@@ -35,7 +35,21 @@
 		<div v-if="followedAllStreams.length" class="followed-section">
 			<h3 class="section-title">Followed Streamers</h3>
 			<input class="search-input" placeholder="Streamer name..." v-model="search" />
-			<StreamerCard v-for="streamer in filteredStreamers" :key="streamer.id" :streamer="streamer" />
+
+			<div v-if="search && filteredStreamers.length === 0" class="empty-search">
+				<div class="icon">🔍</div>
+				<h3>No streamer found</h3>
+				<p>Try a different search term</p>
+			</div>
+
+			<div class="results-section">
+				<StreamerCard
+					v-for="(streamer, index) in filteredStreamers"
+					:key="streamer.id"
+					:streamer="streamer"
+					:style="{ '--index': index }"
+				/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -230,17 +244,16 @@ async function loginWithTwitch() {
 }
 
 .section-title {
-	margin: 0 0 8px 0;
 	font-size: 14px;
 	font-weight: 700;
 	color: #333;
 	text-align: left;
-	padding: 0 12px;
+	padding: 0 5px;
 }
 
 .search-input {
-	flex: 1;
 	padding: 0 5px;
+	margin-inline: 5px;
 	height: 38px;
 	border: 1px solid #3d3d44;
 	border-radius: 8px;
@@ -249,9 +262,8 @@ async function loginWithTwitch() {
 		border-color 0.2s,
 		box-shadow 0.2s,
 		background 0.2s;
-	width: 100%;
+	width: 98%;
 	box-sizing: border-box;
-	margin-bottom: 8px;
 }
 
 .search-input::placeholder {
@@ -262,5 +274,50 @@ async function loginWithTwitch() {
 	outline: none;
 	border-color: #9146ff;
 	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
+}
+
+.followed-section :deep(.streamer-card) {
+	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	animation-delay: calc(var(--index, 0) * 70ms);
+	will-change: transform, opacity;
+}
+
+@keyframes cardWaveIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.empty-search {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 180px;
+	text-align: center;
+	color: #9ca3af;
+}
+
+.empty-search .icon {
+	font-size: 40px;
+	margin-bottom: 12px;
+	opacity: 0.8;
+}
+
+.empty-search h3 {
+	margin: 0;
+	font-size: 18px;
+}
+
+.empty-search p {
+	margin-top: 6px;
+	font-size: 13px;
+	color: #888;
 }
 </style>
