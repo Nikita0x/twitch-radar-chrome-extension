@@ -1,6 +1,6 @@
 {
-	"name": "Twitch Radar",
-	"description": "A fast Twitch stream notifier with desktop notifications.",
+	"name": "Twitch Radar – Live Stream Notifications",
+	"description": "Get desktop notifications when your favorite Twitch streamers go live.",
 	"version": "1.0",
 	"manifest_version": 3,
 	"icons": {
