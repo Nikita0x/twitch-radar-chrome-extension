@@ -3,22 +3,18 @@ import { fetchFollowedStreams } from '@/services/twitch-api';
 
 const ALARM_NAME = 'periodic-notification';
 
-async function sendNotification(stream: {
-	user_id: string;
-	user_name: string;
-	title: string;
-	thumbnail_url: string;
-}) {
-	const thumbnail = stream.thumbnail_url.replace('{width}', '200').replace('{height}', '100');
-
-	await chrome.notifications.create(stream.user_id, {
-		type: 'image',
-		iconUrl: chrome.runtime.getURL('icon.png'),
-		imageUrl: thumbnail,
-		title: stream.user_name,
-		message: stream.title,
-		priority: 2,
-	});
+async function sendNotification(stream: { user_id: string; user_name: string; title: string }) {
+	try {
+		await chrome.notifications.create(stream.user_id, {
+			type: 'basic',
+			iconUrl: chrome.runtime.getURL('icon.png'),
+			title: `${stream.user_name} is LIVE 🔴`,
+			message: stream.title,
+			priority: 2,
+		});
+	} catch (err) {
+		console.error('Failed to send notification for', stream.user_name, err);
+	}
 }
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -45,6 +41,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 	}
 
 	const notified = { ...storage.notifiedStreams };
+	const notificationPromises: Promise<void>[] = [];
 	let changed = false;
 
 	for (const stream of liveStreams) {
@@ -56,11 +53,13 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 		const prevNotified = notified[stream.user_id];
 
 		if (prevNotified !== stream.title) {
-			await sendNotification(stream);
+			notificationPromises.push(sendNotification(stream));
 			notified[stream.user_id] = stream.title;
 			changed = true;
 		}
 	}
+
+	await Promise.all(notificationPromises);
 
 	const liveIds = new Set(liveStreams.map((s) => s.user_id));
 	for (const id of Object.keys(notified)) {
