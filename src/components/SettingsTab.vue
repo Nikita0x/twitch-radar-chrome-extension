@@ -32,22 +32,31 @@
 			</div>
 
 			<div class="results-section">
-				<StreamerCard
-					v-for="(streamer, index) in filteredStreamers"
-					:key="streamer.id"
-					:streamer="streamer"
-					:isLive="liveStreamerIds.has(streamer.id)"
-					:notificationsEnabled="!!streamerNotifications[streamer.id]"
-					@toggleNotifications="handleToggleNotifications"
-					:style="{ '--delay': getDelay(index, filteredStreamers.length) }"
-				/>
+				<TransitionGroup
+					name="filter"
+					tag="div"
+					class="results-inner"
+					:class="{ 'stagger-init': initialLoad }"
+				>
+					<StreamerCard
+						v-for="(streamer, index) in filteredStreamers"
+						:key="streamer.id"
+						:streamer="streamer"
+						:isLive="liveStreamerIds.has(streamer.id)"
+						:notificationsEnabled="!!streamerNotifications[streamer.id]"
+						@toggleNotifications="handleToggleNotifications"
+						:style="
+							initialLoad ? { '--delay': getDelay(index, filteredStreamers.length) } : undefined
+						"
+					/>
+				</TransitionGroup>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTwitchStore } from '@/stores/twitch';
 import { useUserSettings } from '@/stores/user-settings';
@@ -62,12 +71,18 @@ const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isA
 const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
 
 const search = ref('');
+const initialLoad = ref(true);
+
+onMounted(() => {
+	setTimeout(() => {
+		initialLoad.value = false;
+	}, 1500);
+});
 
 function getDelay(index: number, total: number): string {
 	const perItemDelay = 70;
 	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
 	const progress = total > 1 ? index / (total - 1) : 0;
-	// ease-in cubic: early items have generous delays, later items accelerate
 	const delay = maxStagger * Math.pow(progress, 3);
 	return `${delay}ms`;
 }
@@ -215,7 +230,13 @@ async function handleToggleNotifications(streamerId: string) {
 	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
 }
 
-.followed-section :deep(.streamer-card) {
+.results-inner {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ── Initial load stagger ── */
+.stagger-init :deep(.streamer-card) {
 	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 	animation-delay: var(--delay);
 	will-change: transform, opacity;
@@ -231,6 +252,30 @@ async function handleToggleNotifications(streamerId: string) {
 		opacity: 1;
 		transform: translateY(0) scale(1);
 	}
+}
+
+/* ── Filter animation (TransitionGroup) ── */
+.filter-enter-active {
+	transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filter-leave-active {
+	transition: all 100ms cubic-bezier(0.22, 1, 0.36, 1);
+	position: absolute;
+}
+
+.filter-move {
+	transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filter-enter-from {
+	opacity: 0;
+	transform: scale(0.97);
+}
+
+.filter-leave-to {
+	opacity: 0;
+	transform: scale(0.97);
 }
 
 .empty-search {

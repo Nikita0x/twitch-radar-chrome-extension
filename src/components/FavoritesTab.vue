@@ -13,19 +13,26 @@
 			</div>
 
 			<div v-else class="results-section fade-in">
-				<StreamCard
-					v-for="(channel, index) in visibleStreams"
-					:key="channel.id"
-					:stream="channel"
-					:style="{ '--delay': getDelay(index, visibleStreams.length) }"
-				/>
+				<TransitionGroup
+					name="filter"
+					tag="div"
+					class="results-inner"
+					:class="{ 'stagger-init': initialLoad }"
+				>
+					<StreamCard
+						v-for="(channel, index) in visibleStreams"
+						:key="channel.id"
+						:stream="channel"
+						:style="initialLoad ? { '--delay': getDelay(index, visibleStreams.length) } : undefined"
+					/>
+				</TransitionGroup>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
 import AppLoader from './AppLoader.vue';
@@ -43,6 +50,15 @@ const userSettings = useUserSettings();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettings);
 
+const initialLoad = ref(true);
+
+onMounted(() => {
+	// отключаем staggered-анимацию после первого рендера
+	setTimeout(() => {
+		initialLoad.value = false;
+	}, 1500);
+});
+
 async function openTwitchLogin() {
 	await twitchStore.loginWithTwitch();
 }
@@ -51,7 +67,6 @@ function getDelay(index: number, total: number): string {
 	const perItemDelay = 70;
 	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
 	const progress = total > 1 ? index / (total - 1) : 0;
-	// ease-in cubic: early items have generous delays, later items accelerate
 	const delay = maxStagger * Math.pow(progress, 3);
 	return `${delay}ms`;
 }
@@ -138,7 +153,13 @@ const visibleStreams = computed(() => {
 	flex-direction: column;
 }
 
-.results-section :deep(.card) {
+.results-inner {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ── Initial load stagger ── */
+.stagger-init :deep(.card) {
 	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 	animation-delay: var(--delay);
 	will-change: transform, opacity;
@@ -154,6 +175,30 @@ const visibleStreams = computed(() => {
 		opacity: 1;
 		transform: translateY(0) scale(1);
 	}
+}
+
+/* ── Filter animation (TransitionGroup) ── */
+.filter-enter-active {
+	transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filter-leave-active {
+	transition: all 100ms cubic-bezier(0.22, 1, 0.36, 1);
+	position: absolute;
+}
+
+.filter-move {
+	transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filter-enter-from {
+	opacity: 0;
+	transform: scale(0.97);
+}
+
+.filter-leave-to {
+	opacity: 0;
+	transform: scale(0.97);
 }
 
 .empty-search {
