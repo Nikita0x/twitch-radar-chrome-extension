@@ -6,6 +6,9 @@
 3. **Никакого `any`**. Используй `unknown` с проверками, либо создавай интерфейсы/типы
 4. Порядок тегов в SFC: `<template>` → `<script>` → `<style>`
 5. Не аннотируй return type у функций — TypeScript выводит сам
+6. Константы не дублировать — импортировать из единого источника
+7. Не писать код для миграций/обратной совместимости — пользователь может сделать logout/login для сброса данных
+8. Не соглашайся слепо. Анализируй варианты, аргументируй, если есть вариант лучше — предлагай с обоснованием
 
 ## Project Context
 - **Type:** Chrome Extension (Manifest V3)
@@ -21,7 +24,7 @@
 ## Twitch API
 - **Client ID:** `cvem7bputjzs04pdh02g96bqb4wrj9`
 - **Auth flow:** `chrome.identity.launchWebAuthFlow()` (redirect URI — chromiumapp.org)
-- **OAuth scopes:** `user:read:email`, `user:read:follows`
+- **OAuth scopes:** `user:read:follows`
 - **Token storage:** `chrome.storage.local`
 - **API base:** `https://api.twitch.tv/helix`
 
@@ -36,6 +39,6 @@
 ## Architecture Notes
 - Нет Vue Router — это extension, один экран
 - Стили только `scoped`, без внешних UI библиотек
-- Pinia store используется (пример: `src/stores/counter.ts`)
+- Pinia - для глобального стейта и удобства пользования для всех компонентов
 - Все компоненты в `src/components/`
 - Chrome API типы из пакета `chrome-types`

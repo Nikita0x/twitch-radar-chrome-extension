@@ -1,6 +1,8 @@
 interface StorageSchema {
 	auth: AuthState
 	userSettings: UserSettings
+	streamerNotifications: Record<string, boolean>
+	notifiedStreams: Record<string, string>
 }
 
 type Viewers = 'viewers:highToLow' | 'viewers:lowToHigh'
@@ -10,6 +12,7 @@ type Sort = Viewers | StreamDuration
 interface AuthState {
 	isAuthenticated: boolean
 	accessToken: string
+	userId: string
 }
 
 export interface UserSettings {
@@ -25,6 +28,7 @@ export const DEFAULT_STORAGE: StorageSchema = {
 	auth: {
 		accessToken: '',
 		isAuthenticated: false,
+		userId: '',
 	},
 	userSettings: {
 		autoOpen: false,
@@ -32,6 +36,8 @@ export const DEFAULT_STORAGE: StorageSchema = {
 		sort: 'viewers:highToLow',
 		theme: 'light',
 	},
+	streamerNotifications: {},
+	notifiedStreams: {},
 }
 
 export async function getStorage(): Promise<StorageSchema> {

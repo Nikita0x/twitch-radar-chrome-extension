@@ -47,6 +47,9 @@
 					v-for="(streamer, index) in filteredStreamers"
 					:key="streamer.id"
 					:streamer="streamer"
+					:isLive="liveStreamerIds.has(streamer.id)"
+					:notificationsEnabled="!!streamerNotifications[streamer.id]"
+					@toggleNotifications="handleToggleNotifications"
 					:style="{ '--index': index }"
 				/>
 			</div>
@@ -63,27 +66,51 @@ import StreamerCard from './StreamerCard.vue'
 
 const twitchStore = useTwitchStore()
 const userSettingsStore = useUserSettings()
-const { twitchUser, loading, error, followedAllStreams, isAuthenticated } = storeToRefs(twitchStore)
-const { userSettingsState } = storeToRefs(userSettingsStore)
+const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
+	storeToRefs(twitchStore)
+const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore)
 
 const search = ref('')
 
+/** Set of live streamer IDs for O(1) lookup */
+const liveStreamerIds = computed(() => new Set(followedLiveStreams.value.map((s) => s.user_id)))
+
 const filteredStreamers = computed(() => {
-	if (!search.value) return followedAllStreams.value
-	const q = search.value.toLowerCase()
-	return followedAllStreams.value.filter(
-		(s) => s.display_name.toLowerCase().includes(q) || s.login.toLowerCase().includes(q)
-	)
+	// Берём ВСЕХ фолловеров (и онлайн, и оффлайн)
+	let list = followedAllStreams.value
+
+	// Если пользователь что-то ввёл в поиск — фильтруем по имени
+	if (search.value) {
+		const q = search.value.toLowerCase()
+		list = list.filter(
+			(s) => s.display_name.toLowerCase().includes(q) || s.login.toLowerCase().includes(q)
+		)
+	}
+
+	// Сортируем: сначала те, кто в онлайне, потом оффлайн
+	return [...list].sort((a, b) => {
+		// Если стример в liveStreamerIds — он онлайн → 0, иначе → 1
+		const aLive = liveStreamerIds.value.has(a.id) ? 0 : 1
+		const bLive = liveStreamerIds.value.has(b.id) ? 0 : 1
+		// 0 - 0 = 0 (оба онлайн/оффлайн — не меняем порядок)
+		// 0 - 1 = -1 (a онлайн, b оффлайн → a выше)
+		// 1 - 0 = 1 (a оффлайн, b онлайн → b выше)
+		return aLive - bLive
+	})
 })
 
 async function toggleAllNotifications() {
-	await userSettingsStore.updateSettings({
-		enableAllNotifications: !userSettingsState.value.enableAllNotifications,
-	})
+	const enabled = !userSettingsState.value.enableAllNotifications
+	const allStreamerIds = followedAllStreams.value.map((s) => s.id)
+	await userSettingsStore.setAllStreamerNotifications(enabled, allStreamerIds)
 }
 
 async function loginWithTwitch() {
 	await twitchStore.loginWithTwitch()
+}
+
+async function handleToggleNotifications(streamerId: string) {
+	await userSettingsStore.toggleStreamerNotification(streamerId)
 }
 </script>
 

@@ -1,13 +1,16 @@
 <template>
 	<div class="streamer-card">
 		<div class="card-header">
-			<img
-				:src="props.streamer.profile_image_url"
-				:alt="props.streamer.display_name"
-				class="avatar"
-				width="60"
-				height="60"
-			/>
+			<div class="avatar-wrap">
+				<img
+					:src="props.streamer.profile_image_url"
+					:alt="props.streamer.display_name"
+					class="avatar"
+					width="60"
+					height="60"
+				/>
+				<span v-if="props.isLive" class="live-badge">LIVE</span>
+			</div>
 			<div class="header-info">
 				<h3 class="display-name">{{ props.streamer.display_name }}</h3>
 				<span class="login">@{{ props.streamer.login }}</span>
@@ -20,6 +23,18 @@
 					>
 				</div>
 			</div>
+			<button
+				class="notif-toggle"
+				:class="{ active: notificationsEnabled }"
+				@click="emit('toggleNotifications', props.streamer.id)"
+				:title="notificationsEnabled ? 'Disable notifications' : 'Enable notifications'"
+			>
+				<img
+					:src="notificationsEnabled ? 'notifications-on.svg' : 'notifications-off.svg'"
+					width="16"
+					height="16"
+				/>
+			</button>
 		</div>
 		<p v-if="props.streamer.description" class="description">{{ props.streamer.description }}</p>
 		<p v-else class="description empty">No description</p>
@@ -42,6 +57,12 @@ import type { StreamersDetails } from '@/stores/twitch.ts'
 
 const props = defineProps<{
 	streamer: StreamersDetails
+	isLive: boolean
+	notificationsEnabled: boolean
+}>()
+
+const emit = defineEmits<{
+	toggleNotifications: [streamerId: string]
 }>()
 
 function formatDate(dateStr: string) {
@@ -70,13 +91,35 @@ function formatDate(dateStr: string) {
 	align-items: center;
 }
 
+.avatar-wrap {
+	position: relative;
+	flex-shrink: 0;
+}
+
 .avatar {
 	width: 60px;
 	height: 60px;
 	border-radius: 50%;
 	object-fit: cover;
-	flex-shrink: 0;
+	display: block;
 	background: #eee;
+}
+
+.live-badge {
+	position: absolute;
+	bottom: -2px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #eb0400;
+	color: white;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1;
+	padding: 2px 6px;
+	border-radius: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	white-space: nowrap;
 }
 
 .header-info {
@@ -171,5 +214,30 @@ function formatDate(dateStr: string) {
 .profile-link:hover {
 	color: #772ce8;
 	text-decoration: underline;
+}
+
+.notif-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin-left: auto;
+	flex-shrink: 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	background: white;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.notif-toggle:hover {
+	background: #f3f0ff;
+	border-color: #9146ff;
+}
+
+.notif-toggle.active {
+	background: #f3f0ff;
+	border-color: #9146ff;
 }
 </style>
