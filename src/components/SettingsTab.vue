@@ -22,7 +22,7 @@
 		</div>
 
 		<div v-if="followedAllStreams.length" class="followed-section">
-			<h3 class="section-title">Followed Streamers</h3>
+			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
 			<input class="search-input" placeholder="Streamer name..." v-model="search" />
 
 			<div v-if="search && filteredStreamers.length === 0" class="empty-search">
