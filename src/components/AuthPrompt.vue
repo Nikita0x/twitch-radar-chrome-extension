@@ -15,7 +15,7 @@
 					<path d="M12 17v4" />
 				</svg>
 			</div>
-			<h2 class="auth-title">Login Required</h2>
+			<h2 class="auth-title">Never Miss a Live Stream</h2>
 			<p class="auth-text">
 				This extension needs you to sign in with Twitch to show your followed streams and send live
 				notifications.
