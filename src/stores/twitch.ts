@@ -70,12 +70,12 @@ function extractTokenFromUrl(url: string) {
  * This keeps the WebAuthFlow alive even if the popup closes during auth.
  */
 async function performOAuth(authUrl: string): Promise<string> {
-	console.log('[popup] Отправляю запрос OAuth в background...');
+	// console.log('[popup] Отправляю запрос OAuth в background...');
 	const response = await chrome.runtime.sendMessage({ type: 'OAUTH_LOGIN', url: authUrl });
-	console.log('[popup] Получен ответ от background:', response);
+	// console.log('[popup] Получен ответ от background:', response);
 
 	if (!response.ok) {
-		throw new Error(response.error || 'Ошибка авторизации');
+		throw new Error(response.error || 'Authorization error');
 	}
 
 	return response.redirectUrl;
@@ -272,9 +272,9 @@ export const useTwitchStore = defineStore('twitch', () => {
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
 			if (message.includes('canceled') || message.includes('cancelled')) {
-				console.log('Авторизация отменена пользователем');
+				console.log('Authorization declined by user.');
 			} else {
-				error.value = `Ошибка авторизации: ${message}`;
+				error.value = `Authorization error: ${message}`;
 			}
 		} finally {
 			loading.value = false;
