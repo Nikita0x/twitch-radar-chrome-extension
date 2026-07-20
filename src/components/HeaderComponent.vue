@@ -15,7 +15,7 @@
 			<!-- <button class="icon-btn heart-btn" title="Favorites"><img src="/heart.svg" width="20" height="20"
                     class="heart-icon" /></button> -->
 			<button
-				v-if="activeTab === 'favorites'"
+				v-if="isAuthenticated && activeTab === 'favorites'"
 				class="icon-btn cog-btn"
 				title="Settings"
 				@click="activeTab = 'settings'"
@@ -24,7 +24,7 @@
 			</button>
 
 			<div v-else-if="isAuthenticated" style="display: flex; align-items: center; gap: 10px">
-				<button @click="twitchStore.logout" class="logout-btn">Logout</button>
+				<button @click="logout" class="logout-btn">Logout</button>
 
 				<img
 					:src="twitchUser?.profile_image_url"
@@ -37,14 +37,21 @@
 </template>
 
 <script setup lang="ts">
-import type { Tabs } from '@/App.vue'
-import { useTwitchStore } from '@/stores/twitch'
-import { storeToRefs } from 'pinia'
+import type { Tabs } from '@/App.vue';
+import { useTwitchStore } from '@/stores/twitch';
+import { storeToRefs } from 'pinia';
 
-const twitchStore = useTwitchStore()
-const { twitchUser, isAuthenticated } = storeToRefs(twitchStore)
-const props = defineProps()
-const activeTab = defineModel<Tabs>()
+const twitchStore = useTwitchStore();
+const { twitchUser, isAuthenticated } = storeToRefs(twitchStore);
+const props = defineProps();
+const activeTab = defineModel<Tabs>({
+	required: true,
+});
+
+async function logout() {
+	await twitchStore.logout();
+	activeTab.value = 'favorites';
+}
 </script>
 
 <style scoped>

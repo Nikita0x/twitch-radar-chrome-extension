@@ -2,10 +2,8 @@
 	<div class="api-buttons">
 		<div class="state-shell">
 			<AppLoader v-if="loading">Loading streams...</AppLoader>
+			<AuthPrompt v-else-if="!isAuthenticated" @login="openTwitchLogin" />
 			<div v-else-if="error" class="api-error">{{ error }}</div>
-			<div v-else-if="!isAuthenticated" class="empty-state auth-prompt">
-				<button class="login-btn" @click="openTwitchLogin">Login with Twitch</button>
-			</div>
 			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
 
 			<div v-if="isAuthenticated && !loading && visibleStreams.length === 0" class="empty-search">
@@ -31,6 +29,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
 import AppLoader from './AppLoader.vue';
+import AuthPrompt from './AuthPrompt.vue';
 import { useTwitchStore } from '@/stores/twitch';
 import { useUserSettings } from '@/stores/user-settings.ts';
 
@@ -111,26 +110,6 @@ const visibleStreams = computed(() => {
 	justify-content: center;
 	flex-direction: column;
 	gap: 8px;
-}
-
-.login-btn {
-	background-color: #9146ff;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	font-weight: bold;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: background-color 0.2s ease;
-}
-
-.login-btn:hover:not(:disabled) {
-	background-color: #772ce8;
-}
-
-.login-btn:disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
 }
 
 @keyframes fadeInUp {

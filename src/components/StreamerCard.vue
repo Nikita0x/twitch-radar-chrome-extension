@@ -55,7 +55,7 @@
 				rel="noopener noreferrer"
 				class="profile-link"
 			>
-				Open channel →
+				Open channel
 			</a>
 		</div>
 	</div>

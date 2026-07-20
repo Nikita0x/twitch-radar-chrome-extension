@@ -14,19 +14,11 @@
 
 		<div>
 			<AppLoader v-if="localLoading">Loading...</AppLoader>
+			<AuthPrompt v-else-if="!isAuthenticated" @login="loginWithTwitch" />
 			<div v-else-if="error" class="error">
 				<p>{{ error }}</p>
 				<button @click="error = null" class="retry-btn">Try again</button>
 			</div>
-
-			<button
-				v-else-if="!isAuthenticated"
-				@click="loginWithTwitch"
-				class="login-btn"
-				:disabled="loading"
-			>
-				Login with Twitch
-			</button>
 		</div>
 
 		<div v-if="followedAllStreams.length" class="followed-section">
@@ -60,6 +52,7 @@ import { storeToRefs } from 'pinia';
 import { useTwitchStore } from '@/stores/twitch';
 import { useUserSettings } from '@/stores/user-settings';
 import AppLoader from './AppLoader.vue';
+import AuthPrompt from './AuthPrompt.vue';
 import StreamerCard from './StreamerCard.vue';
 
 const twitchStore = useTwitchStore();
@@ -145,77 +138,6 @@ async function handleToggleNotifications(streamerId: string) {
 	height: 16px;
 	cursor: pointer;
 	accent-color: #9146ff;
-}
-
-.state-shell {
-	min-height: 150px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.login-btn {
-	display: block;
-	background-color: #9146ff;
-	color: white;
-	border: none;
-	padding: 10px 20px;
-	font-weight: bold;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-	margin-inline: auto;
-}
-
-.login-btn:hover:not(:disabled) {
-	background-color: #772ce8;
-}
-
-.login-btn:disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
-}
-
-.fade-in {
-	animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(4px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-.user-bar {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 8px 12px;
-	width: 100%;
-	animation: fadeIn 0.2s ease;
-}
-
-.user-bar .user-name {
-	font-size: 14px;
-	font-weight: 600;
-	color: #222;
-	margin: 0;
-	flex: 1;
-	text-align: left;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.user-bar .logout-btn {
-	margin-left: auto;
-	flex-shrink: 0;
 }
 
 .error {
