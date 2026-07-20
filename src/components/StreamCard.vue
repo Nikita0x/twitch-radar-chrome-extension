@@ -7,12 +7,17 @@
 		:title="props.stream.title"
 	>
 		<div class="thumb-wrap">
+			<div v-if="!imageLoaded" class="thumb-skeleton"></div>
+
 			<img
 				:src="props.stream.thumbnail_url.replace('{width}', '200').replace('{height}', '100')"
 				class="thumb"
+				:class="{ loaded: imageLoaded }"
 				width="200"
 				height="100"
+				@load="imageLoaded = true"
 			/>
+
 			<div class="thumb-overlay">
 				<span class="thumb-user">{{ props.stream.user_name }}</span>
 			</div>
@@ -39,12 +44,15 @@
 </template>
 
 <script setup lang="ts">
-import type { FollowData } from '@/stores/twitch'
-import { formatUptime } from '@/utils/utils'
+import { ref } from 'vue';
+import type { FollowData } from '@/stores/twitch';
+import { formatUptime } from '@/utils/utils';
 
 const props = defineProps<{
-	stream: FollowData
-}>()
+	stream: FollowData;
+}>();
+
+const imageLoaded = ref(false);
 </script>
 
 <style scoped>
@@ -83,7 +91,21 @@ const props = defineProps<{
 	width: 200px;
 	height: 100px;
 	object-fit: cover;
-	background: #eee;
+
+	opacity: 0;
+	transform: scale(1.03);
+	filter: blur(8px);
+
+	transition:
+		opacity 0.3s ease,
+		transform 0.3s ease,
+		filter 0.3s ease;
+}
+
+.thumb.loaded {
+	opacity: 1;
+	transform: scale(1);
+	filter: blur(0);
 }
 
 .thumb-overlay {
@@ -162,5 +184,26 @@ const props = defineProps<{
 	align-items: center;
 	/* gap: 5px; */
 	color: black;
+}
+
+.thumb-skeleton {
+	position: absolute;
+	inset: 0;
+
+	background: linear-gradient(90deg, #2d2d2d 25%, #3c3c3c 50%, #2d2d2d 75%);
+
+	background-size: 200% 100%;
+
+	animation: skeleton-loading 1.2s infinite;
+}
+
+@keyframes skeleton-loading {
+	from {
+		background-position: 200% 0;
+	}
+
+	to {
+		background-position: -200% 0;
+	}
 }
 </style>
