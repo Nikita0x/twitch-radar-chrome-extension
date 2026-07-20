@@ -54,16 +54,6 @@ export interface StreamersDetails {
 }
 
 export const CLIENT_ID = 'cvem7bputjzs04pdh02g96bqb4wrj9';
-const REDIRECT_URI = `https://${chrome.runtime.id}.chromiumapp.org/`;
-
-async function launchAuthFlow(url: string) {
-	const redirectUrl = await chrome.identity.launchWebAuthFlow({ url, interactive: true });
-
-	if (!redirectUrl) {
-		throw new Error('Авторизация была отменена или не завершилась');
-	}
-	return redirectUrl;
-}
 
 function extractTokenFromUrl(url: string) {
 	try {
@@ -73,6 +63,22 @@ function extractTokenFromUrl(url: string) {
 	} catch {
 		return null;
 	}
+}
+
+/**
+ * Sends a message to background service worker to perform OAuth via launchWebAuthFlow.
+ * This keeps the WebAuthFlow alive even if the popup closes during auth.
+ */
+async function performOAuth(authUrl: string): Promise<string> {
+	console.log('[popup] Отправляю запрос OAuth в background...');
+	const response = await chrome.runtime.sendMessage({ type: 'OAUTH_LOGIN', url: authUrl });
+	console.log('[popup] Получен ответ от background:', response);
+
+	if (!response.ok) {
+		throw new Error(response.error || 'Ошибка авторизации');
+	}
+
+	return response.redirectUrl;
 }
 
 export const useTwitchStore = defineStore('twitch', () => {
@@ -182,7 +188,6 @@ export const useTwitchStore = defineStore('twitch', () => {
 		try {
 			const allDetails: StreamersDetails[] = [];
 
-			// Twitch API accepts max 100 IDs per request — batch them
 			for (let i = 0; i < ids.length; i += 100) {
 				const batch = ids.slice(i, i + 100);
 				const query = batch.map((id) => `id=${id}`).join('&');
@@ -236,22 +241,22 @@ export const useTwitchStore = defineStore('twitch', () => {
 		loading.value = true;
 		error.value = null;
 		try {
+			const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org/`;
 			const authUrl =
 				`https://id.twitch.tv/oauth2/authorize` +
 				`?client_id=${CLIENT_ID}` +
-				`&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+				`&redirect_uri=${encodeURIComponent(redirectUri)}` +
 				`&response_type=token` +
 				`&scope=user:read:follows`;
 
-			const redirectUrl = await launchAuthFlow(authUrl);
-			const token = extractTokenFromUrl(redirectUrl);
+			const oauthRedirectUrl = await performOAuth(authUrl);
+			const token = extractTokenFromUrl(oauthRedirectUrl);
 			if (!token) {
 				throw new Error('Токен доступа не найден в URL редиректа');
 			}
 
 			accessToken.value = token;
 
-			// Fetch user profile first to get userId
 			twitchUser.value = await getUserProfile(token);
 
 			const storage = await getStorage();

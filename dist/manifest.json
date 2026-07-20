@@ -18,6 +18,7 @@
 		}
 	},
 	"permissions": ["notifications", "identity", "storage", "alarms"],
+	"host_permissions": ["https://api.twitch.tv/*"],
 	"background": {
 		"service_worker": "background.js",
 		"type": "module"

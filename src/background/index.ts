@@ -33,6 +33,61 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
 	}
 });
 
+/* ── OAuth handler ── */
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+	if (message.type === 'OAUTH_LOGIN') {
+		const url = message.url as string;
+		console.log('[background] Получен запрос OAuth');
+		console.log('[background] === DIAGNOSTICS ===');
+		console.log('[background] chrome.runtime.id:', chrome.runtime.id);
+		console.log(
+			'[background] chrome.runtime.getManifest().version:',
+			chrome.runtime.getManifest().version
+		);
+		console.log(
+			'[background] chrome.runtime.getManifest().permissions:',
+			JSON.stringify(chrome.runtime.getManifest().permissions)
+		);
+		console.log('[background] Full auth URL:', url);
+		// Extract and display the redirect_uri for verification
+		try {
+			const parsedUrl = new URL(url);
+			const redirectUri = parsedUrl.searchParams.get('redirect_uri');
+			console.log('[background] redirect_uri parameter:', redirectUri);
+			console.log(
+				'[background] Expected redirect_uri (chromiumapp.org):',
+				`https://${chrome.runtime.id}.chromiumapp.org/`
+			);
+			console.log(
+				'[background] Match:',
+				redirectUri === `https://${chrome.runtime.id}.chromiumapp.org/`
+			);
+		} catch (e) {
+			console.log('[background] Failed to parse auth URL:', e);
+		}
+
+		console.log('[background] Запускаю launchWebAuthFlow...');
+		chrome.identity
+			.launchWebAuthFlow({ url, interactive: true })
+			.then((redirectUrl) => {
+				if (!redirectUrl) {
+					console.log('[background] OAuth: redirectUrl пустой');
+					sendResponse({ ok: false, error: 'Авторизация была отменена или не завершилась' });
+					return;
+				}
+				console.log('[background] OAuth завершён, redirect URL получен:', redirectUrl);
+				sendResponse({ ok: true, redirectUrl });
+			})
+			.catch((err) => {
+				const msg = err instanceof Error ? err.message : String(err);
+				console.log('[background] OAuth ошибка:', msg);
+				console.log('[background] Error stack:', err instanceof Error ? err.stack : 'N/A');
+				sendResponse({ ok: false, error: msg });
+			});
+		return true; // keep channel open for async sendResponse
+	}
+});
+
 chrome.alarms.onAlarm.addListener(async (alarm) => {
 	if (alarm.name !== ALARM_NAME) return;
 
