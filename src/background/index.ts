@@ -49,6 +49,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 			storage.notifiedStreams = {};
 			await saveStorage(storage);
 		}
+		await chrome.action.setBadgeText({ text: '0' });
+		await chrome.action.setBadgeBackgroundColor({ color: '#808080' });
 		return;
 	}
 
@@ -93,4 +95,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 		storage.notifiedStreams = notified;
 		await saveStorage(storage);
 	}
+
+	// Update badge with total live stream count
+	await chrome.action.setBadgeText({ text: String(liveStreams.length) });
+	await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
+	await chrome.action.setBadgeTextColor({ color: 'white' });
 });
