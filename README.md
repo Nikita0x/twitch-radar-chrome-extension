@@ -21,7 +21,7 @@ A fast, lightweight Chrome extension that tracks your followed Twitch streamers 
 ### Load unpacked (for development)
 
 1. Clone the repo
-2. Run `npm install` and `npm run build-dev`
+2. Run `npm install` and `npm run build`
 3. Open `chrome://extensions/`
 4. Enable **Developer mode**
 5. Click **Load unpacked** and select the `dist/` folder
