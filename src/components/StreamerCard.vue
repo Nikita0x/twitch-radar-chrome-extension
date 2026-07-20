@@ -2,12 +2,15 @@
 	<div class="streamer-card">
 		<div class="card-header">
 			<div class="avatar-wrap">
+				<div v-if="!avatarLoaded" class="avatar-skeleton"></div>
 				<img
+					v-show="avatarLoaded"
 					:src="props.streamer.profile_image_url"
 					:alt="props.streamer.display_name"
 					class="avatar"
 					width="60"
 					height="60"
+					@load="avatarLoaded = true"
 				/>
 				<span v-if="props.isLive" class="live-badge">LIVE</span>
 			</div>
@@ -15,10 +18,16 @@
 				<h3 class="display-name">{{ props.streamer.display_name }}</h3>
 				<span class="login">@{{ props.streamer.login }}</span>
 				<div class="badges">
-					<span v-if="props.streamer.broadcaster_type === 'partner'" class="badge partner"
+					<span
+						v-if="props.streamer.broadcaster_type === 'partner'"
+						class="badge partner"
+						title="Top creators with additional features and benefits."
 						>Partner</span
 					>
-					<span v-else-if="props.streamer.broadcaster_type === 'affiliate'" class="badge affiliate"
+					<span
+						v-else-if="props.streamer.broadcaster_type === 'affiliate'"
+						class="badge affiliate"
+						title="Can earn revenue through subscriptions, Bits, and ads."
 						>Affiliate</span
 					>
 				</div>
@@ -53,21 +62,24 @@
 </template>
 
 <script setup lang="ts">
-import type { StreamersDetails } from '@/stores/twitch.ts'
+import { ref } from 'vue';
+import type { StreamersDetails } from '@/stores/twitch.ts';
 
 const props = defineProps<{
-	streamer: StreamersDetails
-	isLive: boolean
-	notificationsEnabled: boolean
-}>()
+	streamer: StreamersDetails;
+	isLive: boolean;
+	notificationsEnabled: boolean;
+}>();
+
+const avatarLoaded = ref(false);
 
 const emit = defineEmits<{
-	toggleNotifications: [streamerId: string]
-}>()
+	toggleNotifications: [streamerId: string];
+}>();
 
 function formatDate(dateStr: string) {
-	const date = new Date(dateStr)
-	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+	const date = new Date(dateStr);
+	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 </script>
 
@@ -97,12 +109,29 @@ function formatDate(dateStr: string) {
 }
 
 .avatar {
+	display: block;
 	width: 60px;
 	height: 60px;
 	border-radius: 50%;
 	object-fit: cover;
-	display: block;
-	background: #eee;
+}
+
+.avatar-skeleton {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	background: linear-gradient(90deg, #2d2d2d 25%, #3c3c3c 50%, #2d2d2d 75%);
+	background-size: 200% 100%;
+	animation: skeleton-loading 1.2s infinite;
+}
+
+@keyframes skeleton-loading {
+	from {
+		background-position: 200% 0;
+	}
+	to {
+		background-position: -200% 0;
+	}
 }
 
 .live-badge {
@@ -170,21 +199,12 @@ function formatDate(dateStr: string) {
 	color: #6b3fa0;
 }
 
-.view-count {
-	font-size: 11px;
-	color: #666;
-}
-
 .description {
 	margin: 0;
 	font-size: 13px;
 	line-height: 1.4;
 	color: #444;
 	overflow: hidden;
-	/* display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 3;
-	line-clamp: 3; */
 }
 
 .description.empty {

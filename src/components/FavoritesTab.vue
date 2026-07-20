@@ -1,15 +1,10 @@
 <template>
 	<div class="api-buttons">
 		<div class="state-shell">
-			<div v-if="loading" class="loading-state" aria-live="polite">
-				<div class="spinner"></div>
-				<span>Loading streams...</span>
-			</div>
+			<AppLoader v-if="loading">Loading streams...</AppLoader>
 			<div v-else-if="error" class="api-error">{{ error }}</div>
 			<div v-else-if="!isAuthenticated" class="empty-state auth-prompt">
-				<!-- <LoginBackground> -->
 				<button class="login-btn" @click="openTwitchLogin">Login with Twitch</button>
-				<!-- </LoginBackground> -->
 			</div>
 			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
 
@@ -32,61 +27,56 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import StreamCard from './StreamCard.vue'
-import { useTwitchStore } from '@/stores/twitch'
-import { useUserSettings } from '@/stores/user-settings.ts'
-import LoginBackground from './LoginBackground.vue'
+import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import StreamCard from './StreamCard.vue';
+import AppLoader from './AppLoader.vue';
+import { useTwitchStore } from '@/stores/twitch';
+import { useUserSettings } from '@/stores/user-settings.ts';
 
 interface Props {
-	search: string
+	search: string;
 }
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-const twitchStore = useTwitchStore()
-const userSettings = useUserSettings()
-const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore)
-const { userSettingsState } = storeToRefs(userSettings)
+const twitchStore = useTwitchStore();
+const userSettings = useUserSettings();
+const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
+const { userSettingsState } = storeToRefs(userSettings);
 
 async function openTwitchLogin() {
-	await twitchStore.loginWithTwitch()
+	await twitchStore.loginWithTwitch();
 }
 
-const getTime = (date: string) => new Date(date).getTime()
+const getTime = (date: string) => new Date(date).getTime();
 
 const visibleStreams = computed(() => {
-	let result = [...followedLiveStreams.value]
-
-	console.log('result: ', result)
-	console.log('result: ', result)
-	console.log('result: ', result)
-	console.log('result: ', result)
+	let result = [...followedLiveStreams.value];
 
 	result = result.filter((stream) =>
 		stream.user_name.toLowerCase().includes(props.search.toLowerCase())
-	)
+	);
 
 	switch (userSettingsState.value.sort) {
 		case 'viewers:highToLow':
-			result.sort((a, b) => b.viewer_count - a.viewer_count)
-			break
+			result.sort((a, b) => b.viewer_count - a.viewer_count);
+			break;
 
 		case 'viewers:lowToHigh':
-			result.sort((a, b) => a.viewer_count - b.viewer_count)
-			break
+			result.sort((a, b) => a.viewer_count - b.viewer_count);
+			break;
 
 		case 'duration:longest':
-			result.sort((a, b) => getTime(a.started_at) - getTime(b.started_at))
-			break
+			result.sort((a, b) => getTime(a.started_at) - getTime(b.started_at));
+			break;
 
 		case 'duration:shortest':
-			result.sort((a, b) => getTime(b.started_at) - getTime(a.started_at))
-			break
+			result.sort((a, b) => getTime(b.started_at) - getTime(a.started_at));
+			break;
 	}
 
-	return result
-})
+	return result;
+});
 </script>
 
 <style scoped>
@@ -110,7 +100,6 @@ const visibleStreams = computed(() => {
 	position: relative;
 }
 
-.loading-state,
 .empty-state {
 	padding: 15px;
 	color: #666;
@@ -122,10 +111,6 @@ const visibleStreams = computed(() => {
 	justify-content: center;
 	flex-direction: column;
 	gap: 8px;
-}
-
-.loading-state {
-	color: #9146ff;
 }
 
 .login-btn {
@@ -148,21 +133,6 @@ const visibleStreams = computed(() => {
 	cursor: not-allowed;
 }
 
-.spinner {
-	width: 24px;
-	height: 24px;
-	border: 3px solid rgba(145, 70, 255, 0.2);
-	border-top-color: #9146ff;
-	border-radius: 50%;
-	animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
-}
-
 @keyframes fadeInUp {
 	from {
 		opacity: 0;
@@ -178,7 +148,6 @@ const visibleStreams = computed(() => {
 .results-section {
 	display: flex;
 	flex-direction: column;
-	/* gap: 6px; */
 }
 
 .results-section :deep(.card) {
@@ -199,91 +168,13 @@ const visibleStreams = computed(() => {
 	}
 }
 
-.result-item {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 8px 8px;
-	border-bottom: 1px solid #f0f0f0;
-	color: inherit;
-	text-decoration: none;
-	cursor: pointer;
-	border-radius: 8px;
-	transition:
-		background-color 0.2s ease,
-		transform 0.2s ease,
-		box-shadow 0.2s ease;
-}
-
-.result-item:hover {
-	background-color: #f5f0ff;
-	transform: translateY(-1px);
-	box-shadow: 0 2px 8px rgba(145, 70, 255, 0.12);
-}
-
-.result-item:last-child {
-	border-bottom: none;
-}
-
-.thumb {
-	width: 40px;
-	height: 40px;
-	border-radius: 6px;
-	object-fit: cover;
-	background: #eee;
-	flex-shrink: 0;
-}
-
-.item-info {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	font-size: 12px;
-	flex: 1;
-	min-width: 0;
-}
-
-.item-name {
-	font-weight: bold;
-	color: #222;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.item-game {
-	color: #666;
-	font-size: 11px;
-}
-
-.meta-row {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	margin-top: 2px;
-	font-size: 11px;
-	color: #666;
-}
-
-.status-badge {
-	font-size: 11px;
-	font-weight: bold;
-}
-
-.online {
-	color: #e91916;
-}
-
 .empty-search {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-
 	min-height: 180px;
-
 	text-align: center;
-
 	color: #9ca3af;
 }
 
@@ -295,7 +186,6 @@ const visibleStreams = computed(() => {
 
 .empty-search h3 {
 	margin: 0;
-
 	font-size: 18px;
 }
 

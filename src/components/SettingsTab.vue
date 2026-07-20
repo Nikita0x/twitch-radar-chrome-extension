@@ -1,22 +1,19 @@
 <template>
 	<div class="twitch-auth">
 		<!-- Notifications toggle -->
-		<div class="setting-row">
+		<div v-if="isAuthenticated" class="setting-row">
 			<label class="toggle-label">
 				<input
 					type="checkbox"
 					:checked="userSettingsState.enableAllNotifications"
 					@change="toggleAllNotifications"
 				/>
-				Enable notifications
+				Enable all notifications
 			</label>
 		</div>
 
 		<div>
-			<div v-if="loading" class="loading" aria-live="polite">
-				<div class="spinner"></div>
-				<span>Loading...</span>
-			</div>
+			<AppLoader v-if="localLoading">Loading...</AppLoader>
 			<div v-else-if="error" class="error">
 				<p>{{ error }}</p>
 				<button @click="error = null" class="retry-btn">Try again</button>
@@ -58,59 +55,67 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useTwitchStore } from '@/stores/twitch'
-import { useUserSettings } from '@/stores/user-settings'
-import StreamerCard from './StreamerCard.vue'
+import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useTwitchStore } from '@/stores/twitch';
+import { useUserSettings } from '@/stores/user-settings';
+import AppLoader from './AppLoader.vue';
+import StreamerCard from './StreamerCard.vue';
 
-const twitchStore = useTwitchStore()
-const userSettingsStore = useUserSettings()
+const twitchStore = useTwitchStore();
+const userSettingsStore = useUserSettings();
 const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
-	storeToRefs(twitchStore)
-const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore)
+	storeToRefs(twitchStore);
+const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
 
-const search = ref('')
+const search = ref('');
+
+/** Local loading — stays true until all data (including followedAllStreams) is loaded */
+const localLoading = computed(
+	() =>
+		loading.value ||
+		(isAuthenticated.value && followedAllStreams.value.length === 0 && !error.value)
+);
 
 /** Set of live streamer IDs for O(1) lookup */
-const liveStreamerIds = computed(() => new Set(followedLiveStreams.value.map((s) => s.user_id)))
+const liveStreamerIds = computed(() => new Set(followedLiveStreams.value.map((s) => s.user_id)));
 
 const filteredStreamers = computed(() => {
 	// Берём ВСЕХ фолловеров (и онлайн, и оффлайн)
-	let list = followedAllStreams.value
+	let list = followedAllStreams.value;
 
 	// Если пользователь что-то ввёл в поиск — фильтруем по имени
 	if (search.value) {
-		const q = search.value.toLowerCase()
+		const q = search.value.toLowerCase();
 		list = list.filter(
 			(s) => s.display_name.toLowerCase().includes(q) || s.login.toLowerCase().includes(q)
-		)
+		);
 	}
 
 	// Сортируем: сначала те, кто в онлайне, потом оффлайн
 	return [...list].sort((a, b) => {
 		// Если стример в liveStreamerIds — он онлайн → 0, иначе → 1
-		const aLive = liveStreamerIds.value.has(a.id) ? 0 : 1
-		const bLive = liveStreamerIds.value.has(b.id) ? 0 : 1
+		const aLive = liveStreamerIds.value.has(a.id) ? 0 : 1;
+		const bLive = liveStreamerIds.value.has(b.id) ? 0 : 1;
 		// 0 - 0 = 0 (оба онлайн/оффлайн — не меняем порядок)
 		// 0 - 1 = -1 (a онлайн, b оффлайн → a выше)
 		// 1 - 0 = 1 (a оффлайн, b онлайн → b выше)
-		return aLive - bLive
-	})
-})
+		return aLive - bLive;
+	});
+});
 
 async function toggleAllNotifications() {
-	const enabled = !userSettingsState.value.enableAllNotifications
-	const allStreamerIds = followedAllStreams.value.map((s) => s.id)
-	await userSettingsStore.setAllStreamerNotifications(enabled, allStreamerIds)
+	const enabled = !userSettingsState.value.enableAllNotifications;
+	const allStreamerIds = followedAllStreams.value.map((s) => s.id);
+	await userSettingsStore.setAllStreamerNotifications(enabled, allStreamerIds);
 }
 
 async function loginWithTwitch() {
-	await twitchStore.loginWithTwitch()
+	await twitchStore.loginWithTwitch();
 }
 
 async function handleToggleNotifications(streamerId: string) {
-	await userSettingsStore.toggleStreamerNotification(streamerId)
+	await userSettingsStore.toggleStreamerNotification(streamerId);
 }
 </script>
 
@@ -150,6 +155,7 @@ async function handleToggleNotifications(streamerId: string) {
 }
 
 .login-btn {
+	display: block;
 	background-color: #9146ff;
 	color: white;
 	border: none;
@@ -158,6 +164,7 @@ async function handleToggleNotifications(streamerId: string) {
 	border-radius: 6px;
 	cursor: pointer;
 	transition: background-color 0.2s;
+	margin-inline: auto;
 }
 
 .login-btn:hover:not(:disabled) {
@@ -209,32 +216,6 @@ async function handleToggleNotifications(streamerId: string) {
 .user-bar .logout-btn {
 	margin-left: auto;
 	flex-shrink: 0;
-}
-
-.loading {
-	padding: 10px;
-	color: #888;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 8px;
-	min-height: 120px;
-}
-
-.spinner {
-	width: 24px;
-	height: 24px;
-	border: 3px solid rgba(145, 70, 255, 0.2);
-	border-top-color: #9146ff;
-	border-radius: 50%;
-	animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-	to {
-		transform: rotate(360deg);
-	}
 }
 
 .error {
