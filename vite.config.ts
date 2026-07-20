@@ -1,8 +1,8 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueDevTools from 'vite-plugin-vue-devtools';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
 		},
 	},
 	build: {
-		sourcemap: true,
+		sourcemap: false,
 		rollupOptions: {
 			input: {
 				main: 'index.html',
@@ -22,12 +22,12 @@ export default defineConfig({
 			output: {
 				entryFileNames: (chunkInfo) => {
 					if (chunkInfo.name === 'background') {
-						return 'background.js'
+						return 'background.js';
 					}
 
-					return 'assets/[name]-[hash].js'
+					return 'assets/[name]-[hash].js';
 				},
 			},
 		},
 	},
-})
+});
