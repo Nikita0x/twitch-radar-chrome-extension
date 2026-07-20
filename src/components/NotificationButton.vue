@@ -8,25 +8,25 @@ function sendNotification() {
 	if (typeof chrome !== 'undefined' && chrome.notifications) {
 		chrome.notifications.create('my-notification-id', {
 			type: 'basic',
-			iconUrl: 'icon.png', // Иконка из папки public/ (скопируется в корень dist/)
+			iconUrl: 'icon128.png', // Иконка из папки public/ (скопируется в корень dist/)
 			title: 'Привет от расширения!',
 			message: 'Это системное уведомление работает на Windows, macOS и Linux!',
 			priority: 2,
-		})
+		});
 	} else {
 		// Фолбек для обычного браузера (если тестируете не как расширение)
 		if (Notification.permission === 'granted') {
 			new Notification('Привет из браузера!', {
 				body: 'Это стандартное веб-уведомление.',
-			})
+			});
 		} else if (Notification.permission !== 'denied') {
 			Notification.requestPermission().then((permission) => {
 				if (permission === 'granted') {
 					new Notification('Привет из браузера!', {
 						body: 'Это стандартное веб-уведомление.',
-					})
+					});
 				}
-			})
+			});
 		}
 	}
 }

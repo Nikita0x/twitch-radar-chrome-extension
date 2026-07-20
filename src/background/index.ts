@@ -12,7 +12,7 @@ async function sendNotification(stream: {
 	try {
 		await chrome.notifications.create(stream.user_login, {
 			type: 'basic',
-			iconUrl: chrome.runtime.getURL('icon.png'),
+			iconUrl: chrome.runtime.getURL('icon128.png'),
 			title: `${stream.user_name} is LIVE 🔴`,
 			message: stream.title,
 			priority: 2,
