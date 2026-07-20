@@ -39,7 +39,7 @@
 					:isLive="liveStreamerIds.has(streamer.id)"
 					:notificationsEnabled="!!streamerNotifications[streamer.id]"
 					@toggleNotifications="handleToggleNotifications"
-					:style="{ '--index': index }"
+					:style="{ '--delay': getDelay(index, filteredStreamers.length) }"
 				/>
 			</div>
 		</div>
@@ -62,6 +62,15 @@ const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isA
 const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
 
 const search = ref('');
+
+function getDelay(index: number, total: number): string {
+	const perItemDelay = 70;
+	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
+	const progress = total > 1 ? index / (total - 1) : 0;
+	// ease-in cubic: early items have generous delays, later items accelerate
+	const delay = maxStagger * Math.pow(progress, 3);
+	return `${delay}ms`;
+}
 
 /** Local loading — stays true until all data (including followedAllStreams) is loaded */
 const localLoading = computed(
@@ -208,7 +217,7 @@ async function handleToggleNotifications(streamerId: string) {
 
 .followed-section :deep(.streamer-card) {
 	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-	animation-delay: calc(var(--index, 0) * 70ms);
+	animation-delay: var(--delay);
 	will-change: transform, opacity;
 }
 

@@ -17,7 +17,7 @@
 					v-for="(channel, index) in visibleStreams"
 					:key="channel.id"
 					:stream="channel"
-					:style="{ '--index': index }"
+					:style="{ '--delay': getDelay(index, visibleStreams.length) }"
 				/>
 			</div>
 		</div>
@@ -45,6 +45,15 @@ const { userSettingsState } = storeToRefs(userSettings);
 
 async function openTwitchLogin() {
 	await twitchStore.loginWithTwitch();
+}
+
+function getDelay(index: number, total: number): string {
+	const perItemDelay = 70;
+	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
+	const progress = total > 1 ? index / (total - 1) : 0;
+	// ease-in cubic: early items have generous delays, later items accelerate
+	const delay = maxStagger * Math.pow(progress, 3);
+	return `${delay}ms`;
 }
 
 const getTime = (date: string) => new Date(date).getTime();
@@ -131,7 +140,7 @@ const visibleStreams = computed(() => {
 
 .results-section :deep(.card) {
 	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-	animation-delay: calc(var(--index, 0) * 70ms);
+	animation-delay: var(--delay);
 	will-change: transform, opacity;
 }
 
