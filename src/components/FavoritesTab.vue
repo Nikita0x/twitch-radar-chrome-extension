@@ -2,7 +2,7 @@
 	<div class="api-buttons">
 		<div class="state-shell">
 			<AppLoader v-if="loading">Loading streams...</AppLoader>
-			<AuthPrompt v-else-if="!isAuthenticated" @login="openTwitchLogin" />
+			<AuthPrompt v-else-if="!isAuthenticated" />
 			<div v-else-if="error" class="api-error">{{ error }}</div>
 			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
 
@@ -58,10 +58,6 @@ onMounted(() => {
 		initialLoad.value = false;
 	}, 1500);
 });
-
-async function openTwitchLogin() {
-	await twitchStore.loginWithTwitch();
-}
 
 function getDelay(index: number, total: number): string {
 	const perItemDelay = 70;

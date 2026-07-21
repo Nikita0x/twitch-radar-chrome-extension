@@ -14,7 +14,6 @@
 
 		<div>
 			<AppLoader v-if="localLoading">Loading...</AppLoader>
-			<AuthPrompt v-else-if="!isAuthenticated" @login="loginWithTwitch" />
 			<div v-else-if="error" class="error">
 				<p>{{ error }}</p>
 				<button @click="error = null" class="retry-btn">Try again</button>
@@ -61,7 +60,6 @@ import { storeToRefs } from 'pinia';
 import { useTwitchStore } from '@/stores/twitch';
 import { useUserSettings } from '@/stores/user-settings';
 import AppLoader from './AppLoader.vue';
-import AuthPrompt from './AuthPrompt.vue';
 import StreamerCard from './StreamerCard.vue';
 
 const twitchStore = useTwitchStore();
@@ -125,10 +123,6 @@ async function toggleAllNotifications() {
 	const enabled = !userSettingsState.value.enableAllNotifications;
 	const allStreamerIds = followedAllStreams.value.map((s) => s.id);
 	await userSettingsStore.setAllStreamerNotifications(enabled, allStreamerIds);
-}
-
-async function loginWithTwitch() {
-	await twitchStore.loginWithTwitch();
 }
 
 async function handleToggleNotifications(streamerId: string) {

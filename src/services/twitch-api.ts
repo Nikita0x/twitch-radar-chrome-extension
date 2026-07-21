@@ -1,4 +1,4 @@
-import { CLIENT_ID } from '@/stores/twitch';
+import { CLIENT_ID } from '@/constants';
 
 export interface LiveStream {
 	user_id: string;

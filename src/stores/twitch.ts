@@ -1,8 +1,10 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
-import { formatUptime } from '@/utils/utils';
+import { extractTokenFromUrl } from '@/utils/utils';
 import { getStorage, saveStorage } from '@/services/storage.service';
 import { fetchFollowedStreams } from '@/services/twitch-api';
+import { CLIENT_ID } from '@/constants';
+import { request } from '@/types/result';
 
 interface TwitchUser {
 	id: string;
@@ -53,18 +55,7 @@ export interface StreamersDetails {
 	view_count: number;
 }
 
-export const CLIENT_ID = 'cvem7bputjzs04pdh02g96bqb4wrj9';
-
-function extractTokenFromUrl(url: string) {
-	try {
-		const hash = new URL(url).hash.substring(1);
-		const params = new URLSearchParams(hash);
-		return params.get('access_token');
-	} catch {
-		return null;
-	}
-}
-
+// TODO: move this logic to some other
 /**
  * Sends a message to background service worker to perform OAuth via launchWebAuthFlow.
  * This keeps the WebAuthFlow alive even if the popup closes during auth.
@@ -282,6 +273,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	async function logout() {
+		// Good
 		const storage = await getStorage();
 		storage.auth.accessToken = '';
 		storage.auth.isAuthenticated = false;
@@ -322,6 +314,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	watch(followedLiveStreams, async () => {
+		// Good
 		if (!isAuthenticated.value) {
 			await chrome.action.setBadgeText({ text: '!' });
 			await chrome.action.setBadgeBackgroundColor({ color: '#808080' });

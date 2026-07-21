@@ -1,7 +1,6 @@
 import { getStorage, saveStorage } from '@/services/storage.service';
 import { fetchFollowedStreams } from '@/services/twitch-api';
-
-const ALARM_NAME = 'periodic-notification';
+import { ALARM_NAME } from '@/constants';
 
 async function sendNotification(stream: {
 	user_id: string;
@@ -37,34 +36,6 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 	if (message.type === 'OAUTH_LOGIN') {
 		const url = message.url as string;
-		// console.log('[background] Получен запрос OAuth');
-		// console.log('[background] === DIAGNOSTICS ===');
-		// console.log('[background] chrome.runtime.id:', chrome.runtime.id);
-		// console.log(
-		// 	'[background] chrome.runtime.getManifest().version:',
-		// 	chrome.runtime.getManifest().version
-		// );
-		// console.log(
-		// 	'[background] chrome.runtime.getManifest().permissions:',
-		// 	JSON.stringify(chrome.runtime.getManifest().permissions)
-		// );
-		// console.log('[background] Full auth URL:', url);
-		// Extract and display the redirect_uri for verification
-		try {
-			const parsedUrl = new URL(url);
-			const redirectUri = parsedUrl.searchParams.get('redirect_uri');
-			// console.log('[background] redirect_uri parameter:', redirectUri);
-			// console.log(
-			// 	'[background] Expected redirect_uri (chromiumapp.org):',
-			// 	`https://${chrome.runtime.id}.chromiumapp.org/`
-			// );
-			// console.log(
-			// 	'[background] Match:',
-			// 	redirectUri === `https://${chrome.runtime.id}.chromiumapp.org/`
-			// );
-		} catch (e) {
-			console.log('[background] Failed to parse auth URL:', e);
-		}
 
 		console.log('[background] Запускаю launchWebAuthFlow...');
 		chrome.identity

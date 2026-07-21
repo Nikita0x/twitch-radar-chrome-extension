@@ -49,7 +49,7 @@
 				</svg>
 				<span>Authentication happens entirely via Twitch — we never see your password.</span>
 			</div>
-			<button class="auth-btn" @click="$emit('login')">
+			<button class="auth-btn" @click="login">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 512 512"
@@ -69,9 +69,13 @@
 </template>
 
 <script setup lang="ts">
-defineEmits<{
-	login: [];
-}>();
+import { useTwitchStore } from '@/stores/twitch';
+
+const twitchStore = useTwitchStore();
+
+async function login() {
+	await twitchStore.loginWithTwitch();
+}
 </script>
 
 <style scoped>

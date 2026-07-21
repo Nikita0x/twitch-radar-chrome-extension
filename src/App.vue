@@ -28,28 +28,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import HeaderComponent from './components/HeaderComponent.vue'
-import SettingsTab from './components/SettingsTab.vue'
-import FavoritesTab from './components/FavoritesTab.vue'
-import { useTwitchStore } from '@/stores/twitch'
-import { useUserSettings } from './stores/user-settings.ts'
-import { storeToRefs } from 'pinia'
+import { ref, onMounted, computed } from 'vue';
+import HeaderComponent from './components/HeaderComponent.vue';
+import SettingsTab from './components/SettingsTab.vue';
+import FavoritesTab from './components/FavoritesTab.vue';
 
-const twitchStore = useTwitchStore()
-const userSettingsStore = useUserSettings()
-const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore)
-const { userSettingsState } = storeToRefs(userSettingsStore)
+import { useTwitchStore } from '@/stores/twitch';
+import { useUserSettings } from './stores/user-settings.ts';
+import { storeToRefs } from 'pinia';
 
-export type Tabs = 'favorites' | 'settings'
+const twitchStore = useTwitchStore();
+const userSettingsStore = useUserSettings();
+const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
+const { userSettingsState } = storeToRefs(userSettingsStore);
 
-const activeTab = ref<Tabs>('favorites')
-const search = ref('')
+export type Tabs = 'favorites' | 'settings';
+
+const activeTab = ref<Tabs>('favorites');
+const search = ref('');
 
 onMounted(async () => {
-	await userSettingsStore.loadSettings()
-	await twitchStore.init()
-})
+	await userSettingsStore.loadSettings();
+	await twitchStore.init();
+});
 </script>
 
 <style scoped>
