@@ -5,13 +5,11 @@
 			<AuthPrompt v-else-if="!isAuthenticated" />
 			<div v-else-if="error" class="api-error">{{ error }}</div>
 			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
-
-			<div v-if="isAuthenticated && !loading && visibleStreams.length === 0" class="empty-search">
+			<div v-else-if="visibleStreams.length === 0" class="empty-search">
 				<div class="icon">🔍</div>
 				<h3>No streamer found</h3>
 				<p>Try a different search term</p>
 			</div>
-
 			<div v-else class="results-section fade-in">
 				<StreamCard
 					v-for="(channel, index) in visibleStreams"
