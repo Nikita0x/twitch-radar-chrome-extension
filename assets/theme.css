@@ -1,0 +1,146 @@
+/* ── Light Theme (default) ── */
+:root,
+[data-theme='light'] {
+	--color-bg-primary: #ffffff;
+	--color-bg-secondary: #faf5ff;
+	--color-bg-tertiary: #f7f3ff;
+	--color-bg-hover: #efe6ff;
+	--color-bg-card-hover: #c4b5fd;
+	--color-bg-error: #fff0f0;
+	--color-bg-input: #ffffff;
+	--color-bg-notif-toggle: #ffffff;
+	--color-bg-toggle-hover: #f3f0ff;
+	--color-bg-skeleton: #2d2d2d;
+	--color-bg-skeleton-shine: #3c3c3c;
+
+	--color-text-primary: #222222;
+	--color-text-secondary: #333333;
+	--color-text-muted: #666666;
+	--color-text-dim: #888888;
+	--color-text-faint: #9b9b9b;
+	--color-text-placeholder: #9b9b9b;
+	--color-text-game: #404040;
+	--color-text-description: #444444;
+	--color-text-empty: #9ca3af;
+	--color-text-empty-icon: #888888;
+	--color-text-dark: #1f1f1f;
+	--color-text-notif-desc: #555555;
+	--color-text-notif-toggle: #6b3fa0;
+	--color-text-notif-label: #444444;
+	--color-text-desc-empty: #aaaaaa;
+	--color-text-desc-muted: #999999;
+
+	--color-border-default: #e0e0e0;
+	--color-border-input: #3d3d44;
+	--color-border-tabs: #e4d9ff;
+	--color-border-notif: #e0e0e0;
+	--color-border-notif-active: #9146ff;
+
+	--color-accent: #9146ff;
+	--color-accent-hover: #772ce8;
+	--color-accent-gradient: linear-gradient(135deg, #9146ff, #7c3aed);
+	--color-accent-gradient-alt: linear-gradient(135deg, #9146ff, #772ce8);
+
+	--color-red: #eb0400;
+	--color-red-bg: #ff4757;
+	--color-red-hover: #e0404e;
+	--color-error-text: #ff4757;
+
+	--color-header-bg: #9147ff;
+	--color-header-text: #ffffff;
+	--color-btn-bg: #ff4757;
+	--color-btn-hover: #e0404e;
+	--color-btn-text: #ffffff;
+
+	--color-live-dot: #eb0400;
+	--color-viewer-count: #eb0400;
+
+	--color-badge-partner-bg: #9146ff;
+	--color-badge-partner-text: #ffffff;
+	--color-badge-affiliate-bg: #e5dbff;
+	--color-badge-affiliate-text: #6b3fa0;
+
+	--color-thumb-user-bg: #000000;
+	--color-thumb-user-text: #ffff00;
+
+	--color-spinner-border: rgba(145, 70, 255, 0.2);
+	--color-spinner-top: #9146ff;
+	--color-spinner-text: #9146ff;
+
+	--color-notif-icon: #0f0f0f;
+	--color-settings-section-border: #eeeeee;
+	--color-settings-title: #333333;
+}
+
+/* ── Dark Theme ── */
+[data-theme='dark'] {
+	--color-bg-primary: #1a1a2e;
+	--color-bg-secondary: #16213e;
+	--color-bg-tertiary: #1f2940;
+	--color-bg-hover: #2a3a5c;
+	--color-bg-card-hover: #2a3a5c;
+	--color-bg-error: #3d1f2a;
+	--color-bg-input: #16213e;
+	--color-bg-notif-toggle: #1f2940;
+	--color-bg-toggle-hover: #2a3a5c;
+	--color-bg-skeleton: #2a3a5c;
+	--color-bg-skeleton-shine: #3d4a6b;
+
+	--color-text-primary: #e0e0e0;
+	--color-text-secondary: #cccccc;
+	--color-text-muted: #aaaaaa;
+	--color-text-dim: #888888;
+	--color-text-faint: #666666;
+	--color-text-placeholder: #666666;
+	--color-text-game: #bbbbbb;
+	--color-text-description: #bbbbbb;
+	--color-text-empty: #555555;
+	--color-text-empty-icon: #555555;
+	--color-text-dark: #e0e0e0;
+	--color-text-notif-desc: #aaaaaa;
+	--color-text-notif-toggle: #b39ddb;
+	--color-text-notif-label: #cccccc;
+	--color-text-desc-empty: #555555;
+	--color-text-desc-muted: #666666;
+
+	--color-border-default: #2a3a5c;
+	--color-border-input: #3d4a6b;
+	--color-border-tabs: #2a3a5c;
+	--color-border-notif: #3d4a6b;
+	--color-border-notif-active: #9146ff;
+
+	--color-accent: #9146ff;
+	--color-accent-hover: #a855f7;
+	--color-accent-gradient: linear-gradient(135deg, #9146ff, #7c3aed);
+	--color-accent-gradient-alt: linear-gradient(135deg, #9146ff, #a855f7);
+
+	--color-red: #eb0400;
+	--color-red-bg: #dc2626;
+	--color-red-hover: #b91c1c;
+	--color-error-text: #f87171;
+
+	--color-header-bg: #0f0f23;
+	--color-header-text: #e0e0e0;
+	--color-btn-bg: #dc2626;
+	--color-btn-hover: #b91c1c;
+	--color-btn-text: #ffffff;
+
+	--color-live-dot: #eb0400;
+	--color-viewer-count: #f87171;
+
+	--color-badge-partner-bg: #7c3aed;
+	--color-badge-partner-text: #ffffff;
+	--color-badge-affiliate-bg: #2a3a5c;
+	--color-badge-affiliate-text: #b39ddb;
+
+	--color-thumb-user-bg: rgba(0, 0, 0, 0.7);
+	--color-thumb-user-text: #ffff00;
+
+	--color-spinner-border: rgba(145, 70, 255, 0.3);
+	--color-spinner-top: #9146ff;
+	--color-spinner-text: #9146ff;
+
+	--color-notif-icon: #b39ddb;
+	--color-settings-section-border: #2a3a5c;
+	--color-settings-title: #cccccc;
+}

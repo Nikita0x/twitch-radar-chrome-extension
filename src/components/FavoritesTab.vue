@@ -13,19 +13,11 @@
 			</div>
 
 			<div v-else class="results-section fade-in">
-				<TransitionGroup
-					name="filter"
-					tag="div"
-					class="results-inner"
-					:class="{ 'stagger-init': initialLoad }"
-				>
-					<StreamCard
-						v-for="(channel, index) in visibleStreams"
-						:key="channel.id"
-						:stream="channel"
-						:style="initialLoad ? { '--delay': getDelay(index, visibleStreams.length) } : undefined"
-					/>
-				</TransitionGroup>
+				<StreamCard
+					v-for="(channel, index) in visibleStreams"
+					:key="channel.id"
+					:stream="channel"
+				/>
 			</div>
 		</div>
 	</div>
@@ -49,23 +41,6 @@ const twitchStore = useTwitchStore();
 const userSettings = useUserSettings();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettings);
-
-const initialLoad = ref(true);
-
-onMounted(() => {
-	// отключаем staggered-анимацию после первого рендера
-	setTimeout(() => {
-		initialLoad.value = false;
-	}, 1500);
-});
-
-function getDelay(index: number, total: number): string {
-	const perItemDelay = 70;
-	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
-	const progress = total > 1 ? index / (total - 1) : 0;
-	const delay = maxStagger * Math.pow(progress, 3);
-	return `${delay}ms`;
-}
 
 const getTime = (date: string) => new Date(date).getTime();
 
@@ -102,13 +77,14 @@ const visibleStreams = computed(() => {
 .api-buttons {
 	margin: 12px 0;
 	font-family: inherit;
+	background: var(--color-bg-primary);
 }
 
 .api-error {
 	padding: 8px;
-	color: #ff4757;
+	color: var(--color-error-text);
 	font-size: 13px;
-	background: #fff0f0;
+	background: var(--color-bg-error);
 	border-radius: 6px;
 	margin-top: 8px;
 	text-align: center;
@@ -121,7 +97,7 @@ const visibleStreams = computed(() => {
 
 .empty-state {
 	padding: 15px;
-	color: #666;
+	color: var(--color-text-muted);
 	text-align: center;
 	font-size: 13px;
 	min-height: 90px;
@@ -152,25 +128,6 @@ const visibleStreams = computed(() => {
 .results-inner {
 	display: flex;
 	flex-direction: column;
-}
-
-/* ── Initial load stagger ── */
-.stagger-init :deep(.card) {
-	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-	animation-delay: var(--delay);
-	will-change: transform, opacity;
-}
-
-@keyframes cardWaveIn {
-	from {
-		opacity: 0;
-		transform: translateY(10px) scale(0.98);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
 }
 
 /* ── Filter animation (TransitionGroup) ── */
@@ -204,7 +161,7 @@ const visibleStreams = computed(() => {
 	align-items: center;
 	min-height: 180px;
 	text-align: center;
-	color: #9ca3af;
+	color: var(--color-text-empty);
 }
 
 .empty-search .icon {
@@ -221,6 +178,6 @@ const visibleStreams = computed(() => {
 .empty-search p {
 	margin-top: 6px;
 	font-size: 13px;
-	color: #888;
+	color: var(--color-text-empty-icon);
 }
 </style>

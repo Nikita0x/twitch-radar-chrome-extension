@@ -60,7 +60,7 @@ const imageLoaded = ref(false);
 	display: flex;
 
 	gap: 10px;
-	border-bottom: 1px solid #f0f0f0;
+	border-bottom: 1px solid var(--color-border-default);
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
@@ -69,7 +69,7 @@ const imageLoaded = ref(false);
 }
 
 .card:hover {
-	background: #c4b5fd;
+	background: var(--color-bg-card-hover);
 
 	transform: translateY(-1px);
 	box-shadow: 0 2px 8px rgba(145, 70, 255, 0.12);
@@ -82,7 +82,6 @@ const imageLoaded = ref(false);
 .thumb-wrap {
 	position: relative;
 	flex-shrink: 0;
-	/* border-radius: 8px; */
 	overflow: hidden;
 }
 
@@ -115,13 +114,11 @@ const imageLoaded = ref(false);
 	padding: 7px 9px;
 	box-sizing: border-box;
 
-	background-color: black;
+	background-color: var(--color-thumb-user-bg);
 }
 .thumb-user {
-	color: yellow;
-	/* color: white; */
+	color: var(--color-thumb-user-text);
 	font-size: 15px;
-	/* font-weight: 700; */
 	letter-spacing: 0.02em;
 	display: block;
 	white-space: nowrap;
@@ -141,7 +138,7 @@ const imageLoaded = ref(false);
 
 .card-name {
 	font-weight: bold;
-	color: #222;
+	color: var(--color-text-primary);
 	overflow: hidden;
 	font-size: 15px;
 
@@ -149,12 +146,10 @@ const imageLoaded = ref(false);
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
-	/* text-overflow: ellipsis; */
-	/* white-space: nowrap; */
 }
 
 .card-game {
-	color: #404040;
+	color: var(--color-text-game);
 	font-size: 14px;
 }
 
@@ -171,26 +166,30 @@ const imageLoaded = ref(false);
 	width: 1em;
 	height: 1em;
 	border-radius: 50%;
-	background-color: #eb0400;
+	background-color: var(--color-live-dot);
 }
 
 .viewer-count {
 	font-weight: 700;
-	color: #eb0400;
+	color: var(--color-viewer-count);
 }
 
 .uptime {
 	display: flex;
 	align-items: center;
-	/* gap: 5px; */
-	color: black;
+	color: var(--color-text-primary);
 }
 
 .thumb-skeleton {
 	position: absolute;
 	inset: 0;
 
-	background: linear-gradient(90deg, #2d2d2d 25%, #3c3c3c 50%, #2d2d2d 75%);
+	background: linear-gradient(
+		90deg,
+		var(--color-bg-skeleton) 25%,
+		var(--color-bg-skeleton-shine) 50%,
+		var(--color-bg-skeleton) 75%
+	);
 
 	background-size: 200% 100%;
 

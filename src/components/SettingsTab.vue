@@ -12,6 +12,18 @@
 			</label>
 		</div>
 
+		<!-- Theme toggle -->
+		<div v-if="isAuthenticated" class="setting-row">
+			<label class="toggle-label">
+				<input
+					type="checkbox"
+					:checked="userSettingsState.theme === 'dark'"
+					@change="userSettingsStore.toggleTheme()"
+				/>
+				Dark theme
+			</label>
+		</div>
+
 		<div>
 			<AppLoader v-if="localLoading">Loading...</AppLoader>
 			<div v-else-if="error" class="error">
@@ -31,24 +43,14 @@
 			</div>
 
 			<div class="results-section">
-				<TransitionGroup
-					name="filter"
-					tag="div"
-					class="results-inner"
-					:class="{ 'stagger-init': initialLoad }"
-				>
-					<StreamerCard
-						v-for="(streamer, index) in filteredStreamers"
-						:key="streamer.id"
-						:streamer="streamer"
-						:isLive="liveStreamerIds.has(streamer.id)"
-						:notificationsEnabled="!!streamerNotifications[streamer.id]"
-						@toggleNotifications="handleToggleNotifications"
-						:style="
-							initialLoad ? { '--delay': getDelay(index, filteredStreamers.length) } : undefined
-						"
-					/>
-				</TransitionGroup>
+				<StreamerCard
+					v-for="(streamer, index) in filteredStreamers"
+					:key="streamer.id"
+					:streamer="streamer"
+					:isLive="liveStreamerIds.has(streamer.id)"
+					:notificationsEnabled="!!streamerNotifications[streamer.id]"
+					@toggleNotifications="handleToggleNotifications"
+				/>
 			</div>
 		</div>
 	</div>
@@ -69,21 +71,6 @@ const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isA
 const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
 
 const search = ref('');
-const initialLoad = ref(true);
-
-onMounted(() => {
-	setTimeout(() => {
-		initialLoad.value = false;
-	}, 1500);
-});
-
-function getDelay(index: number, total: number): string {
-	const perItemDelay = 70;
-	const maxStagger = Math.min(perItemDelay * (total - 1), 1500);
-	const progress = total > 1 ? index / (total - 1) : 0;
-	const delay = maxStagger * Math.pow(progress, 3);
-	return `${delay}ms`;
-}
 
 /** Local loading — stays true until all data (including followedAllStreams) is loaded */
 const localLoading = computed(
@@ -135,6 +122,7 @@ async function handleToggleNotifications(streamerId: string) {
 	margin: 15px 0;
 
 	font-family: inherit;
+	background: var(--color-bg-primary);
 }
 
 .setting-row {
@@ -149,20 +137,21 @@ async function handleToggleNotifications(streamerId: string) {
 	cursor: pointer;
 	font-size: 14px;
 	user-select: none;
+	color: var(--color-text-primary);
 }
 
 .toggle-label input[type='checkbox'] {
 	width: 16px;
 	height: 16px;
 	cursor: pointer;
-	accent-color: #9146ff;
+	accent-color: var(--color-accent);
 }
 
 .error {
 	padding: 10px;
-	color: #ff4757;
+	color: var(--color-error-text);
 	font-size: 14px;
-	background: #fff0f0;
+	background: var(--color-bg-error);
 	border-radius: 6px;
 }
 
@@ -172,8 +161,8 @@ async function handleToggleNotifications(streamerId: string) {
 }
 
 .retry-btn {
-	background-color: #9146ff;
-	color: white;
+	background-color: var(--color-accent);
+	color: var(--color-btn-text);
 	border: none;
 	padding: 5px 15px;
 	border-radius: 4px;
@@ -182,19 +171,19 @@ async function handleToggleNotifications(streamerId: string) {
 }
 
 .retry-btn:hover {
-	background-color: #772ce8;
+	background-color: var(--color-accent-hover);
 }
 
 .followed-section {
 	margin-top: 20px;
-	border-top: 1px solid #eee;
+	border-top: 1px solid var(--color-settings-section-border);
 	padding-top: 12px;
 }
 
 .section-title {
 	font-size: 14px;
 	font-weight: 700;
-	color: #333;
+	color: var(--color-settings-title);
 	text-align: left;
 	padding: 0 5px;
 }
@@ -203,49 +192,33 @@ async function handleToggleNotifications(streamerId: string) {
 	padding: 0 5px;
 	margin-inline: 5px;
 	height: 38px;
-	border: 1px solid #3d3d44;
+	border: 1px solid var(--color-border-input);
 	border-radius: 8px;
 	font-size: 13px;
+	background: var(--color-bg-input);
+	color: var(--color-text-primary);
 	transition:
 		border-color 0.2s,
 		box-shadow 0.2s,
 		background 0.2s;
 	width: 98%;
 	box-sizing: border-box;
+	margin-bottom: 10px;
 }
 
 .search-input::placeholder {
-	color: #9b9b9b;
+	color: var(--color-text-placeholder);
 }
 
 .search-input:focus {
 	outline: none;
-	border-color: #9146ff;
+	border-color: var(--color-accent);
 	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
 }
 
 .results-inner {
 	display: flex;
 	flex-direction: column;
-}
-
-/* ── Initial load stagger ── */
-.stagger-init :deep(.streamer-card) {
-	animation: cardWaveIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-	animation-delay: var(--delay);
-	will-change: transform, opacity;
-}
-
-@keyframes cardWaveIn {
-	from {
-		opacity: 0;
-		transform: translateY(10px) scale(0.98);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
 }
 
 /* ── Filter animation (TransitionGroup) ── */
@@ -279,7 +252,7 @@ async function handleToggleNotifications(streamerId: string) {
 	align-items: center;
 	min-height: 180px;
 	text-align: center;
-	color: #9ca3af;
+	color: var(--color-text-empty);
 }
 
 .empty-search .icon {
@@ -296,6 +269,6 @@ async function handleToggleNotifications(streamerId: string) {
 .empty-search p {
 	margin-top: 6px;
 	font-size: 13px;
-	color: #888;
+	color: var(--color-text-empty-icon);
 }
 </style>

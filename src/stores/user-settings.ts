@@ -58,6 +58,16 @@ export const useUserSettings = defineStore('user-settings', () => {
 		await saveStorage(storage);
 	}
 
+	async function toggleTheme() {
+		const newTheme = userSettingsState.value.theme === 'dark' ? 'light' : 'dark';
+		await updateSettings({ theme: newTheme });
+		applyTheme(newTheme);
+	}
+
+	function applyTheme(theme: 'light' | 'dark') {
+		document.documentElement.setAttribute('data-theme', theme);
+	}
+
 	return {
 		userSettingsState,
 		streamerNotifications,
@@ -65,5 +75,7 @@ export const useUserSettings = defineStore('user-settings', () => {
 		loadSettings,
 		toggleStreamerNotification,
 		setAllStreamerNotifications,
+		toggleTheme,
+		applyTheme,
 	};
 });

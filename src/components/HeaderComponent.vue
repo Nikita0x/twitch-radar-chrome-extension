@@ -7,7 +7,17 @@
 				@click="activeTab = 'favorites'"
 				title="Back"
 			>
-				<img src="../../public/arrow.svg" style="width: 20px; height: 20px" />
+				<svg
+					width="20px"
+					height="20px"
+					viewBox="0 0 200 200"
+					fill="currentColor"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M160,89.75H56l53-53a9.67,9.67,0,0,0,0-14,9.67,9.67,0,0,0-14,0l-56,56a30.18,30.18,0,0,0-8.5,18.5c0,1-.5,1.5-.5,2.5a6.34,6.34,0,0,0,.5,3,31.47,31.47,0,0,0,8.5,18.5l56,56a9.9,9.9,0,0,0,14-14l-52.5-53.5H160a10,10,0,0,0,0-20Z"
+					/>
+				</svg>
 			</button>
 			<span v-else class="brand">Twitch Radar</span>
 		</div>
@@ -20,7 +30,21 @@
 				title="Settings"
 				@click="activeTab = 'settings'"
 			>
-				<img src="/cog.svg" width="20" height="20" class="cog-icon" />
+				<svg
+					width="20px"
+					height="20px"
+					viewBox="0 0 16 16"
+					fill="currentColor"
+					xmlns="http://www.w3.org/2000/svg"
+					class="cog-icon"
+				>
+					<path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M6.50001 0H9.50001L10.0939 2.37548C10.7276 2.6115 11.3107 2.95155 11.8223 3.37488L14.1782 2.70096L15.6782 5.29904L13.9173 7.00166C13.9717 7.32634 14 7.65987 14 8C14 8.34013 13.9717 8.67366 13.9173 8.99834L15.6782 10.701L14.1782 13.299L11.8223 12.6251C11.3107 13.0484 10.7276 13.3885 10.0939 13.6245L9.50001 16H6.50001L5.90614 13.6245C5.27242 13.3885 4.68934 13.0484 4.17768 12.6251L1.82181 13.299L0.321808 10.701L2.08269 8.99834C2.02831 8.67366 2.00001 8.34013 2.00001 8C2.00001 7.65987 2.02831 7.32634 2.08269 7.00166L0.321808 5.29904L1.82181 2.70096L4.17768 3.37488C4.68934 2.95155 5.27241 2.6115 5.90614 2.37548L6.50001 0ZM8.00001 10C9.10458 10 10 9.10457 10 8C10 6.89543 9.10458 6 8.00001 6C6.89544 6 6.00001 6.89543 6.00001 8C6.00001 9.10457 6.89544 10 8.00001 10Z"
+						fill="currentColor"
+					/>
+				</svg>
 			</button>
 
 			<div v-else-if="isAuthenticated" style="display: flex; align-items: center; gap: 10px">
@@ -56,7 +80,7 @@ async function logout() {
 
 <style scoped>
 .header {
-	background-color: #9147ff;
+	background-color: var(--color-header-bg);
 	min-height: 50px;
 	display: flex;
 	justify-content: space-between;
@@ -67,7 +91,7 @@ async function logout() {
 .title {
 	display: flex;
 	align-items: center;
-	color: white;
+	color: var(--color-header-text);
 }
 
 .brand {
@@ -92,6 +116,7 @@ async function logout() {
 	border-radius: 4px;
 	font-size: 18px;
 	transition: background 0.15s ease;
+	color: var(--color-btn-text);
 }
 
 .icon-btn:hover {
@@ -109,6 +134,7 @@ async function logout() {
 .heart-icon {
 	display: block;
 	transition: transform 0.3s ease;
+	color: var(--color-btn-text);
 }
 
 .cog-btn:hover .cog-icon {
@@ -127,8 +153,8 @@ async function logout() {
 }
 
 .logout-btn {
-	background-color: #ff4757;
-	color: white;
+	background-color: var(--color-btn-bg);
+	color: var(--color-btn-text);
 	border: none;
 	padding: 5px 10px;
 	border-radius: 4px;
@@ -138,6 +164,10 @@ async function logout() {
 }
 
 .logout-btn:hover {
-	background-color: #e0404e;
+	background-color: var(--color-btn-hover);
+}
+
+.user-name {
+	color: var(--color-btn-text);
 }
 </style>

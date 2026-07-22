@@ -22,36 +22,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
 
 interface TabItem {
-	id: string
-	label: string
+	id: string;
+	label: string;
 }
 
 const props = defineProps<{
-	tabs: TabItem[]
-	modelValue?: string
-}>()
+	tabs: TabItem[];
+	modelValue?: string;
+}>();
 
 const emit = defineEmits<{
-	(e: 'update:modelValue', value: string): void
-}>()
+	(e: 'update:modelValue', value: string): void;
+}>();
 
-const activeTab = ref(props.modelValue || props.tabs[0]?.id || '')
+const activeTab = ref(props.modelValue || props.tabs[0]?.id || '');
 
 watch(
 	() => props.modelValue,
 	(value) => {
 		if (value) {
-			activeTab.value = value
+			activeTab.value = value;
 		}
 	}
-)
+);
 
 function selectTab(tabId: string) {
-	activeTab.value = tabId
-	emit('update:modelValue', tabId)
+	activeTab.value = tabId;
+	emit('update:modelValue', tabId);
 }
 </script>
 
@@ -70,23 +70,23 @@ function selectTab(tabId: string) {
 .tab-button {
 	flex: 1;
 	padding: 8px 10px;
-	border: 1px solid #e4d9ff;
+	border: 1px solid var(--color-border-tabs);
 	border-radius: 8px;
-	background: #f7f3ff;
-	color: #5b3fa2;
+	background: var(--color-bg-tertiary);
+	color: var(--color-text-notif-toggle);
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s ease;
 }
 
 .tab-button:hover {
-	background: #efe6ff;
+	background: var(--color-bg-hover);
 }
 
 .tab-button.active {
-	background: #9146ff;
+	background: var(--color-accent);
 	color: white;
-	border-color: #9146ff;
+	border-color: var(--color-accent);
 }
 
 .tab-content {

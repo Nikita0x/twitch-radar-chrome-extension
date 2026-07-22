@@ -49,6 +49,7 @@ const search = ref('');
 
 onMounted(async () => {
 	await userSettingsStore.loadSettings();
+	userSettingsStore.applyTheme(userSettingsState.value.theme);
 	await twitchStore.init();
 });
 </script>
@@ -56,10 +57,11 @@ onMounted(async () => {
 <style scoped>
 .extension-shell {
 	width: 500px;
-	height: 560px;
 	box-sizing: border-box;
 	display: flex;
+	flex: 1;
 	flex-direction: column;
+	background: var(--color-bg-primary);
 }
 
 .toolbar {
@@ -72,10 +74,12 @@ onMounted(async () => {
 .sort-select {
 	height: 38px;
 
-	border: 1px solid #3d3d44;
+	border: 1px solid var(--color-border-input);
 	border-radius: 8px;
 
 	font-size: 13px;
+	background: var(--color-bg-input);
+	color: var(--color-text-primary);
 
 	transition:
 		border-color 0.2s,
@@ -89,14 +93,14 @@ onMounted(async () => {
 }
 
 .search-input::placeholder {
-	color: #9b9b9b;
+	color: var(--color-text-placeholder);
 }
 
 .search-input:focus,
 .sort-select:focus {
 	outline: none;
 
-	border-color: #9146ff;
+	border-color: var(--color-accent);
 
 	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
 }
