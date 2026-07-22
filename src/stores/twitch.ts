@@ -2,9 +2,9 @@ import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { extractTokenFromUrl } from '@/utils/utils';
 import { getStorage, saveStorage } from '@/services/storage.service';
-import { fetchFollowedStreams } from '@/services/twitch-api';
+import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { CLIENT_ID } from '@/constants';
-import { request } from '@/types/result';
+import { request, type Result, ok, err } from '@/types/result';
 
 interface TwitchUser {
 	id: string;
@@ -19,27 +19,22 @@ interface TwitchUser {
 	view_count: number;
 }
 
-export type FollowData = Pick<FollowResponse, 'data'>['data'][number];
-
-interface FollowResponse {
-	data: {
-		game_id: string;
-		game_name: string;
-		id: string;
-		is_mature: boolean;
-		language: string;
-		started_at: string;
-		tag_ids: [];
-		tags: string[];
-		thumbnail_url: string;
-		title: string;
-		type: string;
-		user_id: string;
-		user_login: string;
-		user_name: string;
-		viewer_count: number;
-	}[];
-	pagination: {};
+export interface FollowData {
+	game_id: string;
+	game_name: string;
+	id: string;
+	is_mature: boolean;
+	language: string;
+	started_at: string;
+	tag_ids: [];
+	tags: string[];
+	thumbnail_url: string;
+	title: string;
+	type: string;
+	user_id: string;
+	user_login: string;
+	user_name: string;
+	viewer_count: number;
 }
 
 export interface StreamersDetails {
@@ -83,149 +78,113 @@ export const useTwitchStore = defineStore('twitch', () => {
 	const isAuthenticated = computed(() => !!accessToken.value);
 	const totalLiveStreamers = computed(() => followedLiveStreams.value.length);
 
-	async function getUserProfile(token: string) {
-		try {
-			const response = await fetch('https://api.twitch.tv/helix/users', {
+	async function fetchUserProfile(token: string): Promise<Result<TwitchUser>> {
+		const result = await request<{ data: TwitchUser[] }>('https://api.twitch.tv/helix/users', {
+			headers: {
+				'Client-ID': CLIENT_ID,
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		if (!result.ok) {
+			console.error(result.error.status);
+			return err(result.error);
+		}
+
+		const user = result.data.data[0];
+		if (!user) {
+			return { ok: false, error: { status: 0, message: 'User not found' } };
+		}
+
+		return ok(user);
+	}
+
+	async function fetchAllFollowedChannelsIds(token: string): Promise<Result<string[]>> {
+		error.value = null;
+
+		if (!twitchUser.value) {
+			const getUserProfileResult = await fetchUserProfile(token);
+
+			if (!getUserProfileResult.ok) {
+				console.error(getUserProfileResult.error);
+				return getUserProfileResult;
+			}
+
+			twitchUser.value = getUserProfileResult.data;
+		}
+
+		const allIds: string[] = [];
+		let cursor: string | undefined;
+
+		do {
+			const url = new URL('https://api.twitch.tv/helix/channels/followed');
+			url.searchParams.set('user_id', twitchUser.value.id);
+			url.searchParams.set('first', '100');
+			if (cursor) {
+				url.searchParams.set('after', cursor);
+			}
+
+			const result = await request<{
+				data: {
+					broadcaster_id: string;
+					broadcaster_login: string;
+					broadcaster_name: string;
+					followed_at: string;
+				}[];
+				pagination: {
+					cursor: string;
+				};
+				total: number;
+			}>(url.toString(), {
 				headers: {
 					'Client-ID': CLIENT_ID,
 					Authorization: `Bearer ${token}`,
 				},
 			});
 
-			if (!response.ok) {
-				if (response.status === 401) {
-					const storage = await getStorage();
-					storage.auth.accessToken = '';
-					storage.auth.isAuthenticated = false;
-					await saveStorage(storage);
-					accessToken.value = null;
-					followedLiveStreams.value = [];
-					twitchUser.value = null;
-					throw new Error('Токен доступа истёк, выполните повторную авторизацию');
-				}
-				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			if (!result.ok) {
+				console.error(result.error);
+				return result;
 			}
 
-			const data: { data: TwitchUser[] } = await response.json();
-			const user = data.data[0]!;
+			allIds.push(...result.data.data.map((item) => item.broadcaster_id));
+			cursor = result.data.pagination.cursor;
+		} while (cursor);
 
-			return user;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-			error.value = message;
-			twitchUser.value = null;
-			throw err;
-		}
+		return ok(allIds);
 	}
 
-	async function getAllFollowedChannelsIds(token: string) {
-		error.value = null;
-		try {
-			const currentUser = twitchUser.value ?? (await getUserProfile(token));
-			const allIds: string[] = [];
-			let cursor: string | undefined;
-
-			do {
-				const url = new URL('https://api.twitch.tv/helix/channels/followed');
-				url.searchParams.set('user_id', currentUser.id);
-				url.searchParams.set('first', '100');
-				if (cursor) {
-					url.searchParams.set('after', cursor);
-				}
-
-				const followResponse = await fetch(url.toString(), {
-					headers: {
-						'Client-ID': CLIENT_ID,
-						Authorization: `Bearer ${token}`,
-					},
-				});
-
-				if (!followResponse.ok) {
-					throw new Error(`HTTP ${followResponse.status}: ${followResponse.statusText}`);
-				}
-
-				const response: {
-					data: {
-						broadcaster_id: string;
-						broadcaster_login: string;
-						broadcaster_name: string;
-						followed_at: string;
-					}[];
-					pagination: {
-						cursor: string;
-					};
-					total: number;
-				} = await followResponse.json();
-
-				allIds.push(...response.data.map((item) => item.broadcaster_id));
-				cursor = response.pagination.cursor;
-			} while (cursor);
-
-			return allIds;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-
-			error.value = message;
-
-			throw err;
-		}
-	}
-
-	async function getDetailsAboutStreamers(
+	async function fetchDetailsAboutStreamers(
 		token: string,
 		ids: string[]
-	): Promise<StreamersDetails[]> {
+	): Promise<Result<StreamersDetails[]>> {
 		error.value = null;
-		try {
-			const allDetails: StreamersDetails[] = [];
 
-			for (let i = 0; i < ids.length; i += 100) {
-				const batch = ids.slice(i, i + 100);
-				const query = batch.map((id) => `id=${id}`).join('&');
+		const allDetails: StreamersDetails[] = [];
 
-				const response = await fetch(`https://api.twitch.tv/helix/users?${query}`, {
+		for (let i = 0; i < ids.length; i += 100) {
+			const batch = ids.slice(i, i + 100);
+			const query = batch.map((id) => `id=${id}`).join('&');
+
+			const result = await request<{ data: StreamersDetails[] }>(
+				`https://api.twitch.tv/helix/users?${query}`,
+				{
 					headers: {
 						'Client-ID': CLIENT_ID,
 						Authorization: `Bearer ${token}`,
 					},
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 				}
+			);
 
-				const data: { data: StreamersDetails[] } = await response.json();
-				allDetails.push(...data.data);
+			if (!result.ok) {
+				console.error(result.error);
+				return result;
 			}
 
-			return allDetails;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-
-			error.value = message;
-
-			throw err;
+			allDetails.push(...result.data.data);
 		}
-	}
 
-	async function loadFollowedStreams(token: string) {
-		loading.value = true;
-		error.value = null;
-
-		try {
-			const currentUser = twitchUser.value ?? (await getUserProfile(token));
-			const streams = await fetchFollowedStreams(token, currentUser.id);
-
-			followedLiveStreams.value = streams as FollowData[];
-			return followedLiveStreams.value;
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-			error.value = message;
-			followedLiveStreams.value = [];
-			throw err;
-		} finally {
-			loading.value = false;
-		}
+		return ok(allDetails);
 	}
 
 	async function loginWithTwitch() {
@@ -248,7 +207,14 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 			accessToken.value = token;
 
-			twitchUser.value = await getUserProfile(token);
+			const getUserProfileResult = await fetchUserProfile(token);
+
+			if (!getUserProfileResult.ok) {
+				console.error(getUserProfileResult.error);
+				return getUserProfileResult;
+			}
+
+			twitchUser.value = getUserProfileResult.data;
 
 			const storage = await getStorage();
 			storage.auth.accessToken = token;
@@ -256,10 +222,36 @@ export const useTwitchStore = defineStore('twitch', () => {
 			storage.auth.userId = twitchUser.value.id;
 			await saveStorage(storage);
 
-			await loadFollowedStreams(token);
+			const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
+				token,
+				twitchUser.value.id
+			);
 
-			const ids = await getAllFollowedChannelsIds(token);
-			followedAllStreams.value = await getDetailsAboutStreamers(token, ids);
+			if (!fetchFollowedLiveStreamsResult.ok) {
+				console.error(fetchFollowedLiveStreamsResult.error);
+				return fetchFollowedLiveStreamsResult;
+			}
+
+			followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
+
+			const idsResult = await fetchAllFollowedChannelsIds(token);
+
+			if (!idsResult.ok) {
+				console.error(idsResult.error);
+				return idsResult;
+			}
+
+			const getDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
+				token,
+				idsResult.data
+			);
+
+			if (!getDetailsAboutStreamersResult.ok) {
+				console.error(getDetailsAboutStreamersResult.error);
+				return getDetailsAboutStreamersResult;
+			}
+
+			followedAllStreams.value = getDetailsAboutStreamersResult.data;
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
 			if (message.includes('canceled') || message.includes('cancelled')) {
@@ -273,7 +265,6 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	async function logout() {
-		// Good
 		const storage = await getStorage();
 		storage.auth.accessToken = '';
 		storage.auth.isAuthenticated = false;
@@ -295,11 +286,46 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 			if (storage.auth.accessToken) {
 				accessToken.value = storage.auth.accessToken;
-				twitchUser.value = await getUserProfile(accessToken.value);
 
-				followedLiveStreams.value = await loadFollowedStreams(accessToken.value);
-				const ids = await getAllFollowedChannelsIds(accessToken.value);
-				followedAllStreams.value = await getDetailsAboutStreamers(accessToken.value, ids);
+				const getUserProfileResult = await fetchUserProfile(accessToken.value);
+
+				if (!getUserProfileResult.ok) {
+					console.error(getUserProfileResult.error);
+					return getUserProfileResult;
+				}
+
+				twitchUser.value = getUserProfileResult.data;
+
+				const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
+					accessToken.value,
+					twitchUser.value.id
+				);
+
+				if (!fetchFollowedLiveStreamsResult.ok) {
+					console.error(fetchFollowedLiveStreamsResult.error);
+					return fetchFollowedLiveStreamsResult;
+				}
+
+				followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
+
+				const idsResult = await fetchAllFollowedChannelsIds(accessToken.value);
+
+				if (!idsResult.ok) {
+					console.error(idsResult.error);
+					return idsResult;
+				}
+
+				const getDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
+					accessToken.value,
+					idsResult.data
+				);
+
+				if (!getDetailsAboutStreamersResult.ok) {
+					console.error(getDetailsAboutStreamersResult.error);
+					return getDetailsAboutStreamersResult;
+				}
+
+				followedAllStreams.value = getDetailsAboutStreamersResult.data;
 			} else {
 				accessToken.value = null;
 				twitchUser.value = null;
@@ -333,12 +359,11 @@ export const useTwitchStore = defineStore('twitch', () => {
 		followedLiveStreams,
 		followedAllStreams,
 		isAuthenticated,
-		getUserProfile,
-		loadFollowedStreams,
+
 		loginWithTwitch,
 		logout,
 		init,
-		getAllFollowedChannelsIds,
-		getDetailsAboutStreamers,
+		getAllFollowedChannelsIds: fetchAllFollowedChannelsIds,
+		getDetailsAboutStreamers: fetchDetailsAboutStreamers,
 	};
 });

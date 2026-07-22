@@ -1,20 +1,12 @@
 import { CLIENT_ID } from '@/constants';
+import type { FollowData } from '@/stores/twitch';
+import { request, type Result, ok, type Response } from '@/types/result';
 
-export interface LiveStream {
-	user_id: string;
-	user_login: string;
-	user_name: string;
-	title: string;
-	game_name: string;
-	thumbnail_url: string;
-}
-
-/**
- * Fetches all followed live streams for a given user.
- * Handles pagination automatically.
- */
-export async function fetchFollowedStreams(token: string, userId: string): Promise<LiveStream[]> {
-	const allStreams: LiveStream[] = [];
+export async function fetchFollowedLiveStreams(
+	token: string,
+	userId: string
+): Promise<Result<FollowData[]>> {
+	const allStreams: FollowData[] = [];
 	let cursor: string | undefined;
 
 	do {
@@ -25,21 +17,21 @@ export async function fetchFollowedStreams(token: string, userId: string): Promi
 			url.searchParams.set('after', cursor);
 		}
 
-		const res = await fetch(url.toString(), {
+		const result = await request<Response<FollowData[]>>(url.toString(), {
 			headers: {
 				'Client-ID': CLIENT_ID,
 				Authorization: `Bearer ${token}`,
 			},
 		});
 
-		if (!res.ok) {
-			throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+		if (!result.ok) {
+			console.error(result.error);
+			return result;
 		}
 
-		const data = await res.json();
-		allStreams.push(...data.data);
-		cursor = data.pagination?.cursor;
+		allStreams.push(...result.data.data);
+		cursor = result.data.pagination?.cursor;
 	} while (cursor);
 
-	return allStreams;
+	return ok(allStreams);
 }

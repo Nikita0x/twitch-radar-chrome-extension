@@ -1,5 +1,5 @@
 import { getStorage, saveStorage } from '@/services/storage.service';
-import { fetchFollowedStreams } from '@/services/twitch-api';
+import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { ALARM_NAME } from '@/constants';
 
 async function sendNotification(stream: {
@@ -68,7 +68,14 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 	const token = storage.auth.accessToken;
 	const userId = storage.auth.userId;
-	const liveStreams = await fetchFollowedStreams(token, userId);
+	const liveStreamsResult = await fetchFollowedLiveStreams(token, userId);
+
+	if (!liveStreamsResult.ok) {
+		console.error(liveStreamsResult.error);
+		return;
+	}
+
+	const liveStreams = liveStreamsResult.data;
 
 	if (liveStreams.length === 0) {
 		if (Object.keys(storage.notifiedStreams).length > 0) {

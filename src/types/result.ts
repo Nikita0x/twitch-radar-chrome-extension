@@ -13,33 +13,42 @@ export type Result<T, E = ApiError> =
 			readonly error: E;
 	  };
 
-export async function request<T>(url: string, options?: RequestInit): Promise<Result<T>> {
+export function ok<T>(data: T): Result<T> {
+	return { ok: true, data };
+}
+
+export function err<E = ApiError>(error: E): Result<never, E> {
+	return { ok: false, error };
+}
+
+export interface Response<T> {
+	data: T;
+	pagination: {
+		cursor?: string;
+	};
+}
+
+export async function request<ResponseType>(
+	url: string,
+	options?: RequestInit
+): Promise<Result<ResponseType>> {
 	try {
 		const response = await fetch(url, options);
 
 		if (!response.ok) {
-			return {
-				ok: false,
-				error: {
-					status: response.status,
-					message: response.statusText,
-				},
-			};
+			return err({
+				status: response.status,
+				message: response.statusText,
+			});
 		}
 
-		const data = (await response.json()) as T;
+		const data = (await response.json()) as ResponseType;
 
-		return {
-			ok: true,
-			data,
-		};
-	} catch (err) {
-		return {
-			ok: false,
-			error: {
-				status: 0,
-				message: err instanceof Error ? err.message : String(err),
-			},
-		};
+		return ok(data);
+	} catch (error) {
+		return err({
+			status: 0,
+			message: error instanceof Error ? error.message : String(error),
+		});
 	}
 }
