@@ -6,7 +6,12 @@
 			style="display: flex; padding-inline: 5px"
 			class="toolbar"
 		>
-			<input class="search-input" placeholder="Streamer name..." v-model="search" />
+			<input
+				class="search-input"
+				ref="search-input"
+				placeholder="Streamer name..."
+				v-model="search"
+			/>
 			<div>
 				<select
 					class="sort-select"
@@ -28,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, useTemplateRef } from 'vue';
 import HeaderComponent from './components/HeaderComponent.vue';
 import SettingsTab from './components/SettingsTab.vue';
 import FavoritesTab from './components/FavoritesTab.vue';
@@ -46,11 +51,14 @@ export type Tabs = 'favorites' | 'settings';
 
 const activeTab = ref<Tabs>('favorites');
 const search = ref('');
+const input = useTemplateRef('search-input');
 
 onMounted(async () => {
 	await userSettingsStore.loadSettings();
 	userSettingsStore.applyTheme(userSettingsState.value.theme);
 	await twitchStore.init();
+
+	input.value?.focus();
 });
 </script>
 
