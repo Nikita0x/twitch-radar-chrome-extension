@@ -2,6 +2,10 @@
 
 ## Features
 - [x] Нотификации когда стример включил трансляцию (если уже live - то не присылать)
+- [ ] Разделить нотификации на три типа (глобальные настройки + пер-стримерные):
+  - [ ] when streamer goes live (offline → online)
+  - [ ] when streamer changes the title
+  - [ ] when streamer changes the category (game)
 - [ ] Добавить возможность включать и отключать:
   - [x] нотификации
   - [ ] автоматически открывать вкладку (auto-open tab) — `chrome.tabs.create()`
