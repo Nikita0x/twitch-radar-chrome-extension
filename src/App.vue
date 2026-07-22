@@ -67,9 +67,8 @@ onMounted(async () => {
 	width: 500px;
 	box-sizing: border-box;
 	display: flex;
-	flex: 1;
 	flex-direction: column;
-	background: var(--color-bg-primary);
+	background: var(--color-bg);
 }
 
 .toolbar {
@@ -87,7 +86,7 @@ onMounted(async () => {
 
 	font-size: 13px;
 	background: var(--color-bg-input);
-	color: var(--color-text-primary);
+	color: var(--color-text);
 
 	transition:
 		border-color 0.2s,
@@ -101,7 +100,7 @@ onMounted(async () => {
 }
 
 .search-input::placeholder {
-	color: var(--color-text-placeholder);
+	color: var(--color-text-dim);
 }
 
 .search-input:focus,

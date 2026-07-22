@@ -92,7 +92,7 @@ async function login() {
 	gap: 10px;
 	padding: 28px 20px 24px;
 	border-radius: 13px;
-	background: var(--color-bg-primary);
+	background: var(--color-bg);
 	text-align: center;
 }
 
@@ -103,7 +103,7 @@ async function login() {
 	width: 56px;
 	height: 56px;
 	border-radius: 50%;
-	background: var(--color-accent-gradient);
+	background: var(--color-accent);
 	color: white;
 	margin-bottom: 4px;
 }
@@ -112,14 +112,14 @@ async function login() {
 	margin: 0;
 	font-size: 18px;
 	font-weight: 700;
-	color: var(--color-text-dark);
+	color: var(--color-text);
 }
 
 .auth-text {
 	margin: 0;
 	font-size: 13px;
 	line-height: 1.5;
-	color: var(--color-text-notif-desc);
+	color: var(--color-text-muted);
 	max-width: 280px;
 }
 
@@ -145,7 +145,7 @@ async function login() {
 	align-items: center;
 	gap: 8px;
 	margin-top: 4px;
-	background: var(--color-accent-gradient);
+	background: var(--color-accent);
 	color: white;
 	border: none;
 	padding: 11px 22px;

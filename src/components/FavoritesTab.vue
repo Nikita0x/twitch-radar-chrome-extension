@@ -75,14 +75,14 @@ const visibleStreams = computed(() => {
 .api-buttons {
 	margin: 12px 0;
 	font-family: inherit;
-	background: var(--color-bg-primary);
+	background: var(--color-bg);
 }
 
 .api-error {
 	padding: 8px;
-	color: var(--color-error-text);
+	color: var(--color-error);
 	font-size: 13px;
-	background: var(--color-bg-error);
+	background: var(--color-error-bg);
 	border-radius: 6px;
 	margin-top: 8px;
 	text-align: center;
@@ -159,7 +159,7 @@ const visibleStreams = computed(() => {
 	align-items: center;
 	min-height: 180px;
 	text-align: center;
-	color: var(--color-text-empty);
+	color: var(--color-text-muted);
 }
 
 .empty-search .icon {
@@ -176,6 +176,6 @@ const visibleStreams = computed(() => {
 .empty-search p {
 	margin-top: 6px;
 	font-size: 13px;
-	color: var(--color-text-empty-icon);
+	color: var(--color-text-dim);
 }
 </style>

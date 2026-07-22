@@ -130,7 +130,7 @@ function formatDate(dateStr: string) {
 	flex-direction: column;
 	gap: 10px;
 	padding: 5px;
-	border-bottom: 1px solid var(--color-border-default);
+	border-bottom: 1px solid var(--color-border);
 	transition: background 0.2s ease;
 }
 
@@ -163,9 +163,9 @@ function formatDate(dateStr: string) {
 	border-radius: 50%;
 	background: linear-gradient(
 		90deg,
-		var(--color-bg-skeleton) 25%,
-		var(--color-bg-skeleton-shine) 50%,
-		var(--color-bg-skeleton) 75%
+		var(--color-bg-secondary) 25%,
+		var(--color-border) 50%,
+		var(--color-bg-secondary) 75%
 	);
 	background-size: 200% 100%;
 	animation: skeleton-loading 1.2s infinite;
@@ -208,7 +208,7 @@ function formatDate(dateStr: string) {
 	margin: 0;
 	font-size: 16px;
 	font-weight: 700;
-	color: var(--color-text-primary);
+	color: var(--color-text);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -236,25 +236,25 @@ function formatDate(dateStr: string) {
 }
 
 .badge.partner {
-	background: var(--color-badge-partner-bg);
-	color: var(--color-badge-partner-text);
+	background: var(--color-accent);
+	color: white;
 }
 
 .badge.affiliate {
-	background: var(--color-badge-affiliate-bg);
-	color: var(--color-badge-affiliate-text);
+	background: var(--color-bg-secondary);
+	color: var(--color-accent);
 }
 
 .description {
 	margin: 0;
 	font-size: 13px;
 	line-height: 1.4;
-	color: var(--color-text-description);
+	color: var(--color-text-muted);
 	overflow: hidden;
 }
 
 .description.empty {
-	color: var(--color-text-desc-empty);
+	color: var(--color-text-dim);
 	font-style: italic;
 }
 
@@ -266,7 +266,7 @@ function formatDate(dateStr: string) {
 
 .created {
 	font-size: 11px;
-	color: var(--color-text-desc-muted);
+	color: var(--color-text-dim);
 }
 
 .profile-link {
@@ -290,21 +290,21 @@ function formatDate(dateStr: string) {
 	height: 32px;
 	margin-left: auto;
 	flex-shrink: 0;
-	border: 1px solid var(--color-border-notif);
+	border: 1px solid var(--color-border);
 	border-radius: 8px;
-	background: var(--color-bg-notif-toggle);
+	background: var(--color-bg);
 	cursor: pointer;
 	transition: all 0.2s ease;
 }
 
 .notif-toggle:hover {
-	background: var(--color-bg-toggle-hover);
-	border-color: var(--color-border-notif-active);
+	background: var(--color-bg-secondary);
+	border-color: var(--color-accent);
 }
 
 .notif-toggle.active {
-	background: var(--color-bg-toggle-hover);
-	border-color: var(--color-border-notif-active);
+	background: var(--color-bg-secondary);
+	border-color: var(--color-accent);
 }
 
 .notif-icon {

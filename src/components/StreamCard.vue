@@ -60,7 +60,7 @@ const imageLoaded = ref(false);
 	display: flex;
 
 	gap: 10px;
-	border-bottom: 1px solid var(--color-border-default);
+	border-bottom: 1px solid var(--color-border);
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
@@ -69,7 +69,7 @@ const imageLoaded = ref(false);
 }
 
 .card:hover {
-	background: var(--color-bg-card-hover);
+	background: var(--color-bg-secondary);
 
 	transform: translateY(-1px);
 	box-shadow: 0 2px 8px rgba(145, 70, 255, 0.12);
@@ -114,10 +114,10 @@ const imageLoaded = ref(false);
 	padding: 7px 9px;
 	box-sizing: border-box;
 
-	background-color: var(--color-thumb-user-bg);
+	background: rgba(0, 0, 0, 0.6);
 }
 .thumb-user {
-	color: var(--color-thumb-user-text);
+	color: white;
 	font-size: 15px;
 	letter-spacing: 0.02em;
 	display: block;
@@ -138,7 +138,7 @@ const imageLoaded = ref(false);
 
 .card-name {
 	font-weight: bold;
-	color: var(--color-text-primary);
+	color: var(--color-text);
 	overflow: hidden;
 	font-size: 15px;
 
@@ -149,7 +149,7 @@ const imageLoaded = ref(false);
 }
 
 .card-game {
-	color: var(--color-text-game);
+	color: var(--color-text-dim);
 	font-size: 14px;
 }
 
@@ -166,18 +166,18 @@ const imageLoaded = ref(false);
 	width: 1em;
 	height: 1em;
 	border-radius: 50%;
-	background-color: var(--color-live-dot);
+	background-color: var(--color-red);
 }
 
 .viewer-count {
 	font-weight: 700;
-	color: var(--color-viewer-count);
+	color: var(--color-text);
 }
 
 .uptime {
 	display: flex;
 	align-items: center;
-	color: var(--color-text-primary);
+	color: var(--color-text);
 }
 
 .thumb-skeleton {
@@ -186,9 +186,9 @@ const imageLoaded = ref(false);
 
 	background: linear-gradient(
 		90deg,
-		var(--color-bg-skeleton) 25%,
-		var(--color-bg-skeleton-shine) 50%,
-		var(--color-bg-skeleton) 75%
+		var(--color-bg-secondary) 25%,
+		var(--color-border) 50%,
+		var(--color-bg-secondary) 75%
 	);
 
 	background-size: 200% 100%;

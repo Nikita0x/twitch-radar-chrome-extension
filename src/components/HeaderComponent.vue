@@ -116,7 +116,7 @@ async function logout() {
 	border-radius: 4px;
 	font-size: 18px;
 	transition: background 0.15s ease;
-	color: var(--color-btn-text);
+	color: var(--color-header-text);
 }
 
 .icon-btn:hover {
@@ -134,7 +134,7 @@ async function logout() {
 .heart-icon {
 	display: block;
 	transition: transform 0.3s ease;
-	color: var(--color-btn-text);
+	color: var(--color-header-text);
 }
 
 .cog-btn:hover .cog-icon {
@@ -153,8 +153,8 @@ async function logout() {
 }
 
 .logout-btn {
-	background-color: var(--color-btn-bg);
-	color: var(--color-btn-text);
+	background-color: var(--color-red);
+	color: white;
 	border: none;
 	padding: 5px 10px;
 	border-radius: 4px;
@@ -164,10 +164,10 @@ async function logout() {
 }
 
 .logout-btn:hover {
-	background-color: var(--color-btn-hover);
+	filter: brightness(1.2);
 }
 
 .user-name {
-	color: var(--color-btn-text);
+	color: var(--color-header-text);
 }
 </style>

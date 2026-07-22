@@ -8,7 +8,7 @@
 <style scoped>
 .app-loader {
 	padding: 10px;
-	color: var(--color-spinner-text);
+	color: var(--color-text-muted);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -20,8 +20,8 @@
 .spinner {
 	width: 24px;
 	height: 24px;
-	border: 3px solid var(--color-spinner-border);
-	border-top-color: var(--color-spinner-top);
+	border: 3px solid var(--color-border);
+	border-top-color: var(--color-accent);
 	border-radius: 50%;
 	animation: spin 0.8s linear infinite;
 }

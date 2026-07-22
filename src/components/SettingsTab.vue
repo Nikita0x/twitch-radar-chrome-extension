@@ -120,9 +120,8 @@ async function handleToggleNotifications(streamerId: string) {
 <style scoped>
 .twitch-auth {
 	margin: 15px 0;
-
 	font-family: inherit;
-	background: var(--color-bg-primary);
+	background: var(--color-bg);
 }
 
 .setting-row {
@@ -137,7 +136,7 @@ async function handleToggleNotifications(streamerId: string) {
 	cursor: pointer;
 	font-size: 14px;
 	user-select: none;
-	color: var(--color-text-primary);
+	color: var(--color-text);
 }
 
 .toggle-label input[type='checkbox'] {
@@ -149,9 +148,9 @@ async function handleToggleNotifications(streamerId: string) {
 
 .error {
 	padding: 10px;
-	color: var(--color-error-text);
+	color: var(--color-error);
 	font-size: 14px;
-	background: var(--color-bg-error);
+	background: var(--color-error-bg);
 	border-radius: 6px;
 }
 
@@ -162,7 +161,7 @@ async function handleToggleNotifications(streamerId: string) {
 
 .retry-btn {
 	background-color: var(--color-accent);
-	color: var(--color-btn-text);
+	color: white;
 	border: none;
 	padding: 5px 15px;
 	border-radius: 4px;
@@ -176,14 +175,14 @@ async function handleToggleNotifications(streamerId: string) {
 
 .followed-section {
 	margin-top: 20px;
-	border-top: 1px solid var(--color-settings-section-border);
+	border-top: 1px solid var(--color-border);
 	padding-top: 12px;
 }
 
 .section-title {
 	font-size: 14px;
 	font-weight: 700;
-	color: var(--color-settings-title);
+	color: var(--color-text);
 	text-align: left;
 	padding: 0 5px;
 }
@@ -196,7 +195,7 @@ async function handleToggleNotifications(streamerId: string) {
 	border-radius: 8px;
 	font-size: 13px;
 	background: var(--color-bg-input);
-	color: var(--color-text-primary);
+	color: var(--color-text);
 	transition:
 		border-color 0.2s,
 		box-shadow 0.2s,
@@ -207,7 +206,7 @@ async function handleToggleNotifications(streamerId: string) {
 }
 
 .search-input::placeholder {
-	color: var(--color-text-placeholder);
+	color: var(--color-text-dim);
 }
 
 .search-input:focus {
@@ -252,7 +251,7 @@ async function handleToggleNotifications(streamerId: string) {
 	align-items: center;
 	min-height: 180px;
 	text-align: center;
-	color: var(--color-text-empty);
+	color: var(--color-text-muted);
 }
 
 .empty-search .icon {
@@ -269,6 +268,6 @@ async function handleToggleNotifications(streamerId: string) {
 .empty-search p {
 	margin-top: 6px;
 	font-size: 13px;
-	color: var(--color-text-empty-icon);
+	color: var(--color-text-dim);
 }
 </style>
