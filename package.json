@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "vite build --watch --mode development",
 		"check": "vue-tsc --build",
-		"build": "npm run check && vite build"
+		"build": "npm run check && vite build",
+		"format": "npx prettier . --write"
 	},
 	"dependencies": {
 		"pinia": "^3.0.4",

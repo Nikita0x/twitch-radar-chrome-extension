@@ -12,7 +12,6 @@ export function formatUptime(startedAt: string) {
 }
 
 export function extractTokenFromUrl(url: string) {
-	// Good
 	try {
 		const hash = new URL(url).hash.substring(1);
 		const params = new URLSearchParams(hash);

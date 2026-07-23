@@ -4,9 +4,12 @@ import type { UserSettings } from '@/services/storage.service';
 import { getStorage, saveStorage } from '@/services/storage.service';
 import { DEFAULT_STORAGE } from '@/services/storage.service';
 
+export type StreamerId = string;
+export type IsEnabled = boolean;
+
 export const useUserSettings = defineStore('user-settings', () => {
 	const userSettingsState = ref<UserSettings>({ ...DEFAULT_STORAGE.userSettings });
-	const streamerNotifications = ref<Record<string, boolean>>({});
+	const streamerNotifications = ref<Record<StreamerId, IsEnabled>>({});
 
 	async function loadSettings() {
 		const storage = await getStorage();
@@ -41,17 +44,18 @@ export const useUserSettings = defineStore('user-settings', () => {
 	async function setAllStreamerNotifications(enabled: boolean, allStreamerIds: string[]) {
 		const storage = await getStorage();
 
-		// Update the global toggle
+		// TODO: use updateSettings() here
 		storage.userSettings.enableAllNotifications = enabled;
 		userSettingsState.value.enableAllNotifications = enabled;
 
 		// Enable/disable for ALL followed streamers
-		const newNotifications: Record<string, boolean> = {};
+		const newNotifications: Record<StreamerId, IsEnabled> = {};
 
 		for (const id of allStreamerIds) {
 			newNotifications[id] = enabled;
 		}
 
+		// TODO: move stremaerNotifications into userSettings
 		streamerNotifications.value = newNotifications;
 		storage.streamerNotifications = newNotifications;
 

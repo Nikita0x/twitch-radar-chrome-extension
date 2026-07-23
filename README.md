@@ -33,6 +33,7 @@ npm install           # install dependencies
 npm run dev           # live development build (watch mode)
 npm run build         # build an extension (then load `dist` folder)
 npm run check         # TypeScript type check
+npm run format        # Format project with prettier
 ```
 
 ## Report an Issue
