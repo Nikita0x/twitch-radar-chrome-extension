@@ -48,9 +48,11 @@ import { ref } from 'vue';
 import type { FollowData } from '@/stores/twitch';
 import { formatUptime } from '@/utils/utils';
 
-const props = defineProps<{
+interface Props {
 	stream: FollowData;
-}>();
+}
+
+const props = defineProps<Props>();
 
 const imageLoaded = ref(false);
 </script>

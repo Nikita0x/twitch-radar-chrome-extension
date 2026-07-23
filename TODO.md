@@ -32,4 +32,3 @@
 - [ ] Разбить `loginWithTwitch` — вынести цепочку загрузки данных в отдельный метод
 - [ ] Централизовать `error.value = null`
 - [ ] Update userSettings to have streamerNotifications inside (change the structure)
-

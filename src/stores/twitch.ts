@@ -5,6 +5,7 @@ import { getStorage, saveStorage } from '@/services/storage.service';
 import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { CLIENT_ID } from '@/constants';
 import { request, type Result, ok, err } from '@/types/result';
+import { performOAuth } from '@/services/auth.service';
 
 interface TwitchUser {
 	id: string;
@@ -50,26 +51,9 @@ export interface StreamersDetails {
 	view_count: number;
 }
 
-// TODO: move this logic to some other
-/**
- * Sends a message to background service worker to perform OAuth via launchWebAuthFlow.
- * This keeps the WebAuthFlow alive even if the popup closes during auth.
- */
-async function performOAuth(authUrl: string): Promise<string> {
-	// console.log('[popup] Отправляю запрос OAuth в background...');
-	const response = await chrome.runtime.sendMessage({ type: 'OAUTH_LOGIN', url: authUrl });
-	// console.log('[popup] Получен ответ от background:', response);
-
-	if (!response.ok) {
-		throw new Error(response.error || 'Authorization error');
-	}
-
-	return response.redirectUrl;
-}
-
 export const useTwitchStore = defineStore('twitch', () => {
 	const accessToken = ref<string | null>(null);
-	const twitchUser = ref<TwitchUser | null>(null);
+	const user = ref<TwitchUser | null>(null);
 	const loading = ref(false);
 	const error = ref<string | null>(null);
 	const followedLiveStreams = ref<FollowData[]>([]);
@@ -102,7 +86,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	async function fetchAllFollowedChannelsIds(token: string): Promise<Result<string[]>> {
 		error.value = null;
 
-		if (!twitchUser.value) {
+		if (!user.value) {
 			const getUserProfileResult = await fetchUserProfile(token);
 
 			if (!getUserProfileResult.ok) {
@@ -110,7 +94,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 				return getUserProfileResult;
 			}
 
-			twitchUser.value = getUserProfileResult.data;
+			user.value = getUserProfileResult.data;
 		}
 
 		const allIds: string[] = [];
@@ -118,7 +102,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 		do {
 			const url = new URL('https://api.twitch.tv/helix/channels/followed');
-			url.searchParams.set('user_id', twitchUser.value.id);
+			url.searchParams.set('user_id', user.value.id);
 			url.searchParams.set('first', '100');
 			if (cursor) {
 				url.searchParams.set('after', cursor);
@@ -214,18 +198,15 @@ export const useTwitchStore = defineStore('twitch', () => {
 				return getUserProfileResult;
 			}
 
-			twitchUser.value = getUserProfileResult.data;
+			user.value = getUserProfileResult.data;
 
 			const storage = await getStorage();
 			storage.auth.accessToken = token;
 			storage.auth.isAuthenticated = true;
-			storage.auth.userId = twitchUser.value.id;
+			storage.auth.userId = user.value.id;
 			await saveStorage(storage);
 
-			const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
-				token,
-				twitchUser.value.id
-			);
+			const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(token, user.value.id);
 
 			if (!fetchFollowedLiveStreamsResult.ok) {
 				console.error(fetchFollowedLiveStreamsResult.error);
@@ -272,7 +253,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 		await saveStorage(storage);
 
 		accessToken.value = null;
-		twitchUser.value = null;
+		user.value = null;
 		followedLiveStreams.value = [];
 		followedAllStreams.value = [];
 		error.value = null;
@@ -294,11 +275,11 @@ export const useTwitchStore = defineStore('twitch', () => {
 					return getUserProfileResult;
 				}
 
-				twitchUser.value = getUserProfileResult.data;
+				user.value = getUserProfileResult.data;
 
 				const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
 					accessToken.value,
-					twitchUser.value.id
+					user.value.id
 				);
 
 				if (!fetchFollowedLiveStreamsResult.ok) {
@@ -328,7 +309,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 				followedAllStreams.value = getDetailsAboutStreamersResult.data;
 			} else {
 				accessToken.value = null;
-				twitchUser.value = null;
+				user.value = null;
 				followedLiveStreams.value = [];
 			}
 		} catch (err) {
@@ -353,7 +334,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 	return {
 		accessToken,
-		twitchUser,
+		twitchUser: user,
 		loading,
 		error,
 		followedLiveStreams,

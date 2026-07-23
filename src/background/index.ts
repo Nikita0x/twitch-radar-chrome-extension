@@ -1,13 +1,9 @@
 import { getStorage, saveStorage } from '@/services/storage.service';
 import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { ALARM_NAME } from '@/constants';
+import type { FollowData } from '@/stores/twitch';
 
-async function sendNotification(stream: {
-	user_id: string;
-	user_name: string;
-	title: string;
-	user_login: string;
-}) {
+async function sendNotification(stream: FollowData) {
 	try {
 		await chrome.notifications.create(stream.user_login, {
 			type: 'basic',
@@ -51,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 			})
 			.catch((err) => {
 				const msg = err instanceof Error ? err.message : String(err);
-				console.log('[background] OAuth ошибка:', msg);
+				console.log('[background] OAuth error:', msg);
 				console.log('[background] Error stack:', err instanceof Error ? err.stack : 'N/A');
 				sendResponse({ ok: false, error: msg });
 			});
