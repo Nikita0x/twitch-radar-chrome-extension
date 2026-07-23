@@ -1,7 +1,7 @@
 import { getStorage, saveStorage } from '@/services/storage.service';
 import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { ALARM_NAME } from '@/constants';
-import type { FollowData } from '@/stores/twitch';
+import type { FollowData } from '@/stores/twitch.store';
 
 async function sendNotification(stream: FollowData) {
 	try {

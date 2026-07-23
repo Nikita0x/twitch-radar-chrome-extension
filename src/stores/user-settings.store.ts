@@ -7,7 +7,7 @@ import { DEFAULT_STORAGE } from '@/services/storage.service';
 export type StreamerId = string;
 export type IsEnabled = boolean;
 
-export const useUserSettings = defineStore('user-settings', () => {
+export const useUserSettingsStore = defineStore('user-settings', () => {
 	const userSettingsState = ref<UserSettings>({ ...DEFAULT_STORAGE.userSettings });
 	const streamerNotifications = ref<Record<StreamerId, IsEnabled>>({});
 

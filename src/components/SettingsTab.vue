@@ -59,13 +59,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useTwitchStore } from '@/stores/twitch';
-import { useUserSettings } from '@/stores/user-settings';
+import { useTwitchStore } from '@/stores/twitch.store.ts';
+import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+
 import AppLoader from './AppLoader.vue';
 import StreamerCard from './StreamerCard.vue';
 
 const twitchStore = useTwitchStore();
-const userSettingsStore = useUserSettings();
+const userSettingsStore = useUserSettingsStore();
+
 const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
 	storeToRefs(twitchStore);
 const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);

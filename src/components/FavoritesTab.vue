@@ -27,8 +27,8 @@ import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
 import AppLoader from './AppLoader.vue';
 import AuthPrompt from './AuthPrompt.vue';
-import { useTwitchStore } from '@/stores/twitch';
-import { useUserSettings } from '@/stores/user-settings.ts';
+import { useTwitchStore } from '@/stores/twitch.store.ts';
+import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
 
 interface Props {
 	search: string;
@@ -36,7 +36,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const twitchStore = useTwitchStore();
-const userSettings = useUserSettings();
+const userSettings = useUserSettingsStore();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettings);
 

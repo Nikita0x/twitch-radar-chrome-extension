@@ -1,8 +1,8 @@
 <template>
 	<div class="extension-shell">
-		<HeaderComponent style="margin-bottom: 10px" v-model="activeTab" />
+		<HeaderComponent style="margin-bottom: 10px" />
 		<div
-			v-if="isAuthenticated && activeTab === 'favorites'"
+			v-if="isAuthenticated && activeScreen === 'favorites'"
 			style="display: flex; padding-inline: 5px"
 			class="toolbar"
 		>
@@ -27,7 +27,8 @@
 				</select>
 			</div>
 		</div>
-		<FavoritesTab v-if="activeTab === 'favorites'" :sort="userSettingsState.sort" :search />
+		<FavoritesTab v-if="activeScreen === 'favorites'" :sort="userSettingsState.sort" :search />
+		<StreamerSettingsTab v-else-if="activeScreen === 'streamer-settings'" />
 		<SettingsTab v-else />
 	</div>
 </template>
@@ -37,19 +38,21 @@ import { ref, onMounted, computed, useTemplateRef } from 'vue';
 import HeaderComponent from './components/HeaderComponent.vue';
 import SettingsTab from './components/SettingsTab.vue';
 import FavoritesTab from './components/FavoritesTab.vue';
+import StreamerSettingsTab from './components/StreamerSettingsTab.vue';
 
-import { useTwitchStore } from '@/stores/twitch';
-import { useUserSettings } from './stores/user-settings.ts';
+import { useTwitchStore } from '@/stores/twitch.store.ts';
+import { useNavigationStore } from './stores/navigation.store.ts';
+import { useUserSettingsStore } from './stores/user-settings.store.ts';
+
 import { storeToRefs } from 'pinia';
 
 const twitchStore = useTwitchStore();
-const userSettingsStore = useUserSettings();
+const userSettingsStore = useUserSettingsStore();
+const navigationStore = useNavigationStore();
 const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
+const { activeScreen } = storeToRefs(navigationStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
 
-export type Tabs = 'favorites' | 'settings';
-
-const activeTab = ref<Tabs>('favorites');
 const search = ref('');
 const input = useTemplateRef('search-input');
 

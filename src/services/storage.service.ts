@@ -1,4 +1,4 @@
-import type { StreamerId, IsEnabled } from '@/stores/user-settings';
+import type { StreamerId, IsEnabled } from '@/stores/user-settings.store';
 
 interface StorageSchema {
 	auth: AuthState;

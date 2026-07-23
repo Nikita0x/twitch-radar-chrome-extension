@@ -1,5 +1,5 @@
 import { CLIENT_ID } from '@/constants';
-import type { FollowData } from '@/stores/twitch';
+import type { FollowData } from '@/stores/twitch.store';
 import { request, type Result, ok, type Response } from '@/types/result';
 
 export async function fetchFollowedLiveStreams(

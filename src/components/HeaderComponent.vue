@@ -2,9 +2,9 @@
 	<div class="header">
 		<div class="title">
 			<button
-				v-if="activeTab === 'settings'"
+				v-if="activeScreen === 'settings'"
 				class="icon-btn back-btn"
-				@click="activeTab = 'favorites'"
+				@click="activeScreen = 'favorites'"
 				title="Back"
 			>
 				<svg
@@ -25,10 +25,10 @@
 			<!-- <button class="icon-btn heart-btn" title="Favorites"><img src="/heart.svg" width="20" height="20"
                     class="heart-icon" /></button> -->
 			<button
-				v-if="isAuthenticated && activeTab === 'favorites'"
+				v-if="isAuthenticated && activeScreen === 'favorites'"
 				class="icon-btn cog-btn"
 				title="Settings"
-				@click="activeTab = 'settings'"
+				@click="activeScreen = 'settings'"
 			>
 				<svg
 					width="20px"
@@ -61,20 +61,19 @@
 </template>
 
 <script setup lang="ts">
-import type { Tabs } from '@/App.vue';
-import { useTwitchStore } from '@/stores/twitch';
+import { useTwitchStore } from '@/stores/twitch.store';
+import { useNavigationStore } from '@/stores/navigation.store';
 import { storeToRefs } from 'pinia';
 
 const twitchStore = useTwitchStore();
+const navigationStore = useNavigationStore();
 const { twitchUser, isAuthenticated } = storeToRefs(twitchStore);
+const { activeScreen } = storeToRefs(navigationStore);
 const props = defineProps();
-const activeTab = defineModel<Tabs>({
-	required: true,
-});
 
 async function logout() {
 	await twitchStore.logout();
-	activeTab.value = 'favorites';
+	activeScreen.value = 'favorites';
 }
 </script>
 

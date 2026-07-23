@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { useTwitchStore } from '@/stores/twitch';
+import { useTwitchStore } from '@/stores/twitch.store';
 
 const twitchStore = useTwitchStore();
 

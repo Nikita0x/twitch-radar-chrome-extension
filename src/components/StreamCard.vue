@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { FollowData } from '@/stores/twitch';
+import type { FollowData } from '@/stores/twitch.store';
 import { formatUptime } from '@/utils/utils';
 
 interface Props {
