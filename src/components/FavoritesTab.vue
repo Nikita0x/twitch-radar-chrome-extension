@@ -1,5 +1,32 @@
 <template>
 	<div class="state-shell">
+		<div
+			v-if="isAuthenticated && activeScreen === 'favorites'"
+			style="display: flex; padding-inline: 5px"
+			class="toolbar"
+		>
+			<input
+				class="search-input"
+				ref="search-input"
+				placeholder="Streamer name..."
+				v-model="search"
+			/>
+			<div>
+				<select
+					class="sort-select"
+					name="sort"
+					id="pet-select"
+					v-model="userSettingsState.sort"
+					@change="userSettingsStore.updateSettings({ sort: userSettingsState.sort })"
+				>
+					<option value="viewers:highToLow">Viewers: High to Low</option>
+					<option value="viewers:lowToHigh">Viewers: Low to High</option>
+					<option value="duration:longest">Duration: Longest</option>
+					<option value="duration:shortest">Duration: Shortest</option>
+				</select>
+			</div>
+		</div>
+
 		<AppLoader v-if="loading">Loading streams...</AppLoader>
 		<AuthPrompt v-else-if="!isAuthenticated" />
 		<div v-else-if="error" class="api-error">{{ error }}</div>
@@ -16,23 +43,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
 import AppLoader from './AppLoader.vue';
 import AuthPrompt from './AuthPrompt.vue';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+import { useNavigationStore } from '@/stores/navigation.store.ts';
 
-interface Props {
-	search: string;
-}
-const props = defineProps<Props>();
+// interface Props {
+// 	search: string;
+// }
+// const props = defineProps<Props>();
 
 const twitchStore = useTwitchStore();
-const userSettings = useUserSettingsStore();
+const userSettingsStore = useUserSettingsStore();
+const navigationStore = useNavigationStore();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
-const { userSettingsState } = storeToRefs(userSettings);
+const { userSettingsState } = storeToRefs(userSettingsStore);
+const { activeScreen } = storeToRefs(navigationStore);
+
+const search = ref('');
+const inputRef = useTemplateRef('search-input');
 
 const getTime = (date: string) => new Date(date).getTime();
 
@@ -40,7 +73,7 @@ const visibleStreams = computed(() => {
 	let result = [...followedLiveStreams.value];
 
 	result = result.filter((stream) =>
-		stream.user_name.toLowerCase().includes(props.search.toLowerCase())
+		stream.user_name.toLowerCase().includes(search.value.toLowerCase())
 	);
 
 	switch (userSettingsState.value.sort) {
@@ -62,6 +95,12 @@ const visibleStreams = computed(() => {
 	}
 
 	return result;
+});
+
+onMounted(() => {
+	if (!inputRef.value) return;
+
+	inputRef.value.focus();
 });
 </script>
 
@@ -129,5 +168,53 @@ const visibleStreams = computed(() => {
 	margin-top: 6px;
 	font-size: 13px;
 	color: var(--color-text-dim);
+}
+
+.toolbar {
+	display: flex;
+	gap: 5px;
+	padding-block: 5px;
+	align-items: center;
+}
+
+.search-input,
+.sort-select {
+	height: 38px;
+
+	border: 1px solid var(--color-border-input);
+	border-radius: 8px;
+
+	font-size: 13px;
+	background: var(--color-bg-input);
+	color: var(--color-text);
+
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s,
+		background 0.2s;
+}
+
+.search-input {
+	flex: 1;
+	padding: 0 5px;
+}
+
+.search-input::placeholder {
+	color: var(--color-text-dim);
+}
+
+.search-input:focus,
+.sort-select:focus {
+	outline: none;
+
+	border-color: var(--color-accent);
+
+	box-shadow: 0 0 0 3px rgba(145, 70, 255, 0.18);
+}
+
+.sort-select {
+	min-width: 180px;
+
+	cursor: pointer;
 }
 </style>

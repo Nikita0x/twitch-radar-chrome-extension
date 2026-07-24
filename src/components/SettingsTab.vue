@@ -34,7 +34,12 @@
 
 		<div v-if="followedAllStreams.length" class="followed-section">
 			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
-			<input class="search-input" placeholder="Streamer name..." v-model="search" />
+			<input
+				ref="search-input"
+				class="search-input"
+				placeholder="Streamer name..."
+				v-model="search"
+			/>
 
 			<div v-if="search && filteredStreamers.length === 0" class="empty-search">
 				<div class="icon">🔍</div>
@@ -57,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
@@ -73,6 +78,7 @@ const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isA
 const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
 
 const search = ref('');
+const searchRef = useTemplateRef('search-input');
 
 /** Local loading — stays true until all data (including followedAllStreams) is loaded */
 const localLoading = computed(
@@ -117,6 +123,12 @@ async function toggleAllNotifications() {
 async function handleToggleNotifications(streamerId: string) {
 	await userSettingsStore.toggleStreamerNotification(streamerId);
 }
+
+onMounted(() => {
+	if (!searchRef.value) return;
+
+	searchRef.value.focus();
+});
 </script>
 
 <style scoped>
