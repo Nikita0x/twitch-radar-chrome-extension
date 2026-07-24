@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, useTemplateRef } from 'vue';
+import { ref, computed, onMounted, useTemplateRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
 import AppLoader from './AppLoader.vue';
@@ -97,10 +97,8 @@ const visibleStreams = computed(() => {
 	return result;
 });
 
-onMounted(() => {
-	if (!inputRef.value) return;
-
-	inputRef.value.focus();
+watch(inputRef, (input) => {
+	input?.focus();
 });
 </script>
 
