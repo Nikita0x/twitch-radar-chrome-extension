@@ -13,10 +13,9 @@ html {
 	-webkit-text-size-adjust: 100%;
 }
 
-body {
-	display: flex;
-	min-height: 100vh;
-	font-family: sans-serif;
+html, body {
+    overflow: hidden;
+
 }
 
 img,

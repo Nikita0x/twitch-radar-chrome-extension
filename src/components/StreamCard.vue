@@ -114,7 +114,6 @@ const imageLoaded = ref(false);
 	left: 0;
 	bottom: 0;
 	padding: 7px 9px;
-	box-sizing: border-box;
 
 	background: rgba(0, 0, 0, 0.6);
 }

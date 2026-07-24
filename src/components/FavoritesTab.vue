@@ -1,22 +1,20 @@
 <template>
-	<div class="api-buttons">
-		<div class="state-shell">
-			<AppLoader v-if="loading">Loading streams...</AppLoader>
-			<AuthPrompt v-else-if="!isAuthenticated" />
-			<div v-else-if="error" class="api-error">{{ error }}</div>
-			<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
-			<div v-else-if="visibleStreams.length === 0" class="empty-search">
-				<div class="icon">🔍</div>
-				<h3>No streamer found</h3>
-				<p>Try a different search term</p>
-			</div>
-			<div v-else class="results-section fade-in">
-				<StreamCard
-					v-for="(channel, index) in visibleStreams"
-					:key="channel.id"
-					:stream="channel"
-				/>
-			</div>
+	<div class="state-shell">
+		<AppLoader v-if="loading">Loading streams...</AppLoader>
+		<AuthPrompt v-else-if="!isAuthenticated" />
+		<div v-else-if="error" class="api-error">{{ error }}</div>
+		<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
+		<div v-else-if="visibleStreams.length === 0" class="empty-search">
+			<div class="icon">🔍</div>
+			<h3>No streamer found</h3>
+			<p>Try a different search term</p>
+		</div>
+		<div v-else class="results-section fade-in">
+			<StreamCard
+				v-for="(channel, index) in [...visibleStreams, ...visibleStreams]"
+				:key="channel.id"
+				:stream="channel"
+			/>
 		</div>
 	</div>
 </template>
@@ -72,12 +70,6 @@ const visibleStreams = computed(() => {
 </script>
 
 <style scoped>
-.api-buttons {
-	margin: 12px 0;
-	font-family: inherit;
-	background: var(--color-bg);
-}
-
 .api-error {
 	padding: 8px;
 	color: var(--color-error);
@@ -106,18 +98,6 @@ const visibleStreams = computed(() => {
 	gap: 8px;
 }
 
-@keyframes fadeInUp {
-	from {
-		opacity: 0;
-		transform: translateY(4px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
 .results-section {
 	display: flex;
 	flex-direction: column;
@@ -126,30 +106,6 @@ const visibleStreams = computed(() => {
 .results-inner {
 	display: flex;
 	flex-direction: column;
-}
-
-/* ── Filter animation (TransitionGroup) ── */
-.filter-enter-active {
-	transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.filter-leave-active {
-	transition: all 100ms cubic-bezier(0.22, 1, 0.36, 1);
-	position: absolute;
-}
-
-.filter-move {
-	transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.filter-enter-from {
-	opacity: 0;
-	transform: scale(0.97);
-}
-
-.filter-leave-to {
-	opacity: 0;
-	transform: scale(0.97);
 }
 
 .empty-search {

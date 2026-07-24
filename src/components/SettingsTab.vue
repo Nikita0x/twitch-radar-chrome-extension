@@ -24,13 +24,13 @@
 			</label>
 		</div>
 
-		<div>
+		<template>
 			<AppLoader v-if="localLoading">Loading...</AppLoader>
 			<div v-else-if="error" class="error">
 				<p>{{ error }}</p>
 				<button @click="error = null" class="retry-btn">Try again</button>
 			</div>
-		</div>
+		</template>
 
 		<div v-if="followedAllStreams.length" class="followed-section">
 			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
@@ -121,8 +121,6 @@ async function handleToggleNotifications(streamerId: string) {
 
 <style scoped>
 .twitch-auth {
-	margin: 15px 0;
-	font-family: inherit;
 	background: var(--color-bg);
 }
 
@@ -176,7 +174,6 @@ async function handleToggleNotifications(streamerId: string) {
 }
 
 .followed-section {
-	margin-top: 20px;
 	border-top: 1px solid var(--color-border);
 	padding-top: 12px;
 }
@@ -203,7 +200,6 @@ async function handleToggleNotifications(streamerId: string) {
 		box-shadow 0.2s,
 		background 0.2s;
 	width: 98%;
-	box-sizing: border-box;
 	margin-bottom: 10px;
 }
 
@@ -220,30 +216,6 @@ async function handleToggleNotifications(streamerId: string) {
 .results-inner {
 	display: flex;
 	flex-direction: column;
-}
-
-/* ── Filter animation (TransitionGroup) ── */
-.filter-enter-active {
-	transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.filter-leave-active {
-	transition: all 100ms cubic-bezier(0.22, 1, 0.36, 1);
-	position: absolute;
-}
-
-.filter-move {
-	transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.filter-enter-from {
-	opacity: 0;
-	transform: scale(0.97);
-}
-
-.filter-leave-to {
-	opacity: 0;
-	transform: scale(0.97);
 }
 
 .empty-search {

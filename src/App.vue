@@ -1,6 +1,6 @@
 <template>
-	<div class="extension-shell">
-		<HeaderComponent style="margin-bottom: 10px" />
+	<div class="main-container">
+		<HeaderComponent />
 		<div
 			v-if="isAuthenticated && activeScreen === 'favorites'"
 			style="display: flex; padding-inline: 5px"
@@ -27,14 +27,18 @@
 				</select>
 			</div>
 		</div>
-		<FavoritesTab v-if="activeScreen === 'favorites'" :sort="userSettingsState.sort" :search />
-		<StreamerSettingsTab v-else-if="activeScreen === 'streamer-settings'" />
-		<SettingsTab v-else />
+		<ScrollContainer :resetScrollPosition="[['favorites', 'settings']]">
+			<FavoritesTab v-if="activeScreen === 'favorites'" :sort="userSettingsState.sort" :search />
+
+			<StreamerSettingsTab v-if="activeScreen === 'streamer-settings'" />
+
+			<SettingsTab v-if="activeScreen === 'settings'" />
+		</ScrollContainer>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, useTemplateRef } from 'vue';
+import { ref, onMounted, computed, useTemplateRef, watch, nextTick } from 'vue';
 import HeaderComponent from './components/HeaderComponent.vue';
 import SettingsTab from './components/SettingsTab.vue';
 import FavoritesTab from './components/FavoritesTab.vue';
@@ -43,6 +47,8 @@ import StreamerSettingsTab from './components/StreamerSettingsTab.vue';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useNavigationStore } from './stores/navigation.store.ts';
 import { useUserSettingsStore } from './stores/user-settings.store.ts';
+
+import ScrollContainer from './components/ScrollContainer.vue';
 
 import { storeToRefs } from 'pinia';
 
@@ -66,17 +72,18 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.extension-shell {
-	width: 500px;
-	box-sizing: border-box;
+.main-container {
 	display: flex;
 	flex-direction: column;
+	height: 600px;
+	width: 500px;
 	background: var(--color-bg);
 }
 
 .toolbar {
 	display: flex;
 	gap: 5px;
+	padding-block: 5px;
 	align-items: center;
 }
 

@@ -38,7 +38,6 @@
 			<div class="buttons">
 				<button
 					class="notif-toggle"
-					:class="{ active: notificationsEnabled }"
 					@click="openStreamerSettings(streamer)"
 					:title="`Open notification settings for ${streamer.display_name}`"
 				>
