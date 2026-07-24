@@ -33,3 +33,4 @@
 - [ ] Централизовать `error.value = null`
 - [ ] Update userSettings to have streamerNotifications inside (change the structure)
 - [ ] Вынести Switch/Toggle в отдельный  компонент (в нутри StreamerSettingsTab)
+- [ ] Как то выделить StreamerCard - когда юзер включил нотификации или по тайтлу или по auto open tab или по категории
