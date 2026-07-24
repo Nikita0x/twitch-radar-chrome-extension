@@ -3,21 +3,6 @@ import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { ALARM_NAME } from '@/constants';
 import type { FollowData } from '@/stores/twitch.store';
 
-async function sendNotification(stream: FollowData) {
-	try {
-		await chrome.notifications.create(stream.user_login, {
-			type: 'basic',
-			iconUrl: chrome.runtime.getURL('icon128.png'),
-			title: `${stream.user_name} is LIVE 🔴`,
-			message: stream.title,
-			priority: 2,
-			buttons: [{ title: 'Open Stream' }],
-		});
-	} catch (err) {
-		console.error('Failed to send notification for', stream.user_name, err);
-	}
-}
-
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
 });
@@ -130,3 +115,18 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 	await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
 	await chrome.action.setBadgeTextColor({ color: 'white' });
 });
+
+async function sendNotification(stream: FollowData) {
+	try {
+		await chrome.notifications.create(stream.user_login, {
+			type: 'basic',
+			iconUrl: chrome.runtime.getURL('icon128.png'),
+			title: `${stream.user_name} is LIVE 🔴`,
+			message: stream.title,
+			priority: 2,
+			buttons: [{ title: 'Open Stream' }],
+		});
+	} catch (err) {
+		console.error('Failed to send notification for', stream.user_name, err);
+	}
+}
