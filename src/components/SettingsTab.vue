@@ -1,17 +1,5 @@
 <template>
 	<div class="twitch-auth">
-		<!-- Notifications toggle -->
-		<div v-if="isAuthenticated" class="setting-row">
-			<label class="toggle-label">
-				<input
-					type="checkbox"
-					:checked="userSettingsState.enableAllNotifications"
-					@change="toggleAllNotifications"
-				/>
-				Enable all notifications
-			</label>
-		</div>
-
 		<!-- Theme toggle -->
 		<div v-if="isAuthenticated" class="setting-row">
 			<label class="toggle-label">
@@ -52,9 +40,6 @@
 					v-for="(streamer, index) in filteredStreamers"
 					:key="streamer.id"
 					:streamer="streamer"
-					:isLive="liveStreamerIds.has(streamer.id)"
-					:notificationsEnabled="!!streamerNotifications[streamer.id]"
-					@toggleNotifications="handleToggleNotifications"
 				/>
 			</div>
 		</div>
@@ -73,9 +58,9 @@ import StreamerCard from './StreamerCard.vue';
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
 
-const { twitchUser, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
+const { user, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
 	storeToRefs(twitchStore);
-const { userSettingsState, streamerNotifications } = storeToRefs(userSettingsStore);
+const { userSettingsState } = storeToRefs(userSettingsStore);
 
 const search = ref('');
 const searchRef = useTemplateRef('search-input');
@@ -113,16 +98,6 @@ const filteredStreamers = computed(() => {
 		return aLive - bLive;
 	});
 });
-
-async function toggleAllNotifications() {
-	const enabled = !userSettingsState.value.enableAllNotifications;
-	const allStreamerIds = followedAllStreams.value.map((s) => s.id);
-	await userSettingsStore.setAllStreamerNotifications(enabled, allStreamerIds);
-}
-
-async function handleToggleNotifications(streamerId: string) {
-	await userSettingsStore.toggleStreamerNotification(streamerId);
-}
 
 onMounted(() => {
 	if (!searchRef.value) return;

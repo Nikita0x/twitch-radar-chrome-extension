@@ -17,7 +17,7 @@
 					<h2 class="display-name">{{ selectedStreamer.display_name }}</h2>
 					<span class="login">@{{ selectedStreamer.login }}</span>
 					<p class="login">{{ selectedStreamer.description }}</p>
-					<p class="login">{{ selectedStreamer.created_at }}</p>
+					<p class="login">Joined {{ formatDate(selectedStreamer.created_at) }}</p>
 					<div class="badges">
 						<span v-if="selectedStreamer.broadcaster_type === 'partner'" class="badge partner"
 							>Partner</span
@@ -43,8 +43,8 @@
 					<label class="switch">
 						<input
 							type="checkbox"
-							:checked="!!streamerNotifications[selectedStreamer.id]"
-							@change="handleToggleStreamerNotification"
+							:checked="streamerNotifications?.live.enabled"
+							@change="handleToggleLiveNotification"
 						/>
 						<span class="slider"></span>
 					</label>
@@ -58,7 +58,11 @@
 						>
 					</div>
 					<label class="switch">
-						<input type="checkbox" @change="handleToggleTitleChangeNotification" />
+						<input
+							type="checkbox"
+							:checked="streamerNotifications?.titleChange.enabled"
+							@change="handleToggleTitleChangeNotification"
+						/>
 						<span class="slider"></span>
 					</label>
 				</div>
@@ -69,7 +73,11 @@
 						<span class="toggle-desc">Automatically open browser tab when streamer goes live.</span>
 					</div>
 					<label class="switch">
-						<input type="checkbox" @change="handleToggleTitleChangeNotification" />
+						<input
+							type="checkbox"
+							:checked="streamerNotifications?.live.autoOpen"
+							@change="handleToggleAutoOpenNotification"
+						/>
 						<span class="slider"></span>
 					</label>
 				</div>
@@ -84,13 +92,15 @@ import { storeToRefs } from 'pinia';
 import { useNavigationStore } from '@/stores/navigation.store';
 import { useUserSettingsStore } from '@/stores/user-settings.store';
 import { useTwitchStore } from '@/stores/twitch.store';
+import { getStreamerNotifications } from '@/services/storage.service';
+import { formatDate } from '@/utils/utils';
 
 const navigationStore = useNavigationStore();
 const userSettingsStore = useUserSettingsStore();
 const twitchStore = useTwitchStore();
 
 const { selectedStreamer } = storeToRefs(navigationStore);
-const { streamerNotifications } = storeToRefs(userSettingsStore);
+const { userSettingsState } = storeToRefs(userSettingsStore);
 const { followedLiveStreams } = storeToRefs(twitchStore);
 
 const isLive = computed(() => {
@@ -98,14 +108,44 @@ const isLive = computed(() => {
 	return followedLiveStreams.value.some((s) => s.user_id === selectedStreamer.value!.id);
 });
 
-async function handleToggleStreamerNotification() {
-	if (!selectedStreamer.value) return;
-	await userSettingsStore.toggleStreamerNotification(selectedStreamer.value.id);
+const streamerNotifications = computed(() => {
+	if (!selectedStreamer.value) return null;
+
+	return getStreamerNotifications(userSettingsState.value, selectedStreamer.value.id);
+});
+
+async function handleToggleLiveNotification() {
+	if (!selectedStreamer.value || !streamerNotifications.value) return;
+
+	streamerNotifications.value.live.enabled = !streamerNotifications.value.live.enabled;
+
+	await userSettingsStore.updateStreamerNotifications(
+		selectedStreamer.value.id,
+		streamerNotifications.value
+	);
 }
 
 async function handleToggleTitleChangeNotification() {
-	if (!selectedStreamer.value) return;
-	// await userSettingsStore.toggleStreamerTitleChangeNotification(selectedStreamer.value.id);
+	if (!selectedStreamer.value || !streamerNotifications.value) return;
+
+	streamerNotifications.value.titleChange.enabled =
+		!streamerNotifications.value.titleChange.enabled;
+
+	await userSettingsStore.updateStreamerNotifications(
+		selectedStreamer.value.id,
+		streamerNotifications.value
+	);
+}
+
+async function handleToggleAutoOpenNotification() {
+	if (!selectedStreamer.value || !streamerNotifications.value) return;
+
+	streamerNotifications.value.live.autoOpen = !streamerNotifications.value.live.autoOpen;
+
+	await userSettingsStore.updateStreamerNotifications(
+		selectedStreamer.value.id,
+		streamerNotifications.value
+	);
 }
 </script>
 

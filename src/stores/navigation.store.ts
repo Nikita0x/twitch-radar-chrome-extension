@@ -1,9 +1,6 @@
-import { computed, ref, watch } from 'vue';
-import { defineStore } from 'pinia';
-import type { UserSettings } from '@/services/storage.service';
-import { getStorage, saveStorage } from '@/services/storage.service';
-import { DEFAULT_STORAGE } from '@/services/storage.service';
 import type { StreamersDetails } from '@/stores/twitch.store';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export type Screen = 'favorites' | 'settings' | 'streamer-settings';
 

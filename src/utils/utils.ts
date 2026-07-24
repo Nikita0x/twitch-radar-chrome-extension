@@ -11,6 +11,11 @@ export function formatUptime(startedAt: string) {
 	return `${minutes}m`;
 }
 
+export function formatDate(dateStr: string) {
+	const date = new Date(dateStr);
+	return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 export function extractTokenFromUrl(url: string) {
 	try {
 		const hash = new URL(url).hash.substring(1);

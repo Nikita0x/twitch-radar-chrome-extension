@@ -1,12 +1,20 @@
-import { getStorage, saveStorage } from '@/services/storage.service';
-import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { ALARM_NAME } from '@/constants';
+import {
+	getStorage,
+	getStreamerNotifications,
+	saveStorage,
+	type PreviousStream,
+	type StreamerNotifications,
+} from '@/services/storage.service';
+import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import type { FollowData } from '@/stores/twitch.store';
 
+// Create a repeating alarm (every 30 seconds) when the extension is installed or updated.
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
 });
 
+// Open the stream when the user clicks the "Open Stream" notification button.
 chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
 	if (buttonIndex === 0) {
 		chrome.tabs.create({ url: `https://twitch.tv/${notificationId}` });
@@ -15,30 +23,47 @@ chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) =
 
 /* ── OAuth handler ── */
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-	if (message.type === 'OAUTH_LOGIN') {
-		const url = message.url as string;
+	if (message.type !== 'OAUTH_LOGIN') return;
 
-		console.log('[background] Запускаю launchWebAuthFlow...');
-		chrome.identity
-			.launchWebAuthFlow({ url, interactive: true })
-			.then((redirectUrl) => {
-				if (!redirectUrl) {
-					console.log('[background] OAuth: redirectUrl пустой');
-					sendResponse({ ok: false, error: 'Авторизация была отменена или не завершилась' });
-					return;
-				}
-				console.log('[background] OAuth завершён, redirect URL получен:', redirectUrl);
-				sendResponse({ ok: true, redirectUrl });
-			})
-			.catch((err) => {
-				const msg = err instanceof Error ? err.message : String(err);
-				console.log('[background] OAuth error:', msg);
-				console.log('[background] Error stack:', err instanceof Error ? err.stack : 'N/A');
-				sendResponse({ ok: false, error: msg });
-			});
-		return true; // keep channel open for async sendResponse
-	}
+	handleOAuth(message.url, sendResponse);
+
+	return true; // Keep the message channel open for async response.
 });
+
+async function handleOAuth(url: string, sendResponse: (response: unknown) => void) {
+	try {
+		console.log('[background] Starting launchWebAuthFlow...');
+
+		const redirectUrl = await chrome.identity.launchWebAuthFlow({
+			url,
+			interactive: true,
+		});
+
+		if (!redirectUrl) {
+			sendResponse({
+				ok: false,
+				error: 'Authorization was cancelled or not completed.',
+			});
+			return;
+		}
+
+		console.log('[background] OAuth completed:', redirectUrl);
+
+		sendResponse({
+			ok: true,
+			redirectUrl,
+		});
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+
+		console.error('[background] OAuth error:', err);
+
+		sendResponse({
+			ok: false,
+			error: message,
+		});
+	}
+}
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
 	if (alarm.name !== ALARM_NAME) return;
@@ -47,9 +72,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 	if (!storage.auth.isAuthenticated) return;
 
-	const token = storage.auth.accessToken;
-	const userId = storage.auth.userId;
-	const liveStreamsResult = await fetchFollowedLiveStreams(token, userId);
+	const liveStreamsResult = await fetchFollowedLiveStreams(
+		storage.auth.accessToken,
+		storage.auth.userId
+	);
 
 	if (!liveStreamsResult.ok) {
 		console.error(liveStreamsResult.error);
@@ -59,74 +85,127 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 	const liveStreams = liveStreamsResult.data;
 
 	if (liveStreams.length === 0) {
-		if (Object.keys(storage.notifiedStreams).length > 0) {
-			storage.notifiedStreams = {};
-			await saveStorage(storage);
-		}
-		await chrome.action.setBadgeText({ text: '0' });
-		await chrome.action.setBadgeBackgroundColor({ color: '#808080' });
+		await updateBadge(0);
 		return;
 	}
 
-	const notified = { ...storage.notifiedStreams };
-	const notificationPromises: Promise<void>[] = [];
-	let changed = false;
+	await updateBadge(liveStreams.length);
 
-	// If this is the first check (no previously tracked streams),
-	// just record current state without sending notifications.
-	// This prevents spam on first login when many streamers are already live.
-	const isFirstCheck = Object.keys(notified).length === 0;
+	for (const streamer of liveStreams) {
+		const previous = storage.runtime.previousStreams[streamer.user_id];
+		const settings = getStreamerNotifications(storage.userSettings, streamer.user_id);
 
-	for (const stream of liveStreams) {
-		const streamerNotifs = storage.streamerNotifications[stream.user_id] ?? false;
-		const globalNotifs = storage.userSettings.enableAllNotifications;
+		await checkLiveNotification(streamer, previous, settings);
+		await checkTitleNotification(streamer, previous, settings);
+		// await checkCategoryNotification(streamer, previous, settings);
 
-		if (!globalNotifs && !streamerNotifs) continue;
-
-		const prevNotified = notified[stream.user_id];
-
-		if (prevNotified !== stream.title) {
-			// Only send notification if this is not the first check
-			if (!isFirstCheck) {
-				notificationPromises.push(sendNotification(stream));
-			}
-			notified[stream.user_id] = stream.title;
-			changed = true;
-		}
+		storage.runtime.previousStreams[streamer.user_id] = {
+			title: streamer.title,
+			category: streamer.game_name,
+		};
 	}
 
-	await Promise.all(notificationPromises);
-
-	const liveIds = new Set(liveStreams.map((s) => s.user_id));
-	for (const id of Object.keys(notified)) {
-		if (!liveIds.has(id)) {
-			delete notified[id];
-			changed = true;
-		}
-	}
-
-	if (changed) {
-		storage.notifiedStreams = notified;
-		await saveStorage(storage);
-	}
-
-	// Update badge with total live stream count
-	await chrome.action.setBadgeText({ text: String(liveStreams.length) });
-	await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
-	await chrome.action.setBadgeTextColor({ color: 'white' });
+	await saveStorage(storage);
 });
 
-async function sendNotification(stream: FollowData) {
+async function sendNotification(stream: FollowData, title: string, message: string) {
 	try {
 		await chrome.notifications.create(stream.user_login, {
 			type: 'basic',
 			iconUrl: chrome.runtime.getURL('icon128.png'),
-			title: `${stream.user_name} is LIVE 🔴`,
-			message: stream.title,
+			title,
+			message,
 			priority: 2,
 			buttons: [{ title: 'Open Stream' }],
 		});
 	} catch (err) {
 		console.error('Failed to send notification for', stream.user_name, err);
+	}
+}
+
+async function updateBadge(count: number) {
+	if (count === 0) {
+		await chrome.action.setBadgeText({ text: '0' });
+		await chrome.action.setBadgeBackgroundColor({
+			color: '#808080',
+		});
+		return;
+	}
+
+	await chrome.action.setBadgeText({ text: String(count) });
+	await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
+	await chrome.action.setBadgeTextColor({ color: 'white' });
+}
+
+async function checkLiveNotification(
+	stream: FollowData,
+	previous: PreviousStream | undefined,
+	settings: StreamerNotifications
+) {
+	// Live notifications are disabled.
+	if (!settings.live.enabled) return;
+
+	// Stream was already live during the previous check.
+	if (previous) return;
+
+	// Stream just went live.
+	await sendNotification(stream, `${stream.user_name} is LIVE 🔴`, stream.title);
+
+	if (settings.live.autoOpen) {
+		await chrome.tabs.create({
+			url: `https://twitch.tv/${stream.user_login}`,
+		});
+	}
+}
+async function checkTitleNotification(
+	stream: FollowData,
+	previous: PreviousStream | undefined,
+	settings: StreamerNotifications
+) {
+	if (!settings.titleChange.enabled) return;
+
+	// No previous snapshot -> stream just started.
+	if (!previous) return;
+
+	// Title didn't change.
+	if (previous.title === stream.title) return;
+
+	await sendNotification(stream, `${stream.user_name} changed stream title ✏️`, stream.title);
+
+	if (settings.titleChange.autoOpen) {
+		await chrome.tabs.create({
+			url: `https://twitch.tv/${stream.user_login}`,
+		});
+	}
+}
+
+async function checkCategoryNotification(
+	stream: FollowData,
+	previous: PreviousStream | undefined,
+	settings: StreamerNotifications
+) {
+	// Category change notifications are disabled.
+	if (!settings.categoryChange.enabled) return;
+
+	// No previous snapshot means the stream has just started.
+	// This is handled by checkLiveNotification().
+	if (!previous) return;
+
+	// Category hasn't changed.
+	if (previous.category === stream.game_name) return;
+
+	// User only wants notifications for specific categories.
+	if (!settings.categoryChange.categories.includes(stream.game_name)) return;
+
+	await sendNotification(
+		stream,
+		`${stream.user_name} changed category 🎮`,
+		`Now playing: ${stream.game_name}`
+	);
+
+	if (settings.categoryChange.autoOpen) {
+		await chrome.tabs.create({
+			url: `https://twitch.tv/${stream.user_login}`,
+		});
 	}
 }

@@ -68,11 +68,8 @@
 			<div v-else-if="isAuthenticated" style="display: flex; align-items: center; gap: 10px">
 				<button @click="logout" class="logout-btn">Logout</button>
 
-				<img
-					:src="twitchUser?.profile_image_url"
-					style="width: 20px; height: 20px; border-radius: 50%"
-				/>
-				<span class="user-name">{{ twitchUser?.display_name }}</span>
+				<img :src="user?.profile_image_url" style="width: 20px; height: 20px; border-radius: 50%" />
+				<span class="user-name">{{ user?.display_name }}</span>
 			</div>
 		</div>
 	</div>
@@ -85,7 +82,7 @@ import { storeToRefs } from 'pinia';
 
 const twitchStore = useTwitchStore();
 const navigationStore = useNavigationStore();
-const { twitchUser, isAuthenticated } = storeToRefs(twitchStore);
+const { user, isAuthenticated } = storeToRefs(twitchStore);
 const { activeScreen } = storeToRefs(navigationStore);
 const props = defineProps();
 

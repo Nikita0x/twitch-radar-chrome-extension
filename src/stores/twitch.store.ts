@@ -60,7 +60,6 @@ export const useTwitchStore = defineStore('twitch', () => {
 	const followedAllStreams = ref<StreamersDetails[]>([]);
 
 	const isAuthenticated = computed(() => !!accessToken.value);
-	const totalLiveStreamers = computed(() => followedLiveStreams.value.length);
 
 	async function fetchUserProfile(token: string): Promise<Result<TwitchUser>> {
 		const result = await request<{ data: TwitchUser[] }>('https://api.twitch.tv/helix/users', {
@@ -222,17 +221,17 @@ export const useTwitchStore = defineStore('twitch', () => {
 				return idsResult;
 			}
 
-			const getDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
+			const fetchDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
 				token,
 				idsResult.data
 			);
 
-			if (!getDetailsAboutStreamersResult.ok) {
-				console.error(getDetailsAboutStreamersResult.error);
-				return getDetailsAboutStreamersResult;
+			if (!fetchDetailsAboutStreamersResult.ok) {
+				console.error(fetchDetailsAboutStreamersResult.error);
+				return fetchDetailsAboutStreamersResult;
 			}
 
-			followedAllStreams.value = getDetailsAboutStreamersResult.data;
+			followedAllStreams.value = fetchDetailsAboutStreamersResult.data;
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
 			if (message.includes('canceled') || message.includes('cancelled')) {
@@ -277,6 +276,8 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 				user.value = getUserProfileResult.data;
 
+				console.log('fetchUserProfile: ', user.value);
+
 				const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
 					accessToken.value,
 					user.value.id
@@ -289,12 +290,16 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 				followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
 
+				console.log('followedLiveStreams: ', followedLiveStreams.value);
+
 				const idsResult = await fetchAllFollowedChannelsIds(accessToken.value);
 
 				if (!idsResult.ok) {
 					console.error(idsResult.error);
 					return idsResult;
 				}
+
+				console.log('fetchAllFollowedChannelsIds: ', idsResult.data);
 
 				const getDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
 					accessToken.value,
@@ -307,6 +312,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 				}
 
 				followedAllStreams.value = getDetailsAboutStreamersResult.data;
+				console.log('followedAllStreams: ', followedAllStreams.value);
 			} else {
 				accessToken.value = null;
 				user.value = null;
@@ -321,12 +327,11 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	watch(followedLiveStreams, async () => {
-		// Good
 		if (!isAuthenticated.value) {
 			await chrome.action.setBadgeText({ text: '!' });
 			await chrome.action.setBadgeBackgroundColor({ color: '#808080' });
 		} else {
-			await chrome.action.setBadgeText({ text: String(totalLiveStreamers.value) });
+			await chrome.action.setBadgeText({ text: String(followedLiveStreams.value.length) });
 			await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
 			await chrome.action.setBadgeTextColor({ color: 'white' });
 		}
@@ -334,7 +339,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 	return {
 		accessToken,
-		twitchUser: user,
+		user,
 		loading,
 		error,
 		followedLiveStreams,
@@ -344,7 +349,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 		loginWithTwitch,
 		logout,
 		init,
-		getAllFollowedChannelsIds: fetchAllFollowedChannelsIds,
-		getDetailsAboutStreamers: fetchDetailsAboutStreamers,
+		fetchAllFollowedChannelsIds,
+		fetchDetailsAboutStreamers,
 	};
 });
