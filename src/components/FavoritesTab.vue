@@ -10,11 +10,7 @@
 			<p>Try a different search term</p>
 		</div>
 		<div v-else class="results-section fade-in">
-			<StreamCard
-				v-for="(channel, index) in [...visibleStreams, ...visibleStreams]"
-				:key="channel.id"
-				:stream="channel"
-			/>
+			<StreamCard v-for="(channel, index) in visibleStreams" :key="channel.id" :stream="channel" />
 		</div>
 	</div>
 </template>
