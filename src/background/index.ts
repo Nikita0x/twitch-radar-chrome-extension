@@ -86,10 +86,25 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 	if (liveStreams.length === 0) {
 		await updateBadge(0);
+
+		storage.runtime.previousStreams = {};
+		await saveStorage(storage);
+
 		return;
 	}
 
 	await updateBadge(liveStreams.length);
+
+	// ----
+	// delete streamers who are offline
+	// -----
+
+	const liveIds = new Set(liveStreams.map((s) => s.user_id));
+	for (const streamerId of Object.keys(storage.runtime.previousStreams)) {
+		if (!liveIds.has(streamerId)) {
+			delete storage.runtime.previousStreams[streamerId];
+		}
+	}
 
 	for (const streamer of liveStreams) {
 		const previous = storage.runtime.previousStreams[streamer.user_id];
@@ -97,7 +112,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 		await checkLiveNotification(streamer, previous, settings);
 		await checkTitleNotification(streamer, previous, settings);
-		// await checkCategoryNotification(streamer, previous, settings);
+		await checkCategoryNotification(streamer, previous, settings);
 
 		storage.runtime.previousStreams[streamer.user_id] = {
 			title: streamer.title,
@@ -193,9 +208,6 @@ async function checkCategoryNotification(
 
 	// Category hasn't changed.
 	if (previous.category === stream.game_name) return;
-
-	// User only wants notifications for specific categories.
-	if (!settings.categoryChange.categories.includes(stream.game_name)) return;
 
 	await sendNotification(
 		stream,
