@@ -1,4 +1,5 @@
 import type { StreamerId } from '@/stores/user-settings.store';
+import type { FollowData } from '@/stores/twitch.store';
 import { migrateStorage } from './storage.migration';
 
 export interface StorageSchema {
@@ -21,6 +22,7 @@ export interface AuthState {
 
 interface RuntimeState {
 	previousStreams: Record<StreamerId, PreviousStream>;
+	liveStreams: FollowData[];
 }
 
 export interface PreviousStream {
@@ -65,7 +67,7 @@ export const DEFAULT_STORAGE: StorageSchema = {
 		sort: 'viewers:highToLow',
 		theme: 'light',
 	},
-	runtime: { previousStreams: {} },
+	runtime: { previousStreams: {}, liveStreams: [] },
 };
 
 export const DEFAULT_NOTIFICATION_SETTINGS: StreamerNotifications = {

@@ -88,12 +88,15 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 		await updateBadge(0);
 
 		storage.runtime.previousStreams = {};
+		storage.runtime.liveStreams = [];
 		await saveStorage(storage);
 
 		return;
 	}
 
 	await updateBadge(liveStreams.length);
+
+	storage.runtime.liveStreams = liveStreams;
 
 	// ----
 	// delete streamers who are offline

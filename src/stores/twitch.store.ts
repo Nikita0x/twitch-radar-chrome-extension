@@ -260,6 +260,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	async function init() {
+		listenStorageChanges();
 		loading.value = true;
 		try {
 			const storage = await getStorage();
@@ -276,8 +277,6 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 				user.value = getUserProfileResult.data;
 
-				console.log('fetchUserProfile: ', user.value);
-
 				const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(
 					accessToken.value,
 					user.value.id
@@ -290,16 +289,12 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 				followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
 
-				console.log('followedLiveStreams: ', followedLiveStreams.value);
-
 				const idsResult = await fetchAllFollowedChannelsIds(accessToken.value);
 
 				if (!idsResult.ok) {
 					console.error(idsResult.error);
 					return idsResult;
 				}
-
-				console.log('fetchAllFollowedChannelsIds: ', idsResult.data);
 
 				const getDetailsAboutStreamersResult = await fetchDetailsAboutStreamers(
 					accessToken.value,
@@ -312,7 +307,6 @@ export const useTwitchStore = defineStore('twitch', () => {
 				}
 
 				followedAllStreams.value = getDetailsAboutStreamersResult.data;
-				console.log('followedAllStreams: ', followedAllStreams.value);
 			} else {
 				accessToken.value = null;
 				user.value = null;
@@ -324,6 +318,15 @@ export const useTwitchStore = defineStore('twitch', () => {
 		} finally {
 			loading.value = false;
 		}
+	}
+
+	function listenStorageChanges() {
+		chrome.storage.onChanged.addListener((changes) => {
+			const liveStreams = changes.storage?.newValue?.runtime?.liveStreams;
+			if (liveStreams) {
+				followedLiveStreams.value = liveStreams;
+			}
+		});
 	}
 
 	watch(followedLiveStreams, async () => {
