@@ -38,6 +38,7 @@
 			<div class="buttons">
 				<button
 					class="notif-toggle"
+					:class="{ active: hasActiveNotifications }"
 					@click="openStreamerSettings(streamer)"
 					:title="`Open notification settings for ${streamer.display_name}`"
 				>
@@ -80,6 +81,8 @@ import { computed, ref } from 'vue';
 import type { StreamersDetails } from '@/stores/twitch.store';
 import { useNavigationStore } from '@/stores/navigation.store';
 import { useTwitchStore } from '@/stores/twitch.store';
+import { useUserSettingsStore } from '@/stores/user-settings.store';
+import { getStreamerNotifications } from '@/services/storage.service';
 import { storeToRefs } from 'pinia';
 import { formatDate } from '@/utils/utils';
 
@@ -91,8 +94,10 @@ const props = defineProps<Props>();
 
 const navigationStore = useNavigationStore();
 const twitchStore = useTwitchStore();
+const userSettingsStore = useUserSettingsStore();
 const { activeScreen, selectedStreamer } = storeToRefs(navigationStore);
 const { followedLiveStreams } = storeToRefs(twitchStore);
+const { userSettingsState } = storeToRefs(userSettingsStore);
 
 const avatarLoaded = ref(false);
 
@@ -104,6 +109,15 @@ function openStreamerSettings(streamerDetails: StreamersDetails) {
 const isLive = computed(() =>
 	followedLiveStreams.value.some((stream) => stream.user_id === props.streamer.id)
 );
+
+const hasActiveNotifications = computed(() => {
+	const notifications = getStreamerNotifications(userSettingsState.value, props.streamer.id);
+	return (
+		notifications.live.enabled ||
+		notifications.titleChange.enabled ||
+		notifications.categoryChange.enabled
+	);
+});
 </script>
 
 <style scoped>
@@ -288,7 +302,8 @@ const isLive = computed(() =>
 
 .notif-toggle.active {
 	background: var(--color-bg-secondary);
-	border-color: var(--color-accent);
+	border-color: var(--color-notif-active);
+	color: var(--color-notif-active);
 }
 
 .notif-toggle {

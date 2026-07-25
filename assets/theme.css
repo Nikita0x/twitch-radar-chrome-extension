@@ -24,6 +24,7 @@
 	--color-red: #eb0400;
 
 	--color-notif-icon: #0f0f0f;
+	--color-notif-active: #ff8800;
 }
 
 /* ── Dark Theme ── */
@@ -51,4 +52,5 @@
 	--color-red: #eb0400;
 
 	--color-notif-icon: white;
+	--color-notif-active: #ff8800;
 }
