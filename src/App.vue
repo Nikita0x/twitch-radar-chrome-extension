@@ -2,7 +2,13 @@
 	<div class="main-container">
 		<HeaderComponent />
 
-		<ScrollContainer :resetScrollPosition="[['favorites', 'settings']]">
+		<ScrollContainer
+			:resetScrollPosition="[
+				['favorites', 'settings'],
+				['settings', 'favorites'],
+				['settings', 'streamer-settings'],
+			]"
+		>
 			<FavoritesTab v-if="activeScreen === 'favorites'" />
 
 			<StreamerSettingsTab v-if="activeScreen === 'streamer-settings'" />

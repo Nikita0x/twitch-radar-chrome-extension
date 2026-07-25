@@ -30,7 +30,7 @@ const positions = new Map<Screen, number>();
 function shouldResetScroll(from: string, to: string): boolean {
 	if (!props.resetScrollPosition || !from) return false;
 	return props.resetScrollPosition.some(([fromScreen, toScreen]) => {
-		return (from === fromScreen && to === toScreen) || (from === toScreen && to === fromScreen);
+		return from === fromScreen && to === toScreen;
 	});
 }
 
