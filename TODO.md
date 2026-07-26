@@ -3,13 +3,13 @@
 ## Features
 
 - [x] Нотификации когда стример включил трансляцию (если уже live - то не присылать)
-- [ ] Разделить нотификации на три типа (глобальные настройки + пер-стримерные):
-  - [ ] when streamer goes live (offline → online)
-  - [ ] when streamer changes the title
-  - [ ] when streamer changes the category (game)
-- [ ] Добавить возможность включать и отключать:
+- [x] Разделить нотификации на три типа (глобальные настройки + пер-стримерные):
+  - [x] when streamer goes live (offline → online)
+  - [x] when streamer changes the title
+  - [x] when streamer changes the category (game)
+- [x] Добавить возможность включать и отключать:
   - [x] нотификации
-  - [ ] автоматически открывать вкладку (auto-open tab) — `chrome.tabs.create()`
+  - [x] автоматически открывать вкладку (auto-open tab) — `chrome.tabs.create()`
   - [ ] возможно отправка сообщения в чат? (если возможно)
 - [x] Сохранять пользовательские настройки - чтобы при выходе из авторизации и заходе обратно - настройки сохранялись
 - [x] Dark theme — реализован через CSS-переменные, переключатель в SettingsTab
@@ -33,4 +33,4 @@
 - [ ] Централизовать `error.value = null`
 - [ ] Update userSettings to have streamerNotifications inside (change the structure)
 - [ ] Вынести Switch/Toggle в отдельный  компонент (в нутри StreamerSettingsTab)
-- [ ] Как то выделить StreamerCard - когда юзер включил нотификации или по тайтлу или по auto open tab или по категории
+- [x] Как то выделить StreamerCard - когда юзер включил нотификации или по тайтлу или по auto open tab или по категории
