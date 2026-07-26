@@ -1,19 +1,9 @@
 # TODO
 
 ## Features
+- [ ] - Port to FireFox
+- [ ] - Ability to send a message in chat [RESEARCH NEEDED]
 
-- [x] Нотификации когда стример включил трансляцию (если уже live - то не присылать)
-- [x] Разделить нотификации на три типа (глобальные настройки + пер-стримерные):
-  - [x] when streamer goes live (offline → online)
-  - [x] when streamer changes the title
-  - [x] when streamer changes the category (game)
-- [x] Добавить возможность включать и отключать:
-  - [x] нотификации
-  - [x] автоматически открывать вкладку (auto-open tab) — `chrome.tabs.create()`
-  - [ ] возможно отправка сообщения в чат? (если возможно)
-- [x] Сохранять пользовательские настройки - чтобы при выходе из авторизации и заходе обратно - настройки сохранялись
-- [x] Dark theme — реализован через CSS-переменные, переключатель в SettingsTab
-- [x] `getAllFollowedChannelsIds` — переписать на `request()` вместо raw `fetch` (уже было сделано)
 
 ## UI/UX
 
