@@ -144,6 +144,7 @@ const imageLoaded = ref(false);
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
+	overflow-wrap: anywhere;
 }
 
 .card-game {
