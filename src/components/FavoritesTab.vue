@@ -1,7 +1,7 @@
 <template>
 	<div class="state-shell">
 		<div
-			v-if="isAuthenticated && activeScreen === 'favorites'"
+			v-if="isAuthenticated && currentScreen === 'favorites'"
 			style="display: flex; padding-inline: 5px"
 			class="toolbar"
 		>
@@ -62,7 +62,7 @@ const userSettingsStore = useUserSettingsStore();
 const navigationStore = useNavigationStore();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
-const { activeScreen } = storeToRefs(navigationStore);
+const { currentScreen } = storeToRefs(navigationStore);
 
 const search = ref('');
 const inputRef = useTemplateRef('search-input');
@@ -122,6 +122,7 @@ watch(inputRef, (input) => {
 .state-shell {
 	min-height: 120px;
 	position: relative;
+	overflow: auto;
 }
 
 .empty-state {

@@ -95,15 +95,15 @@ const props = defineProps<Props>();
 const navigationStore = useNavigationStore();
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
-const { activeScreen, selectedStreamer } = storeToRefs(navigationStore);
+const { currentScreen, selectedStreamer } = storeToRefs(navigationStore);
 const { followedLiveStreams } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
 
 const avatarLoaded = ref(false);
 
 function openStreamerSettings(streamerDetails: StreamersDetails) {
-	activeScreen.value = 'streamer-settings';
 	selectedStreamer.value = streamerDetails;
+	navigationStore.navigateTo('streamer-settings');
 }
 
 const isLive = computed(() =>

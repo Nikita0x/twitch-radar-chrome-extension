@@ -113,6 +113,7 @@ const imageLoaded = ref(false);
 	padding: 7px 9px;
 
 	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(12px);
 }
 .thumb-user {
 	color: white;

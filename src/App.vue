@@ -2,19 +2,13 @@
 	<div class="main-container">
 		<HeaderComponent />
 
-		<ScrollContainer
-			:resetScrollPosition="[
-				['favorites', 'settings'],
-				['settings', 'favorites'],
-				['settings', 'streamer-settings'],
-			]"
-		>
-			<FavoritesTab v-if="activeScreen === 'favorites'" />
+		<Transition name="screen" mode="out-in">
+			<FavoritesTab v-if="currentScreen === 'favorites'" />
 
-			<StreamerSettingsTab v-if="activeScreen === 'streamer-settings'" />
+			<StreamerSettingsTab v-if="currentScreen === 'streamer-settings'" />
 
-			<SettingsTab v-if="activeScreen === 'settings'" />
-		</ScrollContainer>
+			<SettingsTab v-if="currentScreen === 'settings'" />
+		</Transition>
 	</div>
 </template>
 
@@ -29,15 +23,13 @@ import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useNavigationStore } from './stores/navigation.store.ts';
 import { useUserSettingsStore } from './stores/user-settings.store.ts';
 
-import ScrollContainer from './components/ScrollContainer.vue';
-
 import { storeToRefs } from 'pinia';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
 const navigationStore = useNavigationStore();
 const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
-const { activeScreen } = storeToRefs(navigationStore);
+const { currentScreen } = storeToRefs(navigationStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
 
 onMounted(async () => {
@@ -54,5 +46,22 @@ onMounted(async () => {
 	height: 600px;
 	width: 500px;
 	background: var(--color-bg);
+}
+
+.screen-enter-active,
+.screen-leave-active {
+	transition:
+		opacity 220ms ease-in-out,
+		transform 220ms ease-in-out;
+}
+
+.screen-enter-from {
+	opacity: 0;
+	transform: translateX(12px);
+}
+
+.screen-leave-to {
+	opacity: 0;
+	transform: translateX(-12px);
 }
 </style>

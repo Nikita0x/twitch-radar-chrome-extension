@@ -1,5 +1,14 @@
 <template>
-	<div class="twitch-auth">
+	<div
+		class="twitch-auth"
+		ref="scrollContainer"
+		@scroll="
+			(event) => {
+				const el = event.target as HTMLDivElement;
+				navigationStore.saveScrollPosition('settings', el.scrollTop);
+			}
+		"
+	>
 		<!-- Theme toggle -->
 		<div v-if="isAuthenticated" class="setting-row">
 			<label class="toggle-label">
@@ -51,19 +60,23 @@ import { ref, computed, onMounted, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+import { useNavigationStore } from '@/stores/navigation.store.ts';
 
 import AppLoader from './AppLoader.vue';
 import StreamerCard from './StreamerCard.vue';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
+const navigationStore = useNavigationStore();
 
 const { user, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
 	storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
+const { previousScreen } = storeToRefs(navigationStore);
 
 const search = ref('');
 const searchRef = useTemplateRef('search-input');
+const scrollContainer = useTemplateRef('scrollContainer');
 
 /** Local loading — stays true until all data (including followedAllStreams) is loaded */
 const localLoading = computed(
@@ -103,12 +116,25 @@ onMounted(() => {
 	if (!searchRef.value) return;
 
 	searchRef.value.focus();
+
+	if (!scrollContainer.value) return;
+
+	if (previousScreen.value === 'favorites') {
+		scrollContainer.value.scrollTo({
+			top: 0,
+		});
+	} else {
+		scrollContainer.value.scrollTo({
+			top: navigationStore.getScrollPosition('settings'),
+		});
+	}
 });
 </script>
 
 <style scoped>
 .twitch-auth {
 	background: var(--color-bg);
+	overflow: auto;
 }
 
 .setting-row {

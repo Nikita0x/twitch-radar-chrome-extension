@@ -2,9 +2,9 @@
 	<div class="header">
 		<div class="title">
 			<button
-				v-if="activeScreen === 'settings'"
+				v-if="currentScreen === 'settings'"
 				class="icon-btn back-btn"
-				@click="activeScreen = 'favorites'"
+				@click="navigationStore.navigateTo('favorites')"
 				title="Back"
 			>
 				<svg
@@ -20,9 +20,9 @@
 				</svg>
 			</button>
 			<button
-				v-else-if="activeScreen === 'streamer-settings'"
+				v-else-if="currentScreen === 'streamer-settings'"
 				class="icon-btn back-btn"
-				@click="activeScreen = 'settings'"
+				@click="navigationStore.navigateTo('settings')"
 				title="Back"
 			>
 				<svg
@@ -43,10 +43,10 @@
 			<!-- <button class="icon-btn heart-btn" title="Favorites"><img src="/heart.svg" width="20" height="20"
                     class="heart-icon" /></button> -->
 			<button
-				v-if="isAuthenticated && activeScreen === 'favorites'"
+				v-if="isAuthenticated && currentScreen === 'favorites'"
 				class="icon-btn cog-btn"
 				title="Settings"
-				@click="activeScreen = 'settings'"
+				@click="navigationStore.navigateTo('settings')"
 			>
 				<svg
 					width="20px"
@@ -83,12 +83,12 @@ import { storeToRefs } from 'pinia';
 const twitchStore = useTwitchStore();
 const navigationStore = useNavigationStore();
 const { user, isAuthenticated } = storeToRefs(twitchStore);
-const { activeScreen } = storeToRefs(navigationStore);
+const { currentScreen } = storeToRefs(navigationStore);
 const props = defineProps();
 
 async function logout() {
 	await twitchStore.logout();
-	activeScreen.value = 'favorites';
+	navigationStore.navigateTo('favorites');
 }
 </script>
 
