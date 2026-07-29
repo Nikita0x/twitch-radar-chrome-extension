@@ -38,7 +38,7 @@
 			<div class="buttons">
 				<button
 					class="notif-toggle"
-					:class="{ active: hasActiveNotifications }"
+					:class="{ active: hasNotificationsEnabled }"
 					@click="openStreamerSettings(streamer)"
 					:title="`Open notification settings for ${streamer.display_name}`"
 				>
@@ -85,6 +85,7 @@ import { useUserSettingsStore } from '@/stores/user-settings.store';
 import { getStreamerNotifications } from '@/services/storage.service';
 import { storeToRefs } from 'pinia';
 import { formatDate } from '@/utils/utils';
+import { hasActiveNotifications } from '@/utils/utils';
 
 interface Props {
 	streamer: StreamersDetails;
@@ -110,14 +111,9 @@ const isLive = computed(() =>
 	followedLiveStreams.value.some((stream) => stream.user_id === props.streamer.id)
 );
 
-const hasActiveNotifications = computed(() => {
-	const notifications = getStreamerNotifications(userSettingsState.value, props.streamer.id);
-	return (
-		notifications.live.enabled ||
-		notifications.titleChange.enabled ||
-		notifications.categoryChange.enabled
-	);
-});
+const hasNotificationsEnabled = computed(() =>
+	hasActiveNotifications(userSettingsState.value, props.streamer.id)
+);
 </script>
 
 <style scoped>
