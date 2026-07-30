@@ -6,17 +6,16 @@ A fast, lightweight Chrome extension that tracks your followed Twitch streamers 
 
 ## Features
 
-- 🔴 **Live notifications** — get desktop alerts when a followed streamer starts streaming
-- 🔍 **Search & filter** — quickly find streamers by name
-- 📊 **Sorting** — sort by viewers or stream duration
-- 🔢 **Badge counter** — see how many streamers are live right on the extension icon
-- 🎨 **Custom UI** — clean, modern interface built with Vue 3
+- 🔴 Instant desktop notifications when followed streamers go live
+- ⚙️ Per-streamer notification settings with customizable alerts and auto-open actions
+- 🔍 Search through your followed channels
+- 📊 Sort streams by viewer count or stream duration
+- ⚡ Fast and lightweight interface
+- 🌙 Light and dark themes
+- 👤 Secure sign in with your Twitch account
+- 🔒 Read-only access — your password is never shared or stored
 
 ## Installation
-
-### Chrome Web Store
-
-[Link to Chrome Web Store — coming soon]
 
 ### Load unpacked (for development)
 
