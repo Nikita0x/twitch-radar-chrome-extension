@@ -18,6 +18,7 @@ export default defineConfig({
 			input: {
 				main: 'index.html',
 				background: 'src/background/index.ts',
+				options: 'options.html',
 			},
 			output: {
 				entryFileNames: (chunkInfo) => {

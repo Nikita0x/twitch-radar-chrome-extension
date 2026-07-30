@@ -17,6 +17,7 @@
 			"32": "icon32.png"
 		}
 	},
+	"options_page": "options.html",
 	"permissions": ["notifications", "identity", "storage", "alarms"],
 	"host_permissions": ["https://api.twitch.tv/*"],
 	"background": {
