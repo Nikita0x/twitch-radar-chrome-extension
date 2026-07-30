@@ -4,6 +4,8 @@
 
 A fast, lightweight Chrome extension that tracks your followed Twitch streamers and sends desktop notifications when they go live.
 
+[<img src="public/chrome.png" alt="Chrome Web Store link" height="60px">](https://chromewebstore.google.com/detail/fcjbgobfppjggabcbbnngehhefllbllm)
+
 ## Features
 
 - 🔴 Instant desktop notifications when followed streamers go live
