@@ -3,12 +3,12 @@
 		<div class="card-header">
 			<div style="display: flex; gap: 12px">
 				<div class="avatar-wrap">
-					<div v-if="!avatarLoaded" class="avatar-skeleton"></div>
+					<div class="avatar-skeleton" :class="{ hidden: avatarLoaded }"></div>
 					<img
-						v-show="avatarLoaded"
 						:src="props.streamer.profile_image_url"
 						:alt="props.streamer.display_name"
 						class="avatar"
+						:class="{ loaded: avatarLoaded }"
 						width="60"
 						height="60"
 						@load="avatarLoaded = true"
@@ -140,19 +140,31 @@ const hasNotificationsEnabled = computed(() =>
 .avatar-wrap {
 	position: relative;
 	flex-shrink: 0;
+	width: 60px;
+	height: 60px;
 }
 
 .avatar {
-	display: block;
-	width: 60px;
-	height: 60px;
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	object-fit: cover;
+
+	opacity: 0;
+	transition: opacity 0.25s ease;
+}
+
+.avatar.loaded {
+	opacity: 1;
 }
 
 .avatar-skeleton {
-	width: 60px;
-	height: 60px;
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	background: linear-gradient(
 		90deg,
@@ -162,6 +174,12 @@ const hasNotificationsEnabled = computed(() =>
 	);
 	background-size: 200% 100%;
 	animation: skeleton-loading 1.2s infinite;
+	transition: opacity 0.25s ease;
+	pointer-events: none;
+}
+
+.avatar-skeleton.hidden {
+	opacity: 0;
 }
 
 @keyframes skeleton-loading {

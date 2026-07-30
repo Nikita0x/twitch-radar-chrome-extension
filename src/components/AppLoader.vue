@@ -7,13 +7,16 @@
 
 <style scoped>
 .app-loader {
-	padding: 10px;
-	color: var(--color-text-muted);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	flex: 1;
 	gap: 8px;
+
+	/* background: green; */
+	color: var(--color-text-muted);
+	padding: 10px;
 	min-height: 120px;
 }
 

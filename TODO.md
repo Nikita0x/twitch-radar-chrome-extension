@@ -3,6 +3,9 @@
 ## Features
 - [ ] - Port to FireFox
 - [ ] - Ability to send a message in chat [RESEARCH NEEDED]
+- [ ] - Opening muted tabs?
+- [ ] - Add a separate supporting page
+- [ ] - Add a separate settings page
 
 
 ## UI/UX

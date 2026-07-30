@@ -120,6 +120,11 @@ watch(inputRef, (input) => {
 }
 
 .state-shell {
+	display: flex;
+	flex-direction: column;
+	/* background: red; */
+	height: 100%;
+
 	min-height: 120px;
 	position: relative;
 	overflow: auto;

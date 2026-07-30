@@ -21,15 +21,13 @@
 			</label>
 		</div>
 
-		<template>
-			<AppLoader v-if="localLoading">Loading...</AppLoader>
-			<div v-else-if="error" class="error">
-				<p>{{ error }}</p>
-				<button @click="error = null" class="retry-btn">Try again</button>
-			</div>
-		</template>
+		<AppLoader v-if="localLoading">Loading...</AppLoader>
+		<div v-else-if="error" class="error">
+			<p>{{ error }}</p>
+			<button @click="error = null" class="retry-btn">Try again</button>
+		</div>
 
-		<div v-if="followedAllStreams.length" class="followed-section">
+		<div v-else class="followed-section">
 			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
 			<input
 				ref="search-input"
@@ -137,6 +135,10 @@ onMounted(() => {
 
 <style scoped>
 .twitch-auth {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+
 	background: var(--color-bg);
 	overflow: auto;
 }
