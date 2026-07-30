@@ -94,13 +94,10 @@ const imageLoaded = ref(false);
 	object-fit: cover;
 
 	opacity: 0;
-	transform: scale(1.03);
-	filter: blur(8px);
+	transform: translateY(14px) scale(0.96);
+	filter: blur(6px);
 
-	transition:
-		opacity 0.3s ease,
-		transform 0.3s ease,
-		filter 0.3s ease;
+	transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .thumb.loaded {
@@ -116,6 +113,7 @@ const imageLoaded = ref(false);
 	padding: 7px 9px;
 
 	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(12px);
 }
 .thumb-user {
 	color: white;
@@ -147,6 +145,7 @@ const imageLoaded = ref(false);
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 	line-clamp: 2;
+	overflow-wrap: anywhere;
 }
 
 .card-game {

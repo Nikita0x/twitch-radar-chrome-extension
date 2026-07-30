@@ -1,3 +1,5 @@
+import { getStreamerNotifications, type UserSettings } from '@/services/storage.service';
+
 export function formatUptime(startedAt: string) {
 	const started = new Date(startedAt);
 	const now = new Date();
@@ -6,7 +8,7 @@ export function formatUptime(startedAt: string) {
 	const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
 	if (hours > 0) {
-		return `${hours}h ${minutes}m`;
+		return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
 	}
 	return `${minutes}m`;
 }
@@ -24,4 +26,14 @@ export function extractTokenFromUrl(url: string) {
 	} catch {
 		return null;
 	}
+}
+
+export function hasActiveNotifications(settings: UserSettings, streamerId: string) {
+	const notifications = getStreamerNotifications(settings, streamerId);
+
+	return (
+		notifications.live.enabled ||
+		notifications.titleChange.enabled ||
+		notifications.categoryChange.enabled
+	);
 }

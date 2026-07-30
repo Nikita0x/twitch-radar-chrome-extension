@@ -3,12 +3,12 @@
 		<div class="card-header">
 			<div style="display: flex; gap: 12px">
 				<div class="avatar-wrap">
-					<div v-if="!avatarLoaded" class="avatar-skeleton"></div>
+					<div class="avatar-skeleton" :class="{ hidden: avatarLoaded }"></div>
 					<img
-						v-show="avatarLoaded"
 						:src="props.streamer.profile_image_url"
 						:alt="props.streamer.display_name"
 						class="avatar"
+						:class="{ loaded: avatarLoaded }"
 						width="60"
 						height="60"
 						@load="avatarLoaded = true"
@@ -38,7 +38,7 @@
 			<div class="buttons">
 				<button
 					class="notif-toggle"
-					:class="{ active: hasActiveNotifications }"
+					:class="{ active: hasNotificationsEnabled }"
 					@click="openStreamerSettings(streamer)"
 					:title="`Open notification settings for ${streamer.display_name}`"
 				>
@@ -85,6 +85,7 @@ import { useUserSettingsStore } from '@/stores/user-settings.store';
 import { getStreamerNotifications } from '@/services/storage.service';
 import { storeToRefs } from 'pinia';
 import { formatDate } from '@/utils/utils';
+import { hasActiveNotifications } from '@/utils/utils';
 
 interface Props {
 	streamer: StreamersDetails;
@@ -95,29 +96,24 @@ const props = defineProps<Props>();
 const navigationStore = useNavigationStore();
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
-const { activeScreen, selectedStreamer } = storeToRefs(navigationStore);
+const { currentScreen, selectedStreamer } = storeToRefs(navigationStore);
 const { followedLiveStreams } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
 
 const avatarLoaded = ref(false);
 
 function openStreamerSettings(streamerDetails: StreamersDetails) {
-	activeScreen.value = 'streamer-settings';
 	selectedStreamer.value = streamerDetails;
+	navigationStore.navigateTo('streamer-settings');
 }
 
 const isLive = computed(() =>
 	followedLiveStreams.value.some((stream) => stream.user_id === props.streamer.id)
 );
 
-const hasActiveNotifications = computed(() => {
-	const notifications = getStreamerNotifications(userSettingsState.value, props.streamer.id);
-	return (
-		notifications.live.enabled ||
-		notifications.titleChange.enabled ||
-		notifications.categoryChange.enabled
-	);
-});
+const hasNotificationsEnabled = computed(() =>
+	hasActiveNotifications(userSettingsState.value, props.streamer.id)
+);
 </script>
 
 <style scoped>
@@ -144,19 +140,31 @@ const hasActiveNotifications = computed(() => {
 .avatar-wrap {
 	position: relative;
 	flex-shrink: 0;
+	width: 60px;
+	height: 60px;
 }
 
 .avatar {
-	display: block;
-	width: 60px;
-	height: 60px;
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	object-fit: cover;
+
+	opacity: 0;
+	transition: opacity 0.25s ease;
+}
+
+.avatar.loaded {
+	opacity: 1;
 }
 
 .avatar-skeleton {
-	width: 60px;
-	height: 60px;
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	background: linear-gradient(
 		90deg,
@@ -166,6 +174,12 @@ const hasActiveNotifications = computed(() => {
 	);
 	background-size: 200% 100%;
 	animation: skeleton-loading 1.2s infinite;
+	transition: opacity 0.25s ease;
+	pointer-events: none;
+}
+
+.avatar-skeleton.hidden {
+	opacity: 0;
 }
 
 @keyframes skeleton-loading {

@@ -1,5 +1,14 @@
 <template>
-	<div class="twitch-auth">
+	<div
+		class="twitch-auth"
+		ref="scrollContainer"
+		@scroll="
+			(event) => {
+				const el = event.target as HTMLDivElement;
+				navigationStore.saveScrollPosition('settings', el.scrollTop);
+			}
+		"
+	>
 		<!-- Theme toggle -->
 		<div v-if="isAuthenticated" class="setting-row">
 			<label class="toggle-label">
@@ -12,15 +21,13 @@
 			</label>
 		</div>
 
-		<template>
-			<AppLoader v-if="localLoading">Loading...</AppLoader>
-			<div v-else-if="error" class="error">
-				<p>{{ error }}</p>
-				<button @click="error = null" class="retry-btn">Try again</button>
-			</div>
-		</template>
+		<AppLoader v-if="localLoading">Loading...</AppLoader>
+		<div v-else-if="error" class="error">
+			<p>{{ error }}</p>
+			<button @click="error = null" class="retry-btn">Try again</button>
+		</div>
 
-		<div v-if="followedAllStreams.length" class="followed-section">
+		<div v-else class="followed-section">
 			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
 			<input
 				ref="search-input"
@@ -49,21 +56,36 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, useTemplateRef } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useTwitchStore } from '@/stores/twitch.store.ts';
+import { useTwitchStore, type StreamersDetails } from '@/stores/twitch.store.ts';
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+import { useNavigationStore } from '@/stores/navigation.store.ts';
+import { hasActiveNotifications } from '@/utils/utils.ts';
 
 import AppLoader from './AppLoader.vue';
 import StreamerCard from './StreamerCard.vue';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
+const navigationStore = useNavigationStore();
 
 const { user, loading, error, followedAllStreams, followedLiveStreams, isAuthenticated } =
 	storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
+const { previousScreen } = storeToRefs(navigationStore);
 
 const search = ref('');
 const searchRef = useTemplateRef('search-input');
+const scrollContainer = useTemplateRef('scrollContainer');
+
+function getPriority(streamer: StreamersDetails) {
+	const isLive = liveStreamerIds.value.has(streamer.id);
+	const notificationsEnabled = hasActiveNotifications(userSettingsState.value, streamer.id);
+
+	if (isLive && notificationsEnabled) return 0;
+	if (isLive) return 1;
+	if (notificationsEnabled) return 2;
+	return 3;
+}
 
 /** Local loading — stays true until all data (including followedAllStreams) is loaded */
 const localLoading = computed(
@@ -87,15 +109,8 @@ const filteredStreamers = computed(() => {
 		);
 	}
 
-	// Сортируем: сначала те, кто в онлайне, потом оффлайн
 	return [...list].sort((a, b) => {
-		// Если стример в liveStreamerIds — он онлайн → 0, иначе → 1
-		const aLive = liveStreamerIds.value.has(a.id) ? 0 : 1;
-		const bLive = liveStreamerIds.value.has(b.id) ? 0 : 1;
-		// 0 - 0 = 0 (оба онлайн/оффлайн — не меняем порядок)
-		// 0 - 1 = -1 (a онлайн, b оффлайн → a выше)
-		// 1 - 0 = 1 (a оффлайн, b онлайн → b выше)
-		return aLive - bLive;
+		return getPriority(a) - getPriority(b);
 	});
 });
 
@@ -103,12 +118,29 @@ onMounted(() => {
 	if (!searchRef.value) return;
 
 	searchRef.value.focus();
+
+	if (!scrollContainer.value) return;
+
+	if (previousScreen.value === 'favorites') {
+		scrollContainer.value.scrollTo({
+			top: 0,
+		});
+	} else {
+		scrollContainer.value.scrollTo({
+			top: navigationStore.getScrollPosition('settings'),
+		});
+	}
 });
 </script>
 
 <style scoped>
 .twitch-auth {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+
 	background: var(--color-bg);
+	overflow: auto;
 }
 
 .setting-row {

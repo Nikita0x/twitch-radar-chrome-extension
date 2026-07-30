@@ -1,7 +1,7 @@
 <template>
 	<div class="state-shell">
 		<div
-			v-if="isAuthenticated && activeScreen === 'favorites'"
+			v-if="isAuthenticated && currentScreen === 'favorites'"
 			style="display: flex; padding-inline: 5px"
 			class="toolbar"
 		>
@@ -36,9 +36,9 @@
 			<h3>No streamer found</h3>
 			<p>Try a different search term</p>
 		</div>
-		<div v-else class="results-section fade-in">
+		<TransitionGroup v-else tag="div" name="streams" class="results-section">
 			<StreamCard v-for="(channel, index) in visibleStreams" :key="channel.id" :stream="channel" />
-		</div>
+		</TransitionGroup>
 	</div>
 </template>
 
@@ -62,19 +62,15 @@ const userSettingsStore = useUserSettingsStore();
 const navigationStore = useNavigationStore();
 const { loading, error, followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
-const { activeScreen } = storeToRefs(navigationStore);
+const { currentScreen } = storeToRefs(navigationStore);
 
 const search = ref('');
 const inputRef = useTemplateRef('search-input');
 
 const getTime = (date: string) => new Date(date).getTime();
 
-const visibleStreams = computed(() => {
-	let result = [...followedLiveStreams.value];
-
-	result = result.filter((stream) =>
-		stream.user_name.toLowerCase().includes(search.value.toLowerCase())
-	);
+const sortedStreams = computed(() => {
+	const result = [...followedLiveStreams.value];
 
 	switch (userSettingsState.value.sort) {
 		case 'viewers:highToLow':
@@ -97,6 +93,16 @@ const visibleStreams = computed(() => {
 	return result;
 });
 
+const visibleStreams = computed(() => {
+	const query = search.value.trim().toLowerCase();
+
+	if (!query) {
+		return sortedStreams.value;
+	}
+
+	return sortedStreams.value.filter((stream) => stream.user_name.toLowerCase().includes(query));
+});
+
 watch(inputRef, (input) => {
 	input?.focus();
 });
@@ -114,8 +120,14 @@ watch(inputRef, (input) => {
 }
 
 .state-shell {
+	display: flex;
+	flex-direction: column;
+	/* background: red; */
+	height: 100%;
+
 	min-height: 120px;
 	position: relative;
+	overflow: auto;
 }
 
 .empty-state {
@@ -214,5 +226,35 @@ watch(inputRef, (input) => {
 	min-width: 180px;
 
 	cursor: pointer;
+}
+
+/* animations for filtering */
+.streams-enter-active,
+.streams-leave-active {
+	transition:
+		opacity 250ms ease,
+		transform 250ms ease;
+
+	will-change: opacity, transform;
+}
+
+.streams-enter-from {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.streams-leave-to {
+	opacity: 0;
+	transform: translateX(-20px);
+}
+
+.streams-leave-active {
+	position: absolute;
+	pointer-events: none;
+}
+
+.streams-move {
+	transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+	will-change: transform;
 }
 </style>

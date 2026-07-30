@@ -19,12 +19,16 @@
 					<p class="login">{{ selectedStreamer.description }}</p>
 					<p class="login">Joined {{ formatDate(selectedStreamer.created_at) }}</p>
 					<div class="badges">
-						<span v-if="selectedStreamer.broadcaster_type === 'partner'" class="badge partner"
+						<span
+							v-if="selectedStreamer.broadcaster_type === 'partner'"
+							class="badge partner"
+							title="Top creators with additional features and benefits."
 							>Partner</span
 						>
 						<span
 							v-else-if="selectedStreamer.broadcaster_type === 'affiliate'"
 							class="badge affiliate"
+							title="Can earn revenue through subscriptions, Bits, and ads."
 							>Affiliate</span
 						>
 					</div>
@@ -248,6 +252,7 @@ async function handleToggleCategoryChangeAutoOpen() {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	overflow: auto;
 }
 
 .back-btn {
