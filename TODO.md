@@ -6,6 +6,7 @@
 - [ ] - Opening muted tabs?
 - [ ] - Add a separate supporting page
 - [ ] - Add a separate settings page
+- [ ] - Add an ability to play sounds when stream events happen AND upload new custom sounds (with sensible defaults)
 
 
 ## UI/UX
