@@ -31,7 +31,7 @@
 			<div class="meta-row">
 				<div style="display: flex; align-items: center; gap: 5px">
 					<span class="live"></span>
-					<span class="viewer-count">{{ props.stream.viewer_count }}</span>
+					<AnimatedViewCount :count="props.stream.viewer_count" />
 				</div>
 
 				<span class="uptime"
@@ -47,6 +47,7 @@
 import { ref } from 'vue';
 import type { FollowData } from '@/stores/twitch.store';
 import { formatUptime } from '@/utils/utils';
+import AnimatedViewCount from './AnimatedViewCount.vue';
 
 interface Props {
 	stream: FollowData;
