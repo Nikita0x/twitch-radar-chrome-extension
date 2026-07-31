@@ -8,6 +8,7 @@
 			<StreamerSettingsTab v-if="currentScreen === 'streamer-settings'" />
 
 			<SettingsTab v-if="currentScreen === 'settings'" />
+			<TestingTab v-if="currentScreen === 'testing'" />
 		</Transition>
 	</div>
 </template>
@@ -18,6 +19,7 @@ import FavoritesTab from './components/FavoritesTab.vue';
 import HeaderComponent from './components/HeaderComponent.vue';
 import SettingsTab from './components/SettingsTab.vue';
 import StreamerSettingsTab from './components/StreamerSettingsTab.vue';
+import TestingTab from './components/TestingTab.vue';
 
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useNavigationStore } from './stores/navigation.store.ts';
