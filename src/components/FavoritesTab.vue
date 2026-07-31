@@ -128,6 +128,25 @@ watch(inputRef, (input) => {
 	min-height: 120px;
 	position: relative;
 	overflow: auto;
+
+	scrollbar-color: var(--color-text-dim) transparent;
+}
+
+.state-shell::-webkit-scrollbar {
+	width: 6px;
+}
+
+.state-shell::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.state-shell::-webkit-scrollbar-thumb {
+	background: var(--color-text-dim);
+	border-radius: 3px;
+}
+
+.state-shell::-webkit-scrollbar-thumb:hover {
+	background: var(--color-text-muted);
 }
 
 .empty-state {
