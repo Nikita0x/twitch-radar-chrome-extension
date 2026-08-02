@@ -24,12 +24,14 @@ import TestingTab from './components/TestingTab.vue';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useNavigationStore } from './stores/navigation.store.ts';
 import { useUserSettingsStore } from './stores/user-settings.store.ts';
+import { useStorageStore } from './stores/storage.store.ts';
 
 import { storeToRefs } from 'pinia';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
 const navigationStore = useNavigationStore();
+const storageStore = useStorageStore();
 const { followedLiveStreams, isAuthenticated } = storeToRefs(twitchStore);
 const { currentScreen } = storeToRefs(navigationStore);
 const { userSettingsState } = storeToRefs(userSettingsStore);
@@ -38,6 +40,7 @@ onMounted(async () => {
 	await userSettingsStore.loadSettings();
 	userSettingsStore.applyTheme(userSettingsState.value.theme);
 	await twitchStore.init();
+	await storageStore.load();
 });
 </script>
 

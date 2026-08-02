@@ -10,7 +10,11 @@
 			<div v-if="!imageLoaded" class="thumb-skeleton"></div>
 
 			<img
-				:src="props.stream.thumbnail_url.replace('{width}', '200').replace('{height}', '100')"
+				:src="
+					userSettingsState.livePreviews
+						? getPreview(props.stream.user_login, storage.runtime.previewTick)
+						: props.stream.thumbnail_url.replace('{width}', '200').replace('{height}', '100')
+				"
 				class="thumb"
 				:class="{ loaded: imageLoaded }"
 				width="200"
@@ -44,10 +48,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { FollowData } from '@/stores/twitch.store';
-import { formatUptime } from '@/utils/utils';
+import { formatUptime, getPreview } from '@/utils/utils';
 import AnimatedViewCount from './AnimatedViewCount.vue';
+import { storeToRefs } from 'pinia';
+
+import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+import { useStorageStore } from '@/stores/storage.store.ts';
 
 interface Props {
 	stream: FollowData;
@@ -55,7 +63,20 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const userSettingsStore = useUserSettingsStore();
+const storageStore = useStorageStore();
+
+const { userSettingsState } = storeToRefs(userSettingsStore);
+const { storage } = storeToRefs(storageStore);
+
 const imageLoaded = ref(false);
+
+watch(
+	() => storage.value.runtime.previewTick,
+	() => {
+		imageLoaded.value = false;
+	}
+);
 </script>
 
 <style scoped>

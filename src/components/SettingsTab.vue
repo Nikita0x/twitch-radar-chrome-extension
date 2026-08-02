@@ -21,6 +21,17 @@
 			</label>
 		</div>
 
+		<div class="setting-row">
+			<label class="toggle-label">
+				<input
+					type="checkbox"
+					:checked="userSettingsState.livePreviews"
+					@change="userSettingsStore.toggleLivePreviews"
+				/>
+				Live Previews (experimental)
+			</label>
+		</div>
+
 		<AppLoader v-if="localLoading">Loading...</AppLoader>
 		<div v-else-if="error" class="error">
 			<p>{{ error }}</p>

@@ -98,6 +98,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 
 	storage.runtime.liveStreams = liveStreams;
 
+	if (storage.userSettings.livePreviews) {
+		storage.runtime.previewTick = ((storage.runtime.previewTick ?? 0) + 1) % 10;
+	}
+
 	// ----
 	// delete streamers who are offline
 	// -----

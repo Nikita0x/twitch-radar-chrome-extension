@@ -23,6 +23,7 @@ export interface AuthState {
 interface RuntimeState {
 	previousStreams: Record<StreamerId, PreviousStream>;
 	liveStreams: FollowData[];
+	previewTick: number;
 }
 
 export interface PreviousStream {
@@ -51,6 +52,7 @@ interface CategoryChangeRule extends NotificationRule {
 export interface UserSettings {
 	sort: Sort;
 	theme: 'light' | 'dark';
+	livePreviews: boolean;
 	notifications: Record<StreamerId, StreamerNotifications>;
 }
 
@@ -66,8 +68,9 @@ export const DEFAULT_STORAGE: StorageSchema = {
 		notifications: {},
 		sort: 'viewers:highToLow',
 		theme: 'light',
+		livePreviews: false,
 	},
-	runtime: { previousStreams: {}, liveStreams: [] },
+	runtime: { previousStreams: {}, liveStreams: [], previewTick: 0 },
 };
 
 export const DEFAULT_NOTIFICATION_SETTINGS: StreamerNotifications = {

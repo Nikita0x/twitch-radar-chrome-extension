@@ -42,6 +42,11 @@ export const useUserSettingsStore = defineStore('user-settings', () => {
 		applyTheme(newTheme);
 	}
 
+	async function toggleLivePreviews() {
+		userSettingsState.value.livePreviews = !userSettingsState.value.livePreviews;
+		await updateSettings({ livePreviews: userSettingsState.value.livePreviews });
+	}
+
 	function applyTheme(theme: 'light' | 'dark') {
 		document.documentElement.setAttribute('data-theme', theme);
 	}
@@ -53,5 +58,6 @@ export const useUserSettingsStore = defineStore('user-settings', () => {
 		updateStreamerNotifications,
 		toggleTheme,
 		applyTheme,
+		toggleLivePreviews,
 	};
 });

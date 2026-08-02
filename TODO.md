@@ -9,6 +9,7 @@
 - [ ] - Add an ability to play sounds when stream events happen AND upload new custom sounds (with sensible defaults)
 - [ ] - Ability to add channgels WITHOUT following them
 - [ ] - Popup with what's changed and a button for changelogs in the popup
+- [X] - Live Previews (experimental feature - toggleable in the settings)
 
 
 ## UI/UX

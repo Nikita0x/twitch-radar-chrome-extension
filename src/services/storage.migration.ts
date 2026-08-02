@@ -53,6 +53,7 @@ function migrateV1toV2(storage: StorageSchemaV1): StorageSchema {
 		runtime: {
 			previousStreams: {},
 			liveStreams: [],
+			previewTick: 0,
 		},
 	};
 }

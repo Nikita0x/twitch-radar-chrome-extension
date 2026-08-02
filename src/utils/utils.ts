@@ -37,3 +37,9 @@ export function hasActiveNotifications(settings: UserSettings, streamerId: strin
 		notifications.categoryChange.enabled
 	);
 }
+
+export function getPreview(login: string, tick: number) {
+	const width = 200 + tick;
+
+	return `https://static-cdn.jtvnw.net/previews-ttv/live_user_${login}-${width}x100.jpg`;
+}
