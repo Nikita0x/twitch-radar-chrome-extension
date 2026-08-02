@@ -18,20 +18,7 @@
 				<div class="header-info">
 					<h3 class="display-name">{{ props.streamer.display_name }}</h3>
 					<span class="login">@{{ props.streamer.login }}</span>
-					<div class="badges">
-						<span
-							v-if="props.streamer.broadcaster_type === 'partner'"
-							class="badge partner"
-							title="Top creators with additional features and benefits."
-							>Partner</span
-						>
-						<span
-							v-else-if="props.streamer.broadcaster_type === 'affiliate'"
-							class="badge affiliate"
-							title="Can earn revenue through subscriptions, Bits, and ads."
-							>Affiliate</span
-						>
-					</div>
+					<StreamerTypeBadge :type="props.streamer.broadcaster_type" />
 				</div>
 			</div>
 
@@ -86,6 +73,7 @@ import { getStreamerNotifications } from '@/services/storage.service';
 import { storeToRefs } from 'pinia';
 import { formatDate } from '@/utils/utils';
 import { hasActiveNotifications } from '@/utils/utils';
+import StreamerTypeBadge from './StreamerTypeBadge.vue';
 
 interface Props {
 	streamer: StreamersDetails;
@@ -228,32 +216,6 @@ const hasNotificationsEnabled = computed(() =>
 .login {
 	font-size: 12px;
 	color: var(--color-text-dim);
-}
-
-.badges {
-	display: flex;
-	gap: 6px;
-	align-items: center;
-	margin-top: 2px;
-	flex-wrap: wrap;
-}
-
-.badge {
-	font-size: 10px;
-	font-weight: 700;
-	padding: 2px 6px;
-	border-radius: 4px;
-	text-transform: uppercase;
-}
-
-.badge.partner {
-	background: var(--color-accent);
-	color: white;
-}
-
-.badge.affiliate {
-	background: var(--color-bg-secondary);
-	color: var(--color-accent);
 }
 
 .description {

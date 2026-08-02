@@ -18,20 +18,7 @@
 					<span class="login">@{{ selectedStreamer.login }}</span>
 					<p class="login">{{ selectedStreamer.description }}</p>
 					<p class="login">Joined {{ formatDate(selectedStreamer.created_at) }}</p>
-					<div class="badges">
-						<span
-							v-if="selectedStreamer.broadcaster_type === 'partner'"
-							class="badge partner"
-							title="Top creators with additional features and benefits."
-							>Partner</span
-						>
-						<span
-							v-else-if="selectedStreamer.broadcaster_type === 'affiliate'"
-							class="badge affiliate"
-							title="Can earn revenue through subscriptions, Bits, and ads."
-							>Affiliate</span
-						>
-					</div>
+					<StreamerTypeBadge :type="selectedStreamer.broadcaster_type" />
 				</div>
 			</div>
 
@@ -157,6 +144,7 @@ import { useUserSettingsStore } from '@/stores/user-settings.store';
 import { useTwitchStore } from '@/stores/twitch.store';
 import { getStreamerNotifications } from '@/services/storage.service';
 import { formatDate } from '@/utils/utils';
+import StreamerTypeBadge from './StreamerTypeBadge.vue';
 
 const navigationStore = useNavigationStore();
 const userSettingsStore = useUserSettingsStore();
@@ -341,32 +329,6 @@ async function handleToggleCategoryChangeAutoOpen() {
 .login {
 	font-size: 13px;
 	color: var(--color-text-dim);
-}
-
-.badges {
-	display: flex;
-	gap: 6px;
-	align-items: center;
-	margin-top: 4px;
-	flex-wrap: wrap;
-}
-
-.badge {
-	font-size: 10px;
-	font-weight: 700;
-	padding: 2px 6px;
-	border-radius: 4px;
-	text-transform: uppercase;
-}
-
-.badge.partner {
-	background: var(--color-accent);
-	color: white;
-}
-
-.badge.affiliate {
-	background: var(--color-bg-secondary);
-	color: var(--color-accent);
 }
 
 /* ── Settings section ── */

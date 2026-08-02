@@ -30,6 +30,25 @@
 				/>
 				Live Previews (experimental)
 			</label>
+
+			<div
+				style="cursor: help"
+				title="Automatically refreshes stream preview thumbnails every 30 seconds while the popup is open.
+                
+Experimental feature. May stop working if Twitch changes how preview images are cached."
+			>
+				<svg
+					class="info-icon"
+					xmlns="http://www.w3.org/2000/svg"
+					width="16"
+					height="16"
+					viewBox="0 0 16.93 16.93"
+				>
+					<path
+						d="M8.51 0C3.83-.02.02 3.75 0 8.42c-.02 4.68 3.75 8.49 8.42 8.51 4.68.02 8.49-3.75 8.51-8.42C16.96 3.83 13.18.02 8.51 0m-.12 2.28c.41 0 .75.15 1.03.44.29.28.43.63.43 1.04s-.14.75-.43 1.04c-.28.28-.63.42-1.03.42-.42 0-.76-.14-1.05-.42-.28-.28-.43-.63-.43-1.04 0-.42.15-.76.44-1.04.28-.29.63-.44 1.04-.44M6 6.07h3.89v7.25h1.17v.93H6v-.93h1.16V7H6Z"
+					/>
+				</svg>
+			</div>
 		</div>
 
 		<AppLoader v-if="localLoading">Loading...</AppLoader>
@@ -173,8 +192,15 @@ onMounted(() => {
 }
 
 .setting-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	padding: 8px 5px;
 	text-align: left;
+}
+
+.info-icon {
+	fill: var(--color-text);
 }
 
 .toggle-label {
