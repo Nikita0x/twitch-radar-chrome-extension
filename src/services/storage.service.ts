@@ -119,7 +119,11 @@ export async function getStorage(): Promise<StorageSchema> {
 }
 
 export async function saveStorage(storage: StorageSchema): Promise<void> {
+	// Callers often pass Pinia/Vue reactive proxies (e.g. `userSettingsState.value`).
+	// Firefox's storage.local uses structured clone and rejects those outright;
+	// Chrome tolerates them. Strip reactivity by round-tripping through JSON —
+	// storage.local only ever holds plain JSON-safe data anyway.
 	await browser.storage.local.set({
-		storage,
+		storage: JSON.parse(JSON.stringify(storage)),
 	});
 }
