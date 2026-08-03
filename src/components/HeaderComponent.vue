@@ -2,7 +2,7 @@
 	<div class="header">
 		<div class="title">
 			<button
-				v-if="currentScreen === 'settings'"
+				v-if="currentScreen === 'settings' || currentScreen === 'changelog'"
 				class="icon-btn back-btn"
 				@click="navigationStore.navigateTo('favorites')"
 				title="Back"
@@ -44,6 +44,29 @@
                     class="heart-icon" /></button> -->
 			<button
 				v-if="isAuthenticated && currentScreen === 'favorites'"
+				class="icon-btn heart-btn"
+				title="Changelog"
+				@click="navigationStore.navigateTo('changelog')"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					xml:space="preserve"
+					width="20"
+					height="20"
+					viewBox="0 0 32 32"
+					fill="currentColor"
+					class="heart-icon"
+				>
+					<g stroke="#000" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2">
+						<path d="M27 5V3H1v26a2 2 0 0 0 2 2h26a2 2 0 0 0 2-2V5z" />
+						<path
+							d="M5 19h10v8H5zM27 5v19M27 26v2M4 11h20M4 7h20M4 15h20M18 19h6M18 23h6M18 27h6"
+						/>
+					</g>
+				</svg>
+			</button>
+			<button
+				v-if="isAuthenticated && currentScreen === 'favorites'"
 				class="icon-btn cog-btn"
 				title="Settings"
 				@click="navigationStore.navigateTo('settings')"
@@ -65,7 +88,10 @@
 				</svg>
 			</button>
 
-			<div v-else-if="isAuthenticated" style="display: flex; align-items: center; gap: 10px">
+			<div
+				v-else-if="isAuthenticated && currentScreen === 'settings'"
+				style="display: flex; align-items: center; gap: 10px"
+			>
 				<button @click="logout" class="logout-btn">Logout</button>
 
 				<img :src="user?.profile_image_url" style="width: 20px; height: 20px; border-radius: 50%" />

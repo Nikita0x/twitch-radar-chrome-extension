@@ -2,7 +2,7 @@ import type { StreamersDetails } from '@/stores/twitch.store';
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-export type Screen = 'favorites' | 'settings' | 'streamer-settings' | 'testing';
+export type Screen = 'favorites' | 'settings' | 'streamer-settings' | 'changelog' | 'testing';
 
 export interface NavigationState {
 	current: Screen;

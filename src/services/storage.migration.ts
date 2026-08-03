@@ -48,6 +48,7 @@ function migrateV1toV2(storage: StorageSchemaV1): StorageSchema {
 			sort: storage.userSettings.sort,
 			theme: storage.userSettings.theme,
 			notifications,
+			livePreviews: false,
 		},
 
 		runtime: {
