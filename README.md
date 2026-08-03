@@ -1,10 +1,10 @@
 # Twitch Radar
 
-![Twitch Radar Icon](public/icon128.png)
+![Twitch Radar Icon](src/public/icon128.png)
 
-A fast, lightweight Chrome extension that tracks your followed Twitch streamers and sends desktop notifications when they go live.
+A fast, lightweight browser extension that tracks your followed Twitch streamers and sends desktop notifications when they go live.
 
-[<img src="public/chrome.png" alt="Chrome Web Store link" height="60px">](https://chromewebstore.google.com/detail/fcjbgobfppjggabcbbnngehhefllbllm)
+[<img src="src/public/chrome.png" alt="Chrome Web Store link" height="60px">](https://chromewebstore.google.com/detail/fcjbgobfppjggabcbbnngehhefllbllm)
 
 ## Features
 
@@ -25,16 +25,20 @@ A fast, lightweight Chrome extension that tracks your followed Twitch streamers 
 2. Run `npm install` and `npm run build`
 3. Open `chrome://extensions/`
 4. Enable **Developer mode**
-5. Click **Load unpacked** and select the `dist/` folder
+5. Click **Load unpacked** and select the `.output/chrome-mv3/` folder
 
 ## Build Commands
 
 ```sh
-npm install           # install dependencies
-npm run dev           # live development build (watch mode)
-npm run build         # build an extension (then load `dist` folder)
-npm run check         # TypeScript type check
-npm run format        # Format project with prettier
+npm install             # install dependencies
+npm run dev             # start WXT dev server with HMR (Chrome)
+npm run dev:firefox      # start WXT dev server with HMR (Firefox)
+npm run build            # production build for Chrome (.output/chrome-mv3)
+npm run build:firefox    # production build for Firefox (.output/firefox-mv2)
+npm run zip              # zip the Chrome build for store submission
+npm run zip:firefox      # zip the Firefox build for store submission
+npm run check            # TypeScript type check
+npm run format           # format project with prettier
 ```
 
 ## Report an Issue

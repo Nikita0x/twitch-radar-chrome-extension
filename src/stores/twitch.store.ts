@@ -1,7 +1,8 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { extractTokenFromUrl } from '@/utils/utils';
-import { getStorage, saveStorage } from '@/services/storage.service';
+import { getStorage, saveStorage, type StorageSchema } from '@/services/storage.service';
+import { setBadge } from '@/services/badge.service';
 import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { CLIENT_ID } from '@/constants';
 import { request, type Result, ok, err } from '@/types/result';
@@ -174,7 +175,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 		loading.value = true;
 		error.value = null;
 		try {
-			const redirectUri = `https://${chrome.runtime.id}.chromiumapp.org/`;
+			const redirectUri = browser.identity.getRedirectURL();
 			const authUrl =
 				`https://id.twitch.tv/oauth2/authorize` +
 				`?client_id=${CLIENT_ID}` +
@@ -321,8 +322,9 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	function listenStorageChanges() {
-		chrome.storage.onChanged.addListener((changes) => {
-			const liveStreams = changes.storage?.newValue?.runtime?.liveStreams;
+		browser.storage.onChanged.addListener((changes) => {
+			const newValue = changes.storage?.newValue as StorageSchema | undefined;
+			const liveStreams = newValue?.runtime?.liveStreams;
 			if (liveStreams) {
 				followedLiveStreams.value = liveStreams;
 			}
@@ -331,12 +333,9 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 	watch(followedLiveStreams, async () => {
 		if (!isAuthenticated.value) {
-			await chrome.action.setBadgeText({ text: '!' });
-			await chrome.action.setBadgeBackgroundColor({ color: '#808080' });
+			await setBadge('!', '#808080');
 		} else {
-			await chrome.action.setBadgeText({ text: String(followedLiveStreams.value.length) });
-			await chrome.action.setBadgeBackgroundColor({ color: '#EB0400' });
-			await chrome.action.setBadgeTextColor({ color: 'white' });
+			await setBadge(String(followedLiveStreams.value.length), '#EB0400', 'white');
 		}
 	});
 

@@ -97,12 +97,12 @@ export function getStreamerNotifications(
 }
 
 export async function getStorage(): Promise<StorageSchema> {
-	const result = await chrome.storage.local.get('storage');
+	const result = (await browser.storage.local.get('storage')) as { storage?: StorageSchema };
 
 	if (!result.storage) {
 		const storage = structuredClone(DEFAULT_STORAGE);
 
-		await chrome.storage.local.set({
+		await browser.storage.local.set({
 			storage,
 		});
 
@@ -119,7 +119,7 @@ export async function getStorage(): Promise<StorageSchema> {
 }
 
 export async function saveStorage(storage: StorageSchema): Promise<void> {
-	await chrome.storage.local.set({
+	await browser.storage.local.set({
 		storage,
 	});
 }

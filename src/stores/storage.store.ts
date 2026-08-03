@@ -9,7 +9,7 @@ export const useStorageStore = defineStore('storage', () => {
 		storage.value = await getStorage();
 	}
 
-	chrome.storage.onChanged.addListener(async () => {
+	browser.storage.onChanged.addListener(async () => {
 		storage.value = await getStorage();
 	});
 

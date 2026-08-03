@@ -4,9 +4,14 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite build --watch --mode development",
-		"check": "vue-tsc --build",
-		"build": "npm run check && vite build",
+		"dev": "wxt",
+		"dev:firefox": "wxt -b firefox",
+		"check": "vue-tsc --noEmit",
+		"build": "npm run check && wxt build",
+		"build:firefox": "npm run check && wxt build -b firefox",
+		"zip": "wxt zip",
+		"zip:firefox": "wxt zip -b firefox",
+		"postinstall": "wxt prepare",
 		"format": "npx prettier . --write"
 	},
 	"dependencies": {
@@ -16,15 +21,13 @@
 	"devDependencies": {
 		"@tsconfig/node24": "^24.0.4",
 		"@types/node": "^24.13.2",
-		"@vitejs/plugin-vue": "^6.0.7",
 		"@vue/tsconfig": "^0.9.1",
-		"chrome-types": "^0.1.434",
+		"@wxt-dev/module-vue": "^1.0.3",
 		"npm-run-all2": "^9.0.2",
 		"prettier": "^3.9.5",
 		"typescript": "~6.0.0",
-		"vite": "^8.0.16",
-		"vite-plugin-vue-devtools": "^8.1.2",
-		"vue-tsc": "^3.3.5"
+		"vue-tsc": "^3.3.5",
+		"wxt": "^0.21.3"
 	},
 	"engines": {
 		"node": "^22.18.0 || >=24.12.0"

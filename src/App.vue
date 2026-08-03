@@ -4,12 +4,10 @@
 
 		<Transition name="screen" mode="out-in">
 			<FavoritesTab v-if="currentScreen === 'favorites'" />
-
-			<StreamerSettingsTab v-if="currentScreen === 'streamer-settings'" />
-
-			<SettingsTab v-if="currentScreen === 'settings'" />
-			<ChangelogTab v-if="currentScreen === 'changelog'" />
-			<TestingTab v-if="currentScreen === 'testing'" />
+			<StreamerSettingsTab v-else-if="currentScreen === 'streamer-settings'" />
+			<SettingsTab v-else-if="currentScreen === 'settings'" />
+			<ChangelogTab v-else-if="currentScreen === 'changelog'" />
+			<TestingTab v-else-if="currentScreen === 'testing'" />
 		</Transition>
 	</div>
 </template>
