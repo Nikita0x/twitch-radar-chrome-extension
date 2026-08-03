@@ -27,18 +27,32 @@
 			</div>
 		</div>
 
-		<AppLoader v-if="loading">Loading streams...</AppLoader>
-		<AuthPrompt v-else-if="!isAuthenticated" />
-		<div v-else-if="error" class="api-error">{{ error }}</div>
-		<div v-else-if="followedLiveStreams.length === 0" class="empty-state">No active streams</div>
-		<div v-else-if="visibleStreams.length === 0" class="empty-search">
-			<div class="icon">🔍</div>
-			<h3>No streamer found</h3>
-			<p>Try a different search term</p>
-		</div>
-		<TransitionGroup v-else tag="div" name="streams" class="results-section">
-			<StreamCard v-for="(channel, index) in visibleStreams" :key="channel.id" :stream="channel" />
-		</TransitionGroup>
+		<Transition name="fade" mode="out-in">
+			<AppLoader v-if="loading && !isAuthenticated" key="loading-auth">
+				Signing in with Twitch...
+			</AppLoader>
+			<div v-else-if="loading" key="loading-skeleton" class="results-section">
+				<StreamCardSkeleton v-for="n in 5" :key="n" />
+			</div>
+			<AuthPrompt v-else-if="!isAuthenticated" key="auth-prompt" />
+			<div v-else-if="error" key="error" class="api-error">{{ error }}</div>
+			<div v-else-if="followedLiveStreams.length === 0" key="empty" class="empty-state">
+				No active streams
+			</div>
+			<div v-else-if="visibleStreams.length === 0" key="empty-search" class="empty-search">
+				<div class="icon">🔍</div>
+				<h3>No streamer found</h3>
+				<p>Try a different search term</p>
+			</div>
+			<TransitionGroup v-else key="list" tag="div" name="streams" class="results-section">
+				<StreamCard
+					v-for="(channel, index) in visibleStreams"
+					:key="channel.id"
+					:stream="channel"
+					:style="{ '--i': index }"
+				/>
+			</TransitionGroup>
+		</Transition>
 	</div>
 </template>
 
@@ -46,6 +60,7 @@
 import { ref, computed, onMounted, useTemplateRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import StreamCard from './StreamCard.vue';
+import StreamCardSkeleton from './StreamCardSkeleton.vue';
 import AppLoader from './AppLoader.vue';
 import AuthPrompt from './AuthPrompt.vue';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
@@ -245,6 +260,17 @@ watch(inputRef, (input) => {
 	min-width: 180px;
 
 	cursor: pointer;
+}
+
+/* crossfade between loading/auth/error/empty/list states */
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
 }
 
 /* animations for filtering */

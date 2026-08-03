@@ -51,35 +51,40 @@ Experimental feature. May stop working if Twitch changes how preview images are 
 			</div>
 		</div>
 
-		<AppLoader v-if="localLoading">Loading...</AppLoader>
-		<div v-else-if="error" class="error">
-			<p>{{ error }}</p>
-			<button @click="error = null" class="retry-btn">Try again</button>
-		</div>
-
-		<div v-else class="followed-section">
-			<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
-			<input
-				ref="search-input"
-				class="search-input"
-				placeholder="Streamer name..."
-				v-model="search"
-			/>
-
-			<div v-if="search && filteredStreamers.length === 0" class="empty-search">
-				<div class="icon">🔍</div>
-				<h3>No streamer found</h3>
-				<p>Try a different search term</p>
+		<Transition name="fade" mode="out-in">
+			<div v-if="localLoading" key="loading" class="results-section">
+				<StreamerCardSkeleton v-for="n in 5" :key="n" />
+			</div>
+			<div v-else-if="error" key="error" class="error">
+				<p>{{ error }}</p>
+				<button @click="error = null" class="retry-btn">Try again</button>
 			</div>
 
-			<div class="results-section">
-				<StreamerCard
-					v-for="(streamer, index) in filteredStreamers"
-					:key="streamer.id"
-					:streamer="streamer"
+			<div v-else key="content" class="followed-section">
+				<h3 class="section-title">Followed Streamers ({{ followedAllStreams.length }})</h3>
+				<input
+					ref="search-input"
+					class="search-input"
+					placeholder="Streamer name..."
+					v-model="search"
 				/>
+
+				<div v-if="search && filteredStreamers.length === 0" class="empty-search">
+					<div class="icon">🔍</div>
+					<h3>No streamer found</h3>
+					<p>Try a different search term</p>
+				</div>
+
+				<div class="results-section">
+					<StreamerCard
+						v-for="(streamer, index) in filteredStreamers"
+						:key="streamer.id"
+						:streamer="streamer"
+						:style="{ '--i': index }"
+					/>
+				</div>
 			</div>
-		</div>
+		</Transition>
 	</div>
 </template>
 
@@ -91,8 +96,8 @@ import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
 import { useNavigationStore } from '@/stores/navigation.store.ts';
 import { hasActiveNotifications } from '@/utils/utils.ts';
 
-import AppLoader from './AppLoader.vue';
 import StreamerCard from './StreamerCard.vue';
+import StreamerCardSkeleton from './StreamerCardSkeleton.vue';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();
@@ -218,6 +223,17 @@ onMounted(() => {
 	height: 16px;
 	cursor: pointer;
 	accent-color: var(--color-accent);
+}
+
+/* crossfade between loading/error/content states */
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
 }
 
 .error {

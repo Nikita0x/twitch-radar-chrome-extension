@@ -155,6 +155,9 @@ watch(
 
 	background: rgba(0, 0, 0, 0.6);
 	backdrop-filter: blur(12px);
+
+	animation: card-content-in 0.35s ease both;
+	animation-delay: calc(min(var(--i, 0), 8) * 40ms);
 }
 .thumb-user {
 	color: white;
@@ -174,6 +177,9 @@ watch(
 	gap: 10px;
 	font-size: 12px;
 	flex: 1;
+
+	animation: card-content-in 0.35s ease both;
+	animation-delay: calc(min(var(--i, 0), 8) * 40ms);
 }
 
 .card-name {
@@ -244,6 +250,18 @@ watch(
 
 	to {
 		background-position: -200% 0;
+	}
+}
+
+@keyframes card-content-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
 	}
 }
 </style>

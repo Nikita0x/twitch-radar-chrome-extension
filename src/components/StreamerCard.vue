@@ -113,6 +113,9 @@ const hasNotificationsEnabled = computed(() =>
 	border-bottom: 1px solid var(--color-border);
 	transition: background 0.2s ease;
 
+	animation: card-content-in 0.35s ease both;
+	animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+
 	&:hover {
 		background: var(--color-bg-secondary);
 	}
@@ -176,6 +179,17 @@ const hasNotificationsEnabled = computed(() =>
 	}
 	to {
 		background-position: -200% 0;
+	}
+}
+
+@keyframes card-content-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
 	}
 }
 

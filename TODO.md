@@ -9,7 +9,9 @@
 - [ ] - Add an ability to play sounds when stream events happen AND upload new custom sounds (with sensible defaults)
 - [ ] - Ability to add channgels WITHOUT following them
 - [ ] - Popup with what's changed and a button for changelogs in the popup
-- [X] - Live Previews (experimental feature - toggleable in the settings)
+- [ ] - Add grayscale effect on the #app when NO internet connection...
+- [ ] - Migrate to `wxt` to allow easier builds for FireFox and other browsers...
+- [ ] - Add skeletons (favorites, settings) instead of loader+spinner
 
 
 ## UI/UX
