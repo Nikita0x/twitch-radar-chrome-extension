@@ -1,5 +1,14 @@
 import { defineConfig } from 'wxt';
 
+// Public half of a locally-generated RSA key pair, used only to pin the
+// Chrome/Chromium extension ID (see `key` below). Not a secret — Chrome
+// re-signs on publish, this key only fixes the ID during local unpacked
+// installs, otherwise the ID is re-hashed from the build's absolute path
+// and changes whenever that path changes, breaking the OAuth redirect URI
+// registered with Twitch every time.
+const CHROMIUM_DEV_PUBLIC_KEY =
+	'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4YPqMhtV7dM6KFBdD1izLvwlxglCRGaNDVdNTwKXk6O2lAYqOc+bmeFddSVry/kdwuappyVxvtPvmdr1ssja4+6NIxwRuBGuW1+dwdHGNCLBuUu8vgbs9WsIJKiyi1i8N68Bc9hLYpol6bcxKg12ZBvsW/GWLauei3cTDnk+XOOw3WQRIiwRjOel2eMQBc+1YtsfSAFbC6+oijOUZrBvxFh6xhtFZm6XzzYkNhzp7MVyLi+jLLEH+1qMPqs0oi/zWYBTSswolPl+YEEGXEzFZX+ugPDz1EoOLK3vF1rO7PKra5nq1QMTQMkKk11eAK/ByFLuP2XkFhJHJKmduvj6owIDAQAB';
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
 	srcDir: 'src',
@@ -7,7 +16,7 @@ export default defineConfig({
 	// not srcDir — has to be set explicitly since public/ lives under src/.
 	publicDir: 'src/public',
 	modules: ['@wxt-dev/module-vue'],
-	manifest: {
+	manifest: ({ browser }) => ({
 		name: 'Twitch Radar – Live Stream Notifications',
 		description: 'Get desktop notifications when your favorite Twitch streamers go live.',
 		version: '1.4.0',
@@ -25,13 +34,27 @@ export default defineConfig({
 				32: 'icon32.png',
 			},
 		},
-		// Fixed Firefox add-on ID. Keeps `browser.identity.getRedirectURL()` (and
-		// the moz-extension:// URL in general) stable across rebuilds/reinstalls —
-		// required for the OAuth redirect URI registered with Twitch to keep working.
-		browser_specific_settings: {
-			gecko: {
-				id: 'twitch-radar@nikita0x',
-			},
-		},
-	},
+		// Pins the Chrome extension ID to anejamjbmgpekamgljajekmgnbppnjao,
+		// independent of the build's absolute path. Chromium-only field.
+		...(browser === 'chrome'
+			? { key: CHROMIUM_DEV_PUBLIC_KEY }
+			: {
+					// Fixed Firefox add-on ID. Keeps `browser.identity.getRedirectURL()`
+					// (and the moz-extension:// URL in general) stable across
+					// rebuilds/reinstalls — required for the OAuth redirect URI
+					// registered with Twitch to keep working.
+					browser_specific_settings: {
+						gecko: {
+							id: 'twitch-radar@nikita0x',
+							// Required by Mozilla for new extensions since 2025-11-03. We
+							// don't collect/transmit any user data — everything stays in
+							// local storage or goes straight to Twitch's API with the
+							// user's own token.
+							data_collection_permissions: {
+								required: ['none'],
+							},
+						},
+					},
+				}),
+	}),
 });

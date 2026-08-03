@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref, toRaw, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { extractTokenFromUrl } from '@/utils/utils';
 import { getStorage, saveStorage, type StorageSchema } from '@/services/storage.service';
@@ -214,6 +214,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 			}
 
 			followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
+			await persistLiveStreams(followedLiveStreams.value);
 
 			const idsResult = await fetchAllFollowedChannelsIds(token);
 
@@ -289,6 +290,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 				}
 
 				followedLiveStreams.value = fetchFollowedLiveStreamsResult.data;
+				await persistLiveStreams(followedLiveStreams.value);
 
 				const idsResult = await fetchAllFollowedChannelsIds(accessToken.value);
 
@@ -321,11 +323,21 @@ export const useTwitchStore = defineStore('twitch', () => {
 		}
 	}
 
+	async function persistLiveStreams(streams: FollowData[]) {
+		// `streams` is a Pinia/Vue reactive proxy — hand storage.local a plain
+		// array, since serializing the proxy directly is unreliable.
+		const plainStreams = toRaw(streams).map((s) => toRaw(s));
+
+		const storage = await getStorage();
+		storage.runtime.liveStreams = plainStreams;
+		await saveStorage(storage);
+	}
+
 	function listenStorageChanges() {
 		browser.storage.onChanged.addListener((changes) => {
 			const newValue = changes.storage?.newValue as StorageSchema | undefined;
 			const liveStreams = newValue?.runtime?.liveStreams;
-			if (liveStreams) {
+			if (Array.isArray(liveStreams)) {
 				followedLiveStreams.value = liveStreams;
 			}
 		});

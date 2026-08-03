@@ -85,7 +85,7 @@ const inputRef = useTemplateRef('search-input');
 const getTime = (date: string) => new Date(date).getTime();
 
 const sortedStreams = computed(() => {
-	const result = [...followedLiveStreams.value];
+	const result = Array.isArray(followedLiveStreams.value) ? [...followedLiveStreams.value] : [];
 
 	switch (userSettingsState.value.sort) {
 		case 'viewers:highToLow':
