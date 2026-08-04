@@ -145,8 +145,9 @@ export default defineBackground(() => {
 				iconUrl: `${browser.runtime.getURL('/')}icon128.png`,
 				title,
 				message,
-				priority: 2,
-				buttons: [{ title: 'Open Stream' }],
+				// Firefox throws "Unexpected property" if these are present -
+				// it doesn't support notification buttons/priority at all.
+				...(import.meta.env.FIREFOX ? {} : { priority: 2, buttons: [{ title: 'Open Stream' }] }),
 			});
 		} catch (err) {
 			console.error('Failed to send notification for', stream.user_name, err);

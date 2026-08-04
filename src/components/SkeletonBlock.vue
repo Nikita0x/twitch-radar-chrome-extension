@@ -36,7 +36,7 @@ function toSize(value: string | number) {
 	);
 	background-size: 200% 100%;
 
-	animation: skeleton-loading 1.2s ease-in-out infinite;
+	animation: skeleton-loading 2s ease-in-out infinite;
 }
 
 @keyframes skeleton-loading {
