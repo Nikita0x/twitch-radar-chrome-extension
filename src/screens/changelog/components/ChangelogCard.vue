@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ChangelogItem } from './ChangelogTab.vue';
+import type { ChangelogItem } from '@/screens/changelog/ChangelogScreen.vue';
 
 interface Props {
 	item: ChangelogItem;

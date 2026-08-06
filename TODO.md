@@ -1,6 +1,8 @@
 # TODO
 
 ## Features
+
+- [ ] - Add survey after uninstall (`chrome.runtime.setUninstallURL('YourWebsite')`)
 - [ ] - Port to FireFox
 - [ ] - Ability to send a message in chat [RESEARCH NEEDED]
 - [ ] - Opening muted tabs?
@@ -8,16 +10,11 @@
 - [ ] - Add a separate settings page
 - [ ] - Add an ability to play sounds when stream events happen AND upload new custom sounds (with sensible defaults)
 - [ ] - Ability to add channgels WITHOUT following them
-- [ ] - Popup with what's changed and a button for changelogs in the popup
 - [ ] - Add grayscale effect on the #app when NO internet connection...
-- [ ] - Migrate to `wxt` to allow easier builds for FireFox and other browsers...
-- [ ] - Add skeletons (favorites, settings) instead of loader+spinner
-
 
 ## UI/UX
 
 - [ ] отдельно кнопка сердечка со страницей где будет написано донаты, и спонсоры
-- [ ] Переделать icon.png - придумать дизайн и уменьшить размеры
 - [ ] Hide streamers — дать возможность скрывать стримеров для юзеров (не отписываясь)
 - [ ] Keyword notifications — уведомлять если название стрима содержит ключевые слова
 - [ ] Quiet hours — не уведомлять если ночь и тд
@@ -25,11 +22,4 @@
 
 ## Refactoring
 
-- [ ] Вынести типы (`TwitchUser`, `FollowData`, `StreamersDetails`) в `src/types/twitch.ts`
-- [ ] Вынести `performOAuth` в `src/services/auth.service.ts`
-- [ ] Вынести `getAllFollowedChannelsIds` в `src/services/twitch-api.ts`
-- [ ] Разбить `loginWithTwitch` — вынести цепочку загрузки данных в отдельный метод
-- [ ] Централизовать `error.value = null`
-- [ ] Update userSettings to have streamerNotifications inside (change the structure)
-- [ ] Вынести Switch/Toggle в отдельный  компонент (в нутри StreamerSettingsTab)
-- [x] Как то выделить StreamerCard - когда юзер включил нотификации или по тайтлу или по auto open tab или по категории
+- [ ] Centralize erros and show them to user `error.value = null`

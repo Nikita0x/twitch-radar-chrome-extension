@@ -65,7 +65,7 @@
 import { ref, watch } from 'vue';
 import type { FollowData } from '@/stores/twitch.store';
 import { formatUptime, getPreview } from '@/utils/utils';
-import AnimatedViewCount from './AnimatedViewCount.vue';
+import AnimatedViewCount from '@/components/AnimatedViewCount.vue';
 import { storeToRefs } from 'pinia';
 
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';

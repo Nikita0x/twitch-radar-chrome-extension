@@ -8,7 +8,7 @@ import {
 	type Sort,
 	type StorageSchema,
 	type StreamerNotifications,
-} from './storage.service';
+} from '@/services/storage.service';
 
 interface StorageSchemaV1 {
 	auth: AuthState;

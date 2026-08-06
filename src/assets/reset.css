@@ -13,9 +13,9 @@ html {
 	-webkit-text-size-adjust: 100%;
 }
 
-html, body {
-    overflow: hidden;
-
+html,
+body {
+	overflow: hidden;
 }
 
 img,

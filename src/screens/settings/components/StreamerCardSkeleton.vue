@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import SkeletonBlock from './SkeletonBlock.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 </script>
 
 <style scoped>

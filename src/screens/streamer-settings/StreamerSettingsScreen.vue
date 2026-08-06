@@ -27,109 +27,51 @@
 				<h3 class="section-title">Notification Settings</h3>
 
 				<div class="toggle-row">
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Notify when goes live</span>
-							<span class="toggle-desc">Get notified when the streamer starts streaming</span>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:checked="streamerNotifications?.live.enabled"
-								@change="handleToggleLiveNotification"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Auto-open when live</span>
-							<span class="toggle-desc">Automatically open a new tab when streamer goes live</span>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:disabled="!streamerNotifications?.live.enabled"
-								:checked="streamerNotifications?.live.autoOpen"
-								@change="handleToggleLiveAutoOpen"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
+					<Toggle
+						label="Notify when goes live"
+						description="Get notified when the streamer starts streaming"
+						:checked="streamerNotifications?.live.enabled"
+						@change="handleToggleLiveNotification"
+					/>
+					<Toggle
+						label="Auto-open when live"
+						description="Automatically open a new tab when streamer goes live"
+						:disabled="!streamerNotifications?.live.enabled"
+						:checked="streamerNotifications?.live.autoOpen"
+						@change="handleToggleLiveAutoOpen"
+					/>
 				</div>
 
 				<div class="toggle-row">
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Notify on title change</span>
-							<span class="toggle-desc"
-								>Get notified when the streamer changes the stream title.</span
-							>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:checked="streamerNotifications?.titleChange.enabled"
-								@change="handleToggleTitleChangeNotification"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
-
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Auto-open when title changes</span>
-							<span class="toggle-desc"
-								>Automatically open a new tab when streamer changes the title of the stream</span
-							>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:disabled="!streamerNotifications?.titleChange.enabled"
-								:checked="streamerNotifications?.titleChange.autoOpen"
-								@change="handleToggleTitleChangeAutoOpen"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
+					<Toggle
+						label="Notify on title change"
+						description="Get notified when the streamer changes the stream title."
+						:checked="streamerNotifications?.titleChange.enabled"
+						@change="handleToggleTitleChangeNotification"
+					/>
+					<Toggle
+						label="Auto-open when title changes"
+						description="Automatically open a new tab when streamer changes the title of the stream"
+						:disabled="!streamerNotifications?.titleChange.enabled"
+						:checked="streamerNotifications?.titleChange.autoOpen"
+						@change="handleToggleTitleChangeAutoOpen"
+					/>
 				</div>
 
 				<div class="toggle-row">
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Notify when category changes</span>
-							<span class="toggle-desc"
-								>Get notified when the streamer changes stream's category.</span
-							>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:checked="streamerNotifications?.categoryChange.enabled"
-								@change="handleToggleCategoryChangeNotification"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
-
-					<div class="toggle-container">
-						<div class="toggle-info">
-							<span class="toggle-label">Auto-open when category changes</span>
-							<span class="toggle-desc"
-								>Automatically open a new tab when streamer changes category</span
-							>
-						</div>
-						<label class="switch">
-							<input
-								type="checkbox"
-								:disabled="!streamerNotifications?.categoryChange?.enabled"
-								:checked="streamerNotifications?.categoryChange.autoOpen"
-								@change="handleToggleCategoryChangeAutoOpen"
-							/>
-							<span class="slider"></span>
-						</label>
-					</div>
+					<Toggle
+						label="Notify when category changes"
+						description="Get notified when the streamer changes stream's category."
+						:checked="streamerNotifications?.categoryChange.enabled"
+						@change="handleToggleCategoryChangeNotification"
+					/>
+					<Toggle
+						label="Auto-open when category changes"
+						description="Automatically open a new tab when streamer changes category"
+						:disabled="!streamerNotifications?.categoryChange?.enabled"
+						:checked="streamerNotifications?.categoryChange.autoOpen"
+						@change="handleToggleCategoryChangeAutoOpen"
+					/>
 				</div>
 			</div>
 		</div>
@@ -144,7 +86,8 @@ import { useUserSettingsStore } from '@/stores/user-settings.store';
 import { useTwitchStore } from '@/stores/twitch.store';
 import { getStreamerNotifications } from '@/services/storage.service';
 import { formatDate } from '@/utils/utils';
-import StreamerTypeBadge from './StreamerTypeBadge.vue';
+import StreamerTypeBadge from '@/components/StreamerTypeBadge.vue';
+import Toggle from './components/Toggle.vue';
 
 const navigationStore = useNavigationStore();
 const userSettingsStore = useUserSettingsStore();
@@ -243,27 +186,6 @@ async function handleToggleCategoryChangeAutoOpen() {
 	overflow: auto;
 }
 
-.back-btn {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	padding: 8px 12px;
-	margin: 4px;
-	border: none;
-	background: transparent;
-	color: var(--color-accent);
-	font-size: 14px;
-	font-weight: 600;
-	cursor: pointer;
-	border-radius: 8px;
-	transition: background 0.2s;
-	width: fit-content;
-}
-
-.back-btn:hover {
-	background: var(--color-bg-secondary);
-}
-
 .settings-content {
 	padding: 8px 16px;
 	display: flex;
@@ -355,84 +277,5 @@ async function handleToggleCategoryChangeAutoOpen() {
 	background: var(--color-bg-secondary);
 	border-radius: 10px;
 	gap: 12px;
-}
-
-.toggle-container {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 12px;
-}
-
-.toggle-info {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	min-width: 0;
-}
-
-.toggle-label {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--color-text);
-}
-
-.toggle-desc {
-	font-size: 12px;
-	color: var(--color-text-dim);
-}
-
-/* ── Toggle switch ── */
-.switch {
-	position: relative;
-	display: inline-block;
-	width: 44px;
-	height: 24px;
-	flex-shrink: 0;
-}
-
-.switch input {
-	opacity: 0;
-	width: 0;
-	height: 0;
-
-	&:disabled + .slider {
-		opacity: 0.5;
-		cursor: not-allowed;
-		background-color: var(--color-border);
-	}
-
-	&:disabled:checked + .slider {
-		background-color: var(--color-border);
-	}
-}
-
-.slider {
-	position: absolute;
-	cursor: pointer;
-	inset: 0;
-	background-color: var(--color-border);
-	transition: 0.3s;
-	border-radius: 24px;
-}
-
-.slider::before {
-	content: '';
-	position: absolute;
-	height: 18px;
-	width: 18px;
-	left: 3px;
-	bottom: 3px;
-	background-color: white;
-	transition: 0.3s;
-	border-radius: 50%;
-}
-
-input:checked + .slider {
-	background-color: var(--color-accent);
-}
-
-input:checked + .slider::before {
-	transform: translateX(20px);
 }
 </style>

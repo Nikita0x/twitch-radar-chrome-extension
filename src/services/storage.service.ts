@@ -1,6 +1,6 @@
 import type { StreamerId } from '@/stores/user-settings.store';
 import type { FollowData } from '@/stores/twitch.store';
-import { migrateStorage } from './storage.migration';
+import { migrateStorage } from '@/services/storage.migration';
 
 export interface StorageSchema {
 	version: 2;

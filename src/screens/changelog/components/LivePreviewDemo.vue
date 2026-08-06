@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue';
-import AnimatedViewCount from './AnimatedViewCount.vue';
+import AnimatedViewCount from '@/components/AnimatedViewCount.vue';
 
 const count = ref(500);
 const increasing = ref(true);

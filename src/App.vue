@@ -3,28 +3,27 @@
 		<HeaderComponent />
 
 		<Transition name="screen" mode="out-in">
-			<FavoritesTab v-if="currentScreen === 'favorites'" />
-			<StreamerSettingsTab v-else-if="currentScreen === 'streamer-settings'" />
-			<SettingsTab v-else-if="currentScreen === 'settings'" />
-			<ChangelogTab v-else-if="currentScreen === 'changelog'" />
-			<TestingTab v-else-if="currentScreen === 'testing'" />
+			<component :is="currentPage" />
 		</Transition>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import FavoritesTab from './components/FavoritesTab.vue';
-import HeaderComponent from './components/HeaderComponent.vue';
-import SettingsTab from './components/SettingsTab.vue';
-import StreamerSettingsTab from './components/StreamerSettingsTab.vue';
-import TestingTab from './components/TestingTab.vue';
-import ChangelogTab from './components/ChangelogTab.vue';
+import HeaderComponent from '@/components/HeaderComponent.vue';
+import ChangelogScreen from '@/screens/changelog/ChangelogScreen.vue';
+import FavoritesScreen from '@/screens/favorites/FavoritesScreen.vue';
+import SettingsScreen from '@/screens/settings/SettingsScreen.vue';
+import StreamerSettingsScreen from '@/screens/streamer-settings/StreamerSettingsScreen.vue';
+import TestingScreen from '@/screens/testing/TestingScreen.vue';
+import { computed, onMounted } from 'vue';
 
 import { useTwitchStore } from '@/stores/twitch.store.ts';
-import { useNavigationStore } from './stores/navigation.store.ts';
-import { useUserSettingsStore } from './stores/user-settings.store.ts';
-import { useStorageStore } from './stores/storage.store.ts';
+import { useNavigationStore } from '@/stores/navigation.store.ts';
+import { useStorageStore } from '@/stores/storage.store.ts';
+import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
+
+import type { Component } from 'vue';
+import type { Screen } from '@/stores/navigation.store.ts';
 
 import { storeToRefs } from 'pinia';
 
@@ -42,6 +41,16 @@ onMounted(async () => {
 	await twitchStore.init();
 	await storageStore.load();
 });
+
+const screens: Record<Screen, Component> = {
+	changelog: ChangelogScreen,
+	'streamer-settings': StreamerSettingsScreen,
+	favorites: FavoritesScreen,
+	settings: SettingsScreen,
+	testing: TestingScreen,
+};
+
+const currentPage = computed(() => screens[currentScreen.value]);
 </script>
 
 <style scoped>

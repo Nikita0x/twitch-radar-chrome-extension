@@ -18,8 +18,8 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue';
-import ChangelogCard from './ChangelogCard.vue';
-import LivePreviewDemo from './LivePreviewDemo.vue';
+import ChangelogCard from '@/screens/changelog/components/ChangelogCard.vue';
+import LivePreviewDemo from '@/screens/changelog/components/LivePreviewDemo.vue';
 
 interface Changelog {
 	version: string;

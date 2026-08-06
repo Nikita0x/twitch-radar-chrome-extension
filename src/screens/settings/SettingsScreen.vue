@@ -96,8 +96,8 @@ import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
 import { useNavigationStore } from '@/stores/navigation.store.ts';
 import { hasActiveNotifications } from '@/utils/utils.ts';
 
-import StreamerCard from './StreamerCard.vue';
-import StreamerCardSkeleton from './StreamerCardSkeleton.vue';
+import StreamerCard from '@/screens/settings/components/StreamerCard.vue';
+import StreamerCardSkeleton from '@/screens/settings/components/StreamerCardSkeleton.vue';
 
 const twitchStore = useTwitchStore();
 const userSettingsStore = useUserSettingsStore();

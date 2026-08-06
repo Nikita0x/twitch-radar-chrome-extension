@@ -1,7 +1,11 @@
 <template>
 	<span
 		class="skeleton-block"
-		:style="{ width: toSize(props.width), height: toSize(props.height), borderRadius: props.radius }"
+		:style="{
+			width: toSize(props.width),
+			height: toSize(props.height),
+			borderRadius: props.radius,
+		}"
 	></span>
 </template>
 

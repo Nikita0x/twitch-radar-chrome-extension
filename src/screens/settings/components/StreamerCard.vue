@@ -73,7 +73,7 @@ import { getStreamerNotifications } from '@/services/storage.service';
 import { storeToRefs } from 'pinia';
 import { formatDate } from '@/utils/utils';
 import { hasActiveNotifications } from '@/utils/utils';
-import StreamerTypeBadge from './StreamerTypeBadge.vue';
+import StreamerTypeBadge from '@/components/StreamerTypeBadge.vue';
 
 interface Props {
 	streamer: StreamersDetails;

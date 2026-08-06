@@ -59,10 +59,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, useTemplateRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import StreamCard from './StreamCard.vue';
-import StreamCardSkeleton from './StreamCardSkeleton.vue';
-import AppLoader from './AppLoader.vue';
-import AuthPrompt from './AuthPrompt.vue';
+import StreamCard from '@/screens/favorites/components/StreamCard.vue';
+import StreamCardSkeleton from '@/screens/favorites/components/StreamCardSkeleton.vue';
+import AppLoader from '@/screens/favorites/components/AppLoader.vue';
+import AuthPrompt from '@/screens/favorites/components/AuthPrompt.vue';
 import { useTwitchStore } from '@/stores/twitch.store.ts';
 import { useUserSettingsStore } from '@/stores/user-settings.store.ts';
 import { useNavigationStore } from '@/stores/navigation.store.ts';
