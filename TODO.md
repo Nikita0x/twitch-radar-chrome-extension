@@ -2,8 +2,8 @@
 
 ## Features
 
-- [ ] - Add survey after uninstall (`chrome.runtime.setUninstallURL('YourWebsite')`)
-- [ ] - Port to FireFox
+- [ ] - Add survey after uninstall (`chrome.runtime.setUninstallURL('YourWebsite')`) - also use Cloudflare to send feedback to my Telegram;
+- [ ] - use Cloudflare's KV storage - for saving user's settings and preferencase (id-{settings..})
 - [ ] - Ability to send a message in chat [RESEARCH NEEDED]
 - [ ] - Opening muted tabs?
 - [ ] - Add a separate supporting page
