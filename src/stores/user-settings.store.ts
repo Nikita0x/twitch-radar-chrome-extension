@@ -1,27 +1,21 @@
 import type { StreamerNotifications, UserSettings } from '@/services/storage.service';
-import { DEFAULT_STORAGE, getStorage, saveStorage } from '@/services/storage.service';
+import { DEFAULT_USER_SETTINGS, getUserSettings, saveUserSettings } from '@/services/storage.service';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export type StreamerId = string;
 
 export const useUserSettingsStore = defineStore('user-settings', () => {
-	const userSettingsState = ref<UserSettings>({ ...DEFAULT_STORAGE.userSettings });
+	const userSettingsState = ref<UserSettings>({ ...DEFAULT_USER_SETTINGS });
 
 	async function loadSettings() {
-		const storage = await getStorage();
-
-		userSettingsState.value = storage.userSettings;
+		userSettingsState.value = await getUserSettings();
 	}
 
 	async function updateSettings(partialSettings: Partial<UserSettings>) {
 		Object.assign(userSettingsState.value, partialSettings);
 
-		const storage = await getStorage();
-
-		storage.userSettings = userSettingsState.value;
-
-		await saveStorage(storage);
+		await saveUserSettings(userSettingsState.value);
 	}
 
 	async function updateStreamerNotifications(
@@ -30,10 +24,7 @@ export const useUserSettingsStore = defineStore('user-settings', () => {
 	) {
 		userSettingsState.value.notifications[streamerId] = streamerNotifications;
 
-		const storage = await getStorage();
-		storage.userSettings = userSettingsState.value;
-
-		await saveStorage(storage);
+		await saveUserSettings(userSettingsState.value);
 	}
 
 	async function toggleTheme() {

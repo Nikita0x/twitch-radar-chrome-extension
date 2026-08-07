@@ -3,7 +3,7 @@ import { setBadge } from '@/services/badge.service';
 import {
 	getStorage,
 	getStreamerNotifications,
-	saveStorage,
+	saveRuntime,
 	type PreviousStream,
 	type StreamerNotifications,
 } from '@/services/storage.service';
@@ -97,7 +97,7 @@ export default defineBackground(() => {
 
 			storage.runtime.previousStreams = {};
 			storage.runtime.liveStreams = [];
-			await saveStorage(storage);
+			await saveRuntime(storage.runtime);
 
 			return;
 		}
@@ -135,7 +135,7 @@ export default defineBackground(() => {
 			};
 		}
 
-		await saveStorage(storage);
+		await saveRuntime(storage.runtime);
 	});
 
 	async function sendNotification(stream: FollowData, title: string, message: string) {

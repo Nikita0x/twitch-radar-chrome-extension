@@ -3,7 +3,6 @@ import type { StreamerId } from '@/stores/user-settings.store';
 import {
 	DEFAULT_NOTIFICATION_SETTINGS,
 	DEFAULT_STORAGE,
-	STORAGE_VERSION,
 	type AuthState,
 	type Sort,
 	type StorageSchema,
@@ -25,7 +24,15 @@ interface StorageSchemaV1 {
 	notifiedStreams: Record<StreamerId, string>;
 }
 
-function migrateV1toV2(storage: StorageSchemaV1): StorageSchema {
+// Pre-split shape: everything nested under a single "storage" key with a
+// `version` field. Replaced by three independent top-level keys (see
+// storage.service.ts) to fix a read-modify-write race between concurrent
+// saves to different domains (e.g. background alarm vs. popup settings save).
+interface StorageSchemaV2 extends StorageSchema {
+	version: 2;
+}
+
+function migrateV1toV2(storage: StorageSchemaV1): StorageSchemaV2 {
 	const notifications: Record<StreamerId, StreamerNotifications> = {};
 
 	for (const [streamerId, enabled] of Object.entries(storage.streamerNotifications)) {
@@ -40,7 +47,7 @@ function migrateV1toV2(storage: StorageSchemaV1): StorageSchema {
 	}
 
 	return {
-		version: STORAGE_VERSION,
+		version: 2,
 
 		auth: storage.auth,
 
@@ -59,12 +66,12 @@ function migrateV1toV2(storage: StorageSchemaV1): StorageSchema {
 	};
 }
 
-export function migrateStorage(storage: unknown): StorageSchema {
-	if (!storage) {
-		return structuredClone(DEFAULT_STORAGE);
-	}
-
-	if (typeof storage !== 'object') {
+/**
+ * Splits the legacy single-blob "storage" value (v1, no `version` field; or
+ * v2, `version: 2`) into the current { auth, userSettings, runtime } shape.
+ */
+export function migrateLegacyStorage(storage: unknown): StorageSchema {
+	if (!storage || typeof storage !== 'object') {
 		return structuredClone(DEFAULT_STORAGE);
 	}
 
@@ -73,8 +80,8 @@ export function migrateStorage(storage: unknown): StorageSchema {
 	}
 
 	switch (storage.version) {
-		case STORAGE_VERSION:
-			return storage as StorageSchema;
+		case 2:
+			return storage as StorageSchemaV2;
 
 		default:
 			console.warn('Unknown storage version. Resetting storage.');

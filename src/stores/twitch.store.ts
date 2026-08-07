@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
 import { extractTokenFromUrl } from '@/utils/utils';
-import { getStorage, saveStorage, type StorageSchema } from '@/services/storage.service';
+import { getAuth, saveAuth, getRuntime, saveRuntime, type RuntimeState } from '@/services/storage.service';
 import { setBadge } from '@/services/badge.service';
 import { fetchFollowedLiveStreams } from '@/services/twitch-api';
 import { CLIENT_ID } from '@/constants';
@@ -200,11 +200,11 @@ export const useTwitchStore = defineStore('twitch', () => {
 
 			user.value = getUserProfileResult.data;
 
-			const storage = await getStorage();
-			storage.auth.accessToken = token;
-			storage.auth.isAuthenticated = true;
-			storage.auth.userId = user.value.id;
-			await saveStorage(storage);
+			await saveAuth({
+				accessToken: token,
+				isAuthenticated: true,
+				userId: user.value.id,
+			});
 
 			const fetchFollowedLiveStreamsResult = await fetchFollowedLiveStreams(token, user.value.id);
 
@@ -247,11 +247,7 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	async function logout() {
-		const storage = await getStorage();
-		storage.auth.accessToken = '';
-		storage.auth.isAuthenticated = false;
-		storage.auth.userId = '';
-		await saveStorage(storage);
+		await saveAuth({ accessToken: '', isAuthenticated: false, userId: '' });
 
 		accessToken.value = null;
 		user.value = null;
@@ -265,10 +261,10 @@ export const useTwitchStore = defineStore('twitch', () => {
 		listenStorageChanges();
 		loading.value = true;
 		try {
-			const storage = await getStorage();
+			const auth = await getAuth();
 
-			if (storage.auth.accessToken) {
-				accessToken.value = storage.auth.accessToken;
+			if (auth.accessToken) {
+				accessToken.value = auth.accessToken;
 
 				const getUserProfileResult = await fetchUserProfile(accessToken.value);
 
@@ -324,17 +320,16 @@ export const useTwitchStore = defineStore('twitch', () => {
 	}
 
 	async function persistLiveStreams(streams: FollowData[]) {
-		const storage = await getStorage();
-		storage.runtime.liveStreams = streams;
-		await saveStorage(storage);
+		const runtime = await getRuntime();
+		runtime.liveStreams = streams;
+		await saveRuntime(runtime);
 	}
 
 	function listenStorageChanges() {
 		browser.storage.onChanged.addListener((changes) => {
-			const newValue = changes.storage?.newValue as StorageSchema | undefined;
-			const liveStreams = newValue?.runtime?.liveStreams;
-			if (Array.isArray(liveStreams)) {
-				followedLiveStreams.value = liveStreams;
+			const newRuntime = changes.runtime?.newValue as RuntimeState | undefined;
+			if (Array.isArray(newRuntime?.liveStreams)) {
+				followedLiveStreams.value = newRuntime.liveStreams;
 			}
 		});
 	}
