@@ -46,6 +46,8 @@ npm run format           # format project with prettier
 
 Found a bug or have a feature request? [Open an issue](https://github.com/Nikita0x/chrome-extension/issues) on GitHub.
 
+> **Note (WIP):** in-app errors aren't surfaced to the user yet — they only go to the extension's console (`console.error`). Planned: a visible error banner that also prints `browser.runtime.id`, so a bug screenshot alone is enough to tell which build (dev vs. Chrome Web Store vs. Firefox) reported it. See `TODO.md`.
+
 ## Contributing
 
 Pull requests are welcome! If you'd like to help improve Twitch Radar, feel free to fork the repo and submit a PR.

@@ -27,6 +27,7 @@
 		"prettier": "^3.9.5",
 		"typescript": "~6.0.0",
 		"vue-tsc": "^3.3.5",
+		"wrangler": "^4.119.0",
 		"wxt": "^0.21.3"
 	},
 	"engines": {

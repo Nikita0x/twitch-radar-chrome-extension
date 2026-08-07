@@ -1,7 +1,9 @@
 # TODO
 
-## Features
+## Bugs
+- [x] - При первой установке экстеншена - если выбирать сортинг то обнуляются все live streamers... — fixed: was a read-modify-write race in `storage.service.ts` (single "storage" blob key, any save could clobber a concurrent save to a different domain). Split into independent `auth`/`userSettings`/`runtime` keys.
 
+## Features
 - [ ] - Add survey after uninstall (`chrome.runtime.setUninstallURL('YourWebsite')`) - also use Cloudflare to send feedback to my Telegram;
 - [ ] - use Cloudflare's KV storage - for saving user's settings and preferencase (id-{settings..})
 - [ ] - Ability to send a message in chat [RESEARCH NEEDED]
@@ -22,4 +24,4 @@
 
 ## Refactoring
 
-- [ ] Centralize erros and show them to user `error.value = null`
+- [ ] Centralize erros and show them to user `error.value = null` — include `browser.runtime.id` in the displayed error so a user screenshot is enough to identify which build/store install reported it (this is what made the dev-vs-prod redirect URI mismatch invisible until a user reported it)
