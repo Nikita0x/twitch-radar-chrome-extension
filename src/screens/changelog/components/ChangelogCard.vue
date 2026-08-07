@@ -18,6 +18,16 @@
 		<div v-if="item.preview" class="preview">
 			<component :is="item.preview" />
 		</div>
+
+		<a
+			v-if="item.link"
+			:href="item.link.url"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="link"
+		>
+			{{ item.link.label }} →
+		</a>
 	</div>
 </template>
 
@@ -97,6 +107,19 @@ defineProps<Props>();
 }
 
 .bullets li::marker {
-	color: var(--color-primary);
+	color: var(--color-link);
+}
+
+.link {
+	width: fit-content;
+
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--color-link);
+	text-decoration: none;
+}
+
+.link:hover {
+	text-decoration: underline;
 }
 </style>

@@ -33,24 +33,24 @@ export interface ChangelogItem {
 	description?: string;
 	bullets?: string[];
 	preview?: Component;
+	link?: { label: string; url: string };
 }
 const CHANGELOG: Changelog[] = [
-	// {
-	// 	version: '1.5.0',
-	// 	date: 'September 2026',
-	// 	items: [
-	// 		{
-	// 			title: 'Some cool new update!',
-	// 			description: ' Stay up to day with it!',
-	// 			icon: '🦩',
-	// 			bullets: [
-	// 				'This and that',
-	// 				'Removed another feautre',
-	// 				'Lorem impsum Lorem impsum Lorem impsum Lorem impsumLorem impsum',
-	// 			],
-	// 		},
-	// 	],
-	// },
+	{
+		version: '1.5.0',
+		date: 'August 2026',
+		items: [
+			{
+				icon: '🦊',
+				title: 'Now available on Firefox!',
+				description: 'Twitch Radar is now published on Firefox Add-ons.',
+				link: {
+					label: 'Get it on Firefox Add-ons',
+					url: 'https://addons.mozilla.org/en-US/firefox/addon/twitch-radar-live-notifs/',
+				},
+			},
+		],
+	},
 	{
 		version: '1.4.0',
 		date: 'August 2026',
