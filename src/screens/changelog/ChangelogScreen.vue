@@ -1,25 +1,61 @@
 <template>
 	<div class="changelog-container">
-		<section v-for="release in CHANGELOG" :key="release.version" class="release">
-			<div class="release-header">
-				<h2 class="release-title">v{{ release.version }}</h2>
+		<div class="tabs">
+			<button
+				class="tab"
+				:class="{ active: activeTab === 'changelog' }"
+				@click="activeTab = 'changelog'"
+			>
+				Changelog
+			</button>
+			<button class="tab" :class="{ active: activeTab === 'ideas' }" @click="activeTab = 'ideas'">
+				Ideas
+			</button>
+		</div>
 
-				<span class="release-date">
-					{{ release.date }}
-				</span>
-			</div>
+		<template v-if="activeTab === 'changelog'">
+			<section v-for="release in CHANGELOG" :key="release.version" class="release">
+				<div class="release-header">
+					<h2 class="release-title">v{{ release.version }}</h2>
 
-			<div class="cards">
-				<ChangelogCard v-for="item in release.items" :key="item.title" :item="item" />
-			</div>
-		</section>
+					<span class="release-date">
+						{{ release.date }}
+					</span>
+				</div>
+
+				<div class="cards">
+					<ChangelogCard v-for="item in release.items" :key="item.title" :item="item" />
+				</div>
+			</section>
+		</template>
+
+		<template v-else>
+			<section class="release">
+				<p class="ideas-disclaimer">
+					Stuff I'm considering — not promises, no ETAs. Got a request? Open a
+					<a
+						href="https://github.com/Nikita0x/chrome-extension/issues"
+						target="_blank"
+						rel="noopener noreferrer"
+						>GitHub issue</a
+					>.
+				</p>
+
+				<div class="cards">
+					<ChangelogCard v-for="item in IDEAS" :key="item.title" :item="item" />
+				</div>
+			</section>
+		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { Component } from 'vue';
 import ChangelogCard from '@/screens/changelog/components/ChangelogCard.vue';
 import LivePreviewDemo from '@/screens/changelog/components/LivePreviewDemo.vue';
+
+const activeTab = ref<'changelog' | 'ideas'>('changelog');
 
 interface Changelog {
 	version: string;
@@ -90,6 +126,44 @@ const CHANGELOG: Changelog[] = [
 		],
 	},
 ];
+
+const IDEAS: ChangelogItem[] = [
+	{
+		icon: '🔔',
+		title: 'Keyword notifications',
+		description: 'Get notified when a stream title contains specific keywords you set.',
+	},
+	{
+		icon: '🌙',
+		title: 'Quiet hours',
+		description: "Mute notifications during hours you set — no pings while you're asleep.",
+	},
+	{
+		icon: '🎨',
+		title: 'Streamer groups',
+		description: 'Organize followed streamers into custom, color-coded groups.',
+	},
+	{
+		icon: '🙈',
+		title: 'Hide streamers',
+		description: 'Hide streamers from your list without unfollowing them on Twitch.',
+	},
+	{
+		icon: '🔊',
+		title: 'Custom notification sounds',
+		description: 'Pick a sound per event, or upload your own.',
+	},
+	{
+		icon: '➕',
+		title: 'Track channels without following',
+		description: 'Add a channel to your radar without following it on Twitch.',
+	},
+	{
+		icon: '💜',
+		title: 'Support page',
+		description: 'A page for donations and sponsors, for anyone who wants to support the project.',
+	},
+];
 </script>
 
 <style scoped>
@@ -118,6 +192,56 @@ const CHANGELOG: Changelog[] = [
 
 .changelog-container::-webkit-scrollbar-thumb:hover {
 	background: var(--color-text-muted);
+}
+
+.tabs {
+	display: flex;
+	gap: 6px;
+
+	padding: 3px;
+
+	background: var(--color-bg-secondary);
+	border-radius: 8px;
+}
+
+.tab {
+	flex: 1;
+
+	padding: 6px 0;
+
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+
+	color: var(--color-text-dim);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+}
+
+.tab:hover {
+	color: var(--color-text);
+}
+
+.tab.active {
+	background: var(--color-bg);
+	color: var(--color-accent);
+}
+
+.ideas-disclaimer {
+	margin: 0;
+
+	color: var(--color-text-dim);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.ideas-disclaimer a {
+	color: var(--color-link);
 }
 
 .container {
