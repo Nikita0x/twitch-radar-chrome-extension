@@ -86,6 +86,12 @@ const CHANGELOG: Changelog[] = [
 				},
 			},
 			{
+				icon: '💡',
+				title: 'Ideas tab',
+				description:
+					"A new tab in the Changelog screen for browsing features and ideas I'm considering — nothing here is guaranteed or has a release date.",
+			},
+			{
 				title: 'Other',
 				bullets: [
 					'Fixed an authentication issue (my mistake 😅). Thanks for your patience!',
@@ -128,16 +134,16 @@ const CHANGELOG: Changelog[] = [
 ];
 
 const IDEAS: ChangelogItem[] = [
-	{
-		icon: '🔔',
-		title: 'Keyword notifications',
-		description: 'Get notified when a stream title contains specific keywords you set.',
-	},
-	{
-		icon: '🌙',
-		title: 'Quiet hours',
-		description: "Mute notifications during hours you set — no pings while you're asleep.",
-	},
+	// {
+	// 	icon: '🔔',
+	// 	title: 'Keyword notifications',
+	// 	description: 'Get notified when a stream title contains specific keywords you set.',
+	// },
+	// {
+	// 	icon: '🌙',
+	// 	title: 'Quiet hours',
+	// 	description: "Mute notifications during hours you set — no pings while you're asleep.",
+	// },
 	{
 		icon: '🎨',
 		title: 'Streamer groups',
