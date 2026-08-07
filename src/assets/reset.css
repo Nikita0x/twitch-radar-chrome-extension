@@ -42,3 +42,12 @@ a {
 #app {
 	display: flex;
 }
+
+
+italic {
+    font-style: italic;
+}
+
+bold {
+    font-weight: 700;
+}

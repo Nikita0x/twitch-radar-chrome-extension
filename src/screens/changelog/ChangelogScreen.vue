@@ -49,6 +49,13 @@ const CHANGELOG: Changelog[] = [
 					url: 'https://addons.mozilla.org/en-US/firefox/addon/twitch-radar-live-notifs/',
 				},
 			},
+			{
+				title: 'Other',
+				bullets: [
+					'Fixed an authentication issue (my mistake 😅). Thanks for your patience!',
+					'Fixed the issue with race conditions',
+				],
+			},
 		],
 	},
 	{

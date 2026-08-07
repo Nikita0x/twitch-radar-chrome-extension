@@ -2,17 +2,13 @@
 	<div class="card">
 		<div class="header">
 			<span v-if="item.icon">{{ item.icon }}</span>
-			<h3>{{ item.title }}</h3>
+			<h3 v-html="item.title"></h3>
 		</div>
 
-		<p v-if="item.description" class="description">
-			{{ item.description }}
-		</p>
+		<p v-if="item.description" class="description" v-html="item.description"></p>
 
 		<ul v-if="item.bullets" class="bullets">
-			<li v-for="bullet in item.bullets" :key="bullet">
-				{{ bullet }}
-			</li>
+			<li v-for="bullet in item.bullets" :key="bullet" v-html="bullet"></li>
 		</ul>
 
 		<div v-if="item.preview" class="preview">
@@ -108,6 +104,14 @@ defineProps<Props>();
 
 .bullets li::marker {
 	color: var(--color-link);
+}
+
+.description :deep(svg),
+.bullets :deep(svg) {
+	width: 1em;
+	height: 1em;
+	vertical-align: -0.15em;
+	fill: currentColor;
 }
 
 .link {
