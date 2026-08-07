@@ -1,8 +1,45 @@
 <template>
-	<div class="testing-container">Testing tab. Tab for testing dev.</div>
+	<div class="testing-container">
+		<p>What is the reason for uninstall?</p>
+		<p>{{ reason }}</p>
+		<textarea v-model="reason" />
+
+		<button @click="sendFeedback(reason)">Submit</button>
+		<p v-if="status">{{ status }}</p>
+	</div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue';
+import { request } from '@/types/result';
+import type { Feedback } from '../../../shared/feedback.interface';
+
+const reason = ref<string>('');
+const status = ref<string>('');
+
+async function sendFeedback(reason: string) {
+	const manifestVersion = browser.runtime.getVersion();
+	const operatingSystem = (await browser.runtime.getPlatformInfo()).os;
+	const extensionID = browser.runtime.id;
+	const browserName = navigator.userAgent;
+
+	const feedback: Feedback = {
+		reason,
+		manifestVersion,
+		operatingSystem,
+		extensionID,
+		browserName,
+	};
+
+	const resp = await request(`${import.meta.env.WXT_WORKER_URL}/feedback`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(feedback),
+	});
+
+	status.value = resp.ok ? 'Feedback sent!' : `Error: ${resp.error.message}`;
+}
+</script>
 
 <style scoped>
 .testing-container {
