@@ -5,7 +5,6 @@
 A fast, lightweight browser extension that tracks your followed Twitch streamers and sends desktop notifications when they go live.
 
 [<img src="src/public/firefox.png" alt="Firefox Add-ons store link" height="60px">](https://addons.mozilla.org/en-US/firefox/addon/twitch-radar-live-notifs/)
-
 [<img src="src/public/chrome.png" alt="Chrome Web Store link" height="60px">](https://chromewebstore.google.com/detail/fcjbgobfppjggabcbbnngehhefllbllm)
 
 ## Features 
