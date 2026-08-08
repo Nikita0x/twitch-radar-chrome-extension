@@ -4,5 +4,9 @@
 		// Required for Vue's `<script setup>` template type-checking.
 		"jsx": "preserve",
 		"jsxImportSource": "vue"
-	}
+	},
+	// worker/ is its own project with its own tsconfig chain (see worker/tsconfig.json),
+	// checked separately via wrangler/vitest — keep it out of the extension's TS program.
+	// (exclude overrides rather than merges with .wxt/tsconfig.json's, so repeat those entries)
+	"exclude": ["worker", "**/node_modules", ".output"]
 }
