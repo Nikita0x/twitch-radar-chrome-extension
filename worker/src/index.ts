@@ -11,25 +11,30 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import type { Feedback } from '../../shared/feedback.interface';
+import type { Feedback } from '@shared/feedback.interface';
 
-// Chrome's extension ID is a hash of the public key pinned in wxt.config.ts,
-// so it's the same for every install (dev and published). Firefox has no
-// equivalent: moz-extension:// UUIDs are randomized per browser profile by
-// design (anti-fingerprinting), so they can't be pinned — only the scheme
-// prefix can be checked.
-const ALLOWED_ORIGINS = new Set(['chrome-extension://anejamjbmgpekamgljajekmgnbppnjao']);
-
-function isAllowedOrigin(origin: string | null): origin is string {
+// Chrome assigns two different, both-permanent IDs for the same extension:
+// one derived from the `key` pinned in wxt.config.ts (used for local unpacked
+// dev installs), and one assigned by the Chrome Web Store on first upload
+// (used by every published/production install — the store ignores the
+// manifest `key` for ID purposes). CHROME_EXTENSION_ID (wrangler.jsonc `vars`)
+// is a comma-separated list of both: the deployed worker needs to accept the
+// dev ID too, since `npm run prod` points a locally-built unpacked extension
+// at this same deployed worker for testing against the real backend. Firefox
+// has no equivalent: moz-extension:// UUIDs are randomized per browser
+// profile by design (anti-fingerprinting), so they can't be pinned — only
+// the scheme prefix can be checked.
+function isAllowedOrigin(origin: string | null, extensionIds: string): origin is string {
 	if (!origin) return false;
-	return ALLOWED_ORIGINS.has(origin) || origin.startsWith('moz-extension://');
+	if (origin.startsWith('moz-extension://')) return true;
+	return extensionIds.split(',').some((id) => origin === `chrome-extension://${id}`);
 }
 
 // No Access-Control-Allow-Origin at all (rather than a fixed value) is what
 // makes disallowed origins fail: the browser refuses to send the real
 // request once the OPTIONS preflight comes back without permission.
-function corsHeaders(origin: string | null): HeadersInit {
-	if (!isAllowedOrigin(origin)) return {};
+function corsHeaders(origin: string | null, extensionIds: string): HeadersInit {
+	if (!isAllowedOrigin(origin, extensionIds)) return {};
 
 	return {
 		'Access-Control-Allow-Origin': origin,
@@ -41,7 +46,7 @@ function corsHeaders(origin: string | null): HeadersInit {
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
-		const headers = corsHeaders(request.headers.get('Origin'));
+		const headers = corsHeaders(request.headers.get('Origin'), env.CHROME_EXTENSION_ID);
 
 		if (url.pathname === '/feedback') {
 			if (request.method === 'OPTIONS') {
