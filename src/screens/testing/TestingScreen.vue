@@ -18,7 +18,7 @@ const reason = ref<string>('');
 const status = ref<string>('');
 
 async function sendFeedback(comment: string) {
-	const manifestVersion = browser.runtime.getVersion();
+	const manifestVersion = browser.runtime.getManifest().version;
 	const operatingSystem = (await browser.runtime.getPlatformInfo()).os;
 	const extensionID = browser.runtime.id;
 	const browserName = navigator.userAgent;

@@ -22,14 +22,19 @@ export default defineBackground(() => {
 	browser.runtime.onStartup.addListener(updateUninstallUrl);
 
 	async function updateUninstallUrl() {
-		const url = new URL(`${import.meta.env.WXT_WORKER_URL}/uninstall`);
-		url.searchParams.set('version', browser.runtime.getVersion());
-		url.searchParams.set('os', (await browser.runtime.getPlatformInfo()).os);
-		url.searchParams.set('id', browser.runtime.id);
+		try {
+			const url = new URL(`${import.meta.env.WXT_WORKER_URL}/uninstall`);
+			url.searchParams.set('version', browser.runtime.getManifest().version);
+			url.searchParams.set('os', (await browser.runtime.getPlatformInfo()).os);
+			url.searchParams.set('id', browser.runtime.id);
 
-		// Chrome and Firefox both support this; the URL must be http(s) since the
-		// extension (and its internal pages) may already be gone by the time it opens.
-		await browser.runtime.setUninstallURL(url.toString());
+			// Chrome and Firefox both support this; the URL must be http(s) since the
+			// extension (and its internal pages) may already be gone by the time it opens.
+			await browser.runtime.setUninstallURL(url.toString());
+			console.log('[background] setUninstallURL set to', url.toString());
+		} catch (err) {
+			console.error('[background] setUninstallURL failed:', err);
+		}
 	}
 
 	// Open the stream when the user clicks the "Open Stream" notification button.
