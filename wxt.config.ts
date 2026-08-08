@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'wxt';
 
 // Public half of a locally-generated RSA key pair, used only to pin the
@@ -16,6 +17,11 @@ export default defineConfig({
 	// not srcDir — has to be set explicitly since public/ lives under src/.
 	publicDir: 'src/public',
 	modules: ['@wxt-dev/module-vue'],
+	// `shared/` lives outside srcDir (also imported by worker/), so it needs its
+	// own alias — WXT's built-in `@` only covers src/.
+	alias: {
+		'@shared': resolve(__dirname, 'shared'),
+	},
 	manifest: ({ browser }) => ({
 		name: 'Twitch Radar – Live Stream Notifications',
 		description: 'Get desktop notifications when your favorite Twitch streamers go live.',

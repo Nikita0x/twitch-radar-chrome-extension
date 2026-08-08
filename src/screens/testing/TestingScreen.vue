@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { request } from '@/types/result';
-import type { Feedback } from '../../../shared/feedback.interface';
+import type { Feedback } from '@shared/feedback.interface';
 
 const reason = ref<string>('');
 const status = ref<string>('');

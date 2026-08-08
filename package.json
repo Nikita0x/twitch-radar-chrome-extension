@@ -6,6 +6,8 @@
 	"scripts": {
 		"dev": "wxt",
 		"dev:firefox": "wxt -b firefox",
+		"prod": "wxt -m production",
+		"prod:firefox": "wxt -b firefox -m production",
 		"check": "vue-tsc --noEmit",
 		"build": "npm run check && wxt build",
 		"build:firefox": "npm run check && wxt build -b firefox",
