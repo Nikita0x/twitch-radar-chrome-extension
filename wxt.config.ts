@@ -52,12 +52,14 @@ export default defineConfig({
 					browser_specific_settings: {
 						gecko: {
 							id: 'twitch-radar@nikita0x',
-							// Required by Mozilla for new extensions since 2025-11-03. We
-							// don't collect/transmit any user data — everything stays in
-							// local storage or goes straight to Twitch's API with the
-							// user's own token.
+							// Required by Mozilla for new extensions since 2025-11-03. Twitch
+							// data stays local or goes straight to Twitch's API with the
+							// user's own token — but the uninstall survey (worker/src/uninstall.html)
+							// does send technical/diagnostic info (reason, version, OS, browser,
+							// extension ID) when a user chooses to submit it, so 'none' would
+							// misrepresent that. See docs/privacy-policy.html for the full disclosure.
 							data_collection_permissions: {
-								required: ['none'],
+								required: ['technicalAndInteraction'],
 							},
 						},
 					},
