@@ -54,12 +54,16 @@ export default defineConfig({
 							id: 'twitch-radar@nikita0x',
 							// Required by Mozilla for new extensions since 2025-11-03. Twitch
 							// data stays local or goes straight to Twitch's API with the
-							// user's own token — but the uninstall survey (worker/src/uninstall.html)
-							// does send technical/diagnostic info (reason, version, OS, browser,
-							// extension ID) when a user chooses to submit it, so 'none' would
-							// misrepresent that. See docs/privacy-policy.html for the full disclosure.
+							// user's own token, so nothing is collected as a condition of use.
+							// The uninstall survey (worker/src/uninstall.html) does send
+							// technical/diagnostic info (reason, version, OS, browser, extension
+							// ID), but only when a user opts in to submit it — and
+							// technicalAndInteraction is only valid under `optional`, Firefox
+							// rejects it under `required`. See docs/privacy-policy.html for the
+							// full disclosure.
 							data_collection_permissions: {
-								required: ['technicalAndInteraction'],
+								required: ['none'],
+								optional: ['technicalAndInteraction'],
 							},
 						},
 					},
