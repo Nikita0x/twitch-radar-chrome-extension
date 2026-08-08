@@ -92,9 +92,25 @@ const CHANGELOG: Changelog[] = [
 					"A new tab in the Changelog screen for browsing features and ideas I'm considering — nothing here is guaranteed or has a release date.",
 			},
 			{
+				icon: '👋',
+				title: 'Uninstall survey',
+				description:
+					"If you ever uninstall Twitch Radar, you'll now see a short, optional survey asking why. Totally skippable — but if you fill it in, it genuinely helps me improve things.",
+			},
+			{
+				icon: '🔒',
+				title: 'Privacy Policy',
+				description:
+					'Added a Privacy Policy page explaining exactly what data the extension does (and does not) collect.',
+				link: {
+					label: 'Read the Privacy Policy',
+					url: 'https://nikita0x.github.io/twitch-radar-extension/privacy-policy.html',
+				},
+			},
+			{
 				title: 'Other',
 				bullets: [
-					'Fixed an authentication issue (my mistake 😅). Thanks for your patience!',
+					'Fixed an authentication issue (my mistake 😅). Added an uninstall survey - to quicker identify critical bugs. Thanks for your patience!',
 					'Fixed the issue with race conditions',
 				],
 			},

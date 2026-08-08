@@ -1,6 +1,5 @@
 <template>
 	<div class="main-container">
-		<p @click="navigationStore.navigateTo('testing')">go to testing tab</p>
 		<HeaderComponent />
 
 		<Transition name="screen" mode="out-in">
