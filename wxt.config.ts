@@ -25,7 +25,7 @@ export default defineConfig({
 	manifest: ({ browser, command }) => ({
 		name: 'Twitch Radar – Live Stream Notifications',
 		description: 'Get desktop notifications when your favorite Twitch streamers go live.',
-		version: '1.5.0',
+		version: '1.5.1',
 		permissions: ['notifications', 'identity', 'storage', 'alarms'],
 		host_permissions: ['https://api.twitch.tv/*'],
 		icons: {
@@ -52,28 +52,28 @@ export default defineConfig({
 			: browser === 'chrome'
 				? {}
 				: {
-					// Fixed Firefox add-on ID. Keeps `browser.identity.getRedirectURL()`
-					// (and the moz-extension:// URL in general) stable across
-					// rebuilds/reinstalls — required for the OAuth redirect URI
-					// registered with Twitch to keep working.
-					browser_specific_settings: {
-						gecko: {
-							id: 'twitch-radar@nikita0x',
-							// Required by Mozilla for new extensions since 2025-11-03. Twitch
-							// data stays local or goes straight to Twitch's API with the
-							// user's own token, so nothing is collected as a condition of use.
-							// The uninstall survey (worker/src/uninstall.html) does send
-							// technical/diagnostic info (reason, version, OS, browser, extension
-							// ID), but only when a user opts in to submit it — and
-							// technicalAndInteraction is only valid under `optional`, Firefox
-							// rejects it under `required`. See docs/privacy-policy.html for the
-							// full disclosure.
-							data_collection_permissions: {
-								required: ['none'],
-								optional: ['technicalAndInteraction'],
+						// Fixed Firefox add-on ID. Keeps `browser.identity.getRedirectURL()`
+						// (and the moz-extension:// URL in general) stable across
+						// rebuilds/reinstalls — required for the OAuth redirect URI
+						// registered with Twitch to keep working.
+						browser_specific_settings: {
+							gecko: {
+								id: 'twitch-radar@nikita0x',
+								// Required by Mozilla for new extensions since 2025-11-03. Twitch
+								// data stays local or goes straight to Twitch's API with the
+								// user's own token, so nothing is collected as a condition of use.
+								// The uninstall survey (worker/src/uninstall.html) does send
+								// technical/diagnostic info (reason, version, OS, browser, extension
+								// ID), but only when a user opts in to submit it — and
+								// technicalAndInteraction is only valid under `optional`, Firefox
+								// rejects it under `required`. See docs/privacy-policy.html for the
+								// full disclosure.
+								data_collection_permissions: {
+									required: ['none'],
+									optional: ['technicalAndInteraction'],
+								},
 							},
 						},
-					},
-				}),
+					}),
 	}),
 });
