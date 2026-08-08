@@ -1,11 +1,9 @@
 # TODO
 
 ## Bugs
-- [x] - При первой установке экстеншена - если выбирать сортинг то обнуляются все live streamers... — fixed: was a read-modify-write race in `storage.service.ts` (single "storage" blob key, any save could clobber a concurrent save to a different domain). Split into independent `auth`/`userSettings`/`runtime` keys.
+- [ ] - None
 
 ## Features
-- [ ] - Add PLANS somewhere in Changelogs... So that users can see timelines and future features.. (Coming next...). Also - Developer notes!
-- [ ] - Add survey after uninstall (`chrome.runtime.setUninstallURL('YourWebsite')`) - also use Cloudflare to send feedback to my Telegram;
 - [ ] - use Cloudflare's KV storage - for saving user's settings and preferencase (id-{settings..})
 - [ ] - Ability to send a message in chat [RESEARCH NEEDED]
 - [ ] - Opening muted tabs?
