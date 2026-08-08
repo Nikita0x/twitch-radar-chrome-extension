@@ -16,6 +16,22 @@ export default defineBackground(() => {
 		browser.alarms.create(ALARM_NAME, { periodInMinutes: 0.5 });
 	});
 
+	// Re-set on both install and startup (not just once) so the URL's baked-in
+	// version query param stays current across extension updates.
+	browser.runtime.onInstalled.addListener(updateUninstallUrl);
+	browser.runtime.onStartup.addListener(updateUninstallUrl);
+
+	async function updateUninstallUrl() {
+		const url = new URL(`${import.meta.env.WXT_WORKER_URL}/uninstall`);
+		url.searchParams.set('version', browser.runtime.getVersion());
+		url.searchParams.set('os', (await browser.runtime.getPlatformInfo()).os);
+		url.searchParams.set('id', browser.runtime.id);
+
+		// Chrome and Firefox both support this; the URL must be http(s) since the
+		// extension (and its internal pages) may already be gone by the time it opens.
+		await browser.runtime.setUninstallURL(url.toString());
+	}
+
 	// Open the stream when the user clicks the "Open Stream" notification button.
 	browser.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
 		if (buttonIndex === 0) {

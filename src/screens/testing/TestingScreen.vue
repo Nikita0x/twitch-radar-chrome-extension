@@ -17,14 +17,15 @@ import type { Feedback } from '@shared/feedback.interface';
 const reason = ref<string>('');
 const status = ref<string>('');
 
-async function sendFeedback(reason: string) {
+async function sendFeedback(comment: string) {
 	const manifestVersion = browser.runtime.getVersion();
 	const operatingSystem = (await browser.runtime.getPlatformInfo()).os;
 	const extensionID = browser.runtime.id;
 	const browserName = navigator.userAgent;
 
 	const feedback: Feedback = {
-		reason,
+		reasons: ['other'],
+		comment,
 		manifestVersion,
 		operatingSystem,
 		extensionID,

@@ -11,7 +11,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import type { Feedback } from '@shared/feedback.interface';
+import { UNINSTALL_REASON_LABELS, type Feedback } from '@shared/feedback.interface';
+import uninstallHtml from './uninstall.html';
 
 // Chrome assigns two different, both-permanent IDs for the same extension:
 // one derived from the `key` pinned in wxt.config.ts (used for local unpacked
@@ -48,6 +49,13 @@ export default {
 		const url = new URL(request.url);
 		const headers = corsHeaders(request.headers.get('Origin'), env.CHROME_EXTENSION_ID);
 
+		// Opened by the browser itself (via browser.runtime.setUninstallURL, set in
+		// src/entrypoints/background.ts) when a user removes the extension. Served
+		// same-origin with /feedback below, so the page's own fetch() call needs no CORS.
+		if (url.pathname === '/uninstall') {
+			return new Response(uninstallHtml, { headers: { 'Content-Type': 'text/html; charset=UTF-8' } });
+		}
+
 		if (url.pathname === '/feedback') {
 			if (request.method === 'OPTIONS') {
 				return new Response(null, { headers });
@@ -59,9 +67,13 @@ export default {
 
 			const feedback = await request.json<Feedback>();
 
+			const reasonLabels = feedback.reasons.map((reason) => UNINSTALL_REASON_LABELS[reason] ?? reason);
+
 			const text = [
 				'New uninstall feedback',
-				`Reason: ${feedback.reason}`,
+				`Reasons: ${reasonLabels.length > 0 ? reasonLabels.join(', ') : '(none selected)'}`,
+				...(feedback.missingFeatureDetails ? [`Missing feature: ${feedback.missingFeatureDetails}`] : []),
+				...(feedback.comment ? [`Comment: ${feedback.comment}`] : []),
 				`Version: ${feedback.manifestVersion}`,
 				`OS: ${feedback.operatingSystem}`,
 				`Extension ID: ${feedback.extensionID}`,
