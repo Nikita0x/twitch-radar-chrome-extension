@@ -22,7 +22,7 @@ export default defineConfig({
 	alias: {
 		'@shared': resolve(__dirname, 'shared'),
 	},
-	manifest: ({ browser }) => ({
+	manifest: ({ browser, command }) => ({
 		name: 'Twitch Radar – Live Stream Notifications',
 		description: 'Get desktop notifications when your favorite Twitch streamers go live.',
 		version: '1.5.0',
@@ -41,10 +41,17 @@ export default defineConfig({
 			},
 		},
 		// Pins the Chrome extension ID to anejamjbmgpekamgljajekmgnbppnjao,
-		// independent of the build's absolute path. Chromium-only field.
-		...(browser === 'chrome'
+		// independent of the build's absolute path. Dev-server only (`command
+		// === 'serve'`) — the Chrome Web Store derives the real key/ID from the
+		// developer account on upload, and rejects a `build`/`zip` package whose
+		// manifest carries a `key` that doesn't match what it already has on
+		// file for the listing ("key field value in the manifest doesn't match
+		// the current item").
+		...(browser === 'chrome' && command === 'serve'
 			? { key: CHROMIUM_DEV_PUBLIC_KEY }
-			: {
+			: browser === 'chrome'
+				? {}
+				: {
 					// Fixed Firefox add-on ID. Keeps `browser.identity.getRedirectURL()`
 					// (and the moz-extension:// URL in general) stable across
 					// rebuilds/reinstalls — required for the OAuth redirect URI
