@@ -44,6 +44,36 @@ function corsHeaders(origin: string | null, extensionIds: string): HeadersInit {
 	};
 }
 
+// Telegram's HTML parse_mode only understands a small tag subset, and rejects
+// the whole message with a 400 if free-text content (reason/comment, typed
+// by the user) happens to contain something that looks like a tag. Escaping
+// is what keeps user-typed text from being interpreted as markup at all.
+function escapeHtml(value: string): string {
+	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function formatFeedbackMessage(feedback: Feedback): string {
+	const reasonLabels = feedback.reasons.map((reason) => UNINSTALL_REASON_LABELS[reason] ?? reason);
+
+	const lines = [
+		'🗑 <b>New uninstall feedback</b>',
+		'',
+		`📋 <b>Reasons:</b> ${reasonLabels.length > 0 ? escapeHtml(reasonLabels.join(', ')) : '<i>(none selected)</i>'}`,
+		...(feedback.missingFeatureDetails
+			? [`🔧 <b>Missing feature:</b> ${escapeHtml(feedback.missingFeatureDetails)}`]
+			: []),
+		...(feedback.comment ? [`💬 <b>Comment:</b> ${escapeHtml(feedback.comment)}`] : []),
+		'',
+		'<b>Details</b>',
+		`🏷 Version: <code>${escapeHtml(feedback.manifestVersion)}</code>`,
+		`💻 OS: <code>${escapeHtml(feedback.operatingSystem)}</code>`,
+		`🆔 Extension ID: <code>${escapeHtml(feedback.extensionID)}</code>`,
+		`🌐 Browser: <code>${escapeHtml(feedback.browserName)}</code>`,
+	];
+
+	return lines.join('\n');
+}
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
@@ -67,25 +97,13 @@ export default {
 
 			const feedback = await request.json<Feedback>();
 
-			const reasonLabels = feedback.reasons.map((reason) => UNINSTALL_REASON_LABELS[reason] ?? reason);
-
-			const text = [
-				'New uninstall feedback',
-				`Reasons: ${reasonLabels.length > 0 ? reasonLabels.join(', ') : '(none selected)'}`,
-				...(feedback.missingFeatureDetails ? [`Missing feature: ${feedback.missingFeatureDetails}`] : []),
-				...(feedback.comment ? [`Comment: ${feedback.comment}`] : []),
-				`Version: ${feedback.manifestVersion}`,
-				`OS: ${feedback.operatingSystem}`,
-				`Extension ID: ${feedback.extensionID}`,
-				`Browser: ${feedback.browserName}`,
-			].join('\n');
-
 			const telegramResp = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					chat_id: env.TELEGRAM_CHAT_ID,
-					text,
+					text: formatFeedbackMessage(feedback),
+					parse_mode: 'HTML',
 				}),
 			});
 
